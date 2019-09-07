@@ -1,5 +1,5 @@
 import bpy
-from blender2pmxe import global_variable
+from . import global_variable
 
 # global_variable
 GV = global_variable.Init()

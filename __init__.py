@@ -17,9 +17,9 @@ from glob import glob
 from bpy.app.translations import pgettext_iface as iface_
 from bpy_extras.io_utils import ExportHelper, ImportHelper
 from bpy.props import StringProperty, BoolProperty, EnumProperty, FloatProperty, FloatVectorProperty, PointerProperty, IntProperty
-from blender2pmxe import import_pmx, export_pmx
-from blender2pmxe import add_function, solidify_edge, global_variable
-from blender2pmxe import space_view3d_materials_utils
+from . import import_pmx, export_pmx
+from . import add_function, solidify_edge, global_variable
+from . import space_view3d_materials_utils
 
 # global_variable
 GV = global_variable.Init()
@@ -103,7 +103,7 @@ class Blender2PmxeProperties(bpy.types.PropertyGroup):
 
     @classmethod
     def register(cls):
-        bpy.types.Scene.b2pmxe_properties = PointerProperty(type=cls)
+        bpy.types.Scene.b2pmxe_properties: PointerProperty(type=cls)
 
         def toggle_shadeless(self, context):
             context.space_data.show_textured_shadeless = self.shadeless
@@ -113,23 +113,23 @@ class Blender2PmxeProperties(bpy.types.PropertyGroup):
                 if mat:
                     mat.use_shadeless = self.shadeless
 
-        cls.edge_color = FloatVectorProperty(
+        cls.edge_color: FloatVectorProperty(
             name="Color",
             default=(0.0, 0.0, 0.0),
             min=0.0, max=1.0, step=10, precision=3,
             subtype='COLOR'
         )
-        cls.edge_thickness = FloatProperty(
+        cls.edge_thickness: FloatProperty(
             name="Thickness",
             default=0.01, min=0.0025, max=0.05, step=0.01, precision=4,
             unit='LENGTH'
         )
-        cls.shadeless = BoolProperty(
+        cls.shadeless: BoolProperty(
             name="Shadeless",
             update=toggle_shadeless,
             default=False
         )
-        cls.make_xml_option = EnumProperty(
+        cls.make_xml_option: EnumProperty(
             name="Make XML Option",
             items=(
                 ('NONE', "None", ""),
@@ -149,30 +149,30 @@ class Blender2PmxeProperties(bpy.types.PropertyGroup):
 class Blender2PmxeAddonPreferences(bpy.types.AddonPreferences):
     bl_idname = __name__
 
-    use_T_stance = BoolProperty(
+    use_T_stance: BoolProperty(
         name="Append with T stance",
         description="Append template armature with T stance",
         default=False
     )
-    use_custom_shape = BoolProperty(
+    use_custom_shape: BoolProperty(
         name="Use Custom Shape",
         description="Use Custom Shape when creating bones",
         default=False
     )
-    use_japanese_name = BoolProperty(
+    use_japanese_name: BoolProperty(
         name="Use Japanese Bone name",
         description="Append template armature with Japanese bone name",
         default=False
     )
 
-    saveVersions = IntProperty(name="Save Versions", default=0, min=0, max=32)
+    saveVersions: IntProperty(name="Save Versions", default=0, min=0, max=32)
 
-    rotShoulder = FloatProperty(name="Shoulder", default=0.261799, min=-1.5708, max=1.5708, unit='ROTATION')
-    rotArm = FloatProperty(name="Arm", default=0.401426, min=-1.5708, max=1.5708, unit='ROTATION')
+    rotShoulder: FloatProperty(name="Shoulder", default=0.261799, min=-1.5708, max=1.5708, unit='ROTATION')
+    rotArm: FloatProperty(name="Arm", default=0.401426, min=-1.5708, max=1.5708, unit='ROTATION')
 
-    twistBones = IntProperty(name="Number", default=3, min=0, max=3)
-    autoInfluence = FloatProperty(name="Influence", default=0.5, min=-1.0, max=1.0, step=1)
-    threshold = FloatProperty(name="Threshold", default=0.01, min=0.0, max=1.0, step=0.001, precision=5)
+    twistBones: IntProperty(name="Number", default=3, min=0, max=3)
+    autoInfluence: FloatProperty(name="Influence", default=0.5, min=-1.0, max=1.0, step=1)
+    threshold: FloatProperty(name="Threshold", default=0.01, min=0.0, max=1.0, step=0.001, precision=5)
 
     def draw(self, context):
         layout = self.layout
@@ -205,9 +205,9 @@ class ImportBlender2Pmx(bpy.types.Operator, ImportHelper):
     # bl_options = {'PRESET'}
 
     filename_ext = ".pmx"
-    filter_glob = StringProperty(default="*.pm[dx]", options={'HIDDEN'})
+    filter_glob: StringProperty(default="*.pm[dx]", options={'HIDDEN'})
 
-    adjust_bone_position = BoolProperty(
+    adjust_bone_position: BoolProperty(
         name="Adjust bone position",
         description="Automatically adjust bone position",
         default=False
@@ -233,22 +233,22 @@ class ExportBlender2Pmx(bpy.types.Operator, ExportHelper):
 
     # ExportHelper mixin class uses this
     filename_ext = ".pmx"
-    filter_glob = StringProperty(default="*.pmx", options={'HIDDEN'})
+    filter_glob: StringProperty(default="*.pmx", options={'HIDDEN'})
 
-    encode_type = EnumProperty(items=(('OPT_Utf-8', "UTF-8", "To use UTF-8 encoding."),
-                                      ('OPT_Utf-16', "UTF-16", "To use UTF-16 encoding."),
-                                      ),
-                               name="Encode",
-                               description="Select the encoding to use",
+    encode_type: EnumProperty(items=(('OPT_Utf-8', "UTF-8", "To use UTF-8 encoding."),
+                                     ('OPT_Utf-16', "UTF-16", "To use UTF-16 encoding."),
+    ),
+                              name="Encode",
+                              description="Select the encoding to use",
                                default='OPT_Utf-16'
-                               )
+    )
 
-    use_mesh_modifiers = BoolProperty(
+    use_mesh_modifiers: BoolProperty(
         name="Apply Modifiers",
         description="Apply modifiers (Warning, may be slow)",
         default=False,
     )
-    use_custom_normals = BoolProperty(
+    use_custom_normals: BoolProperty(
         name="Custom Normals",
         description="Use custom normals",
         default=False,
@@ -314,15 +314,15 @@ class B2PmxeMessageOperator(bpy.types.Operator):
     bl_idname = "b2pmxe.message"
     bl_label = "B2Pmxe Message"
 
-    type = EnumProperty(
+    type: EnumProperty(
         items=(
             ('ERROR', "Error", ""),
             ('INFO', "Info", ""),
         ), default='ERROR')
-    line1 = StringProperty(default="")
-    line2 = StringProperty(default="")
-    line3 = StringProperty(default="")
-    use_console = BoolProperty(default=False)
+    line1: StringProperty(default="")
+    line2: StringProperty(default="")
+    line3: StringProperty(default="")
+    use_console: BoolProperty(default=False)
 
     def execute(self, context):
         return {'FINISHED'}
@@ -411,7 +411,7 @@ class B2PmxeSaveAsXML(bpy.types.Operator):
     bl_label = "Save As XML File"
     bl_options = {'UNDO'}
 
-    filename = StringProperty(name="Filename", default="")
+    filename: StringProperty(name="Filename", default="")
 
     @classmethod
     def poll(cls, context):
@@ -836,22 +836,29 @@ def menu_func_export(self, context):
 
 def menu_func_vg(self, context):
     self.layout.separator()
-    self.layout.operator("b2pmxe.mirror_vertexgroup", text=iface_("Mirror active vertex group (L/R)"), icon='ZOOMIN')
+    self.layout.operator("b2pmxe.mirror_vertexgroup", text=iface_("Mirror active vertex group (L/R)"), icon='ZOOM_IN')
 
+classes = [
+    ExportBlender2Pmx,
+    ImportBlender2Pmx,
+    add_function.B2PmxeMirrorVertexGroup,
+]
 
 def register():
-    bpy.utils.register_module(__name__)
-    bpy.types.MESH_MT_vertex_group_specials.append(menu_func_vg)
-    bpy.types.INFO_MT_file_export.append(menu_func_export)
-    bpy.types.INFO_MT_file_import.append(menu_func_import)
+    for cls in classes:
+        bpy.utils.register_class(cls)
+    bpy.types.MESH_MT_vertex_group_context_menu.append(menu_func_vg)
+    bpy.types.TOPBAR_MT_file_export.append(menu_func_export)
+    bpy.types.TOPBAR_MT_file_import.append(menu_func_import)
     bpy.app.translations.register(__name__, translation_dict)
 
 
 def unregister():
-    bpy.utils.unregister_module(__name__)
-    bpy.types.MESH_MT_vertex_group_specials.remove(menu_func_vg)
-    bpy.types.INFO_MT_file_export.remove(menu_func_export)
-    bpy.types.INFO_MT_file_import.remove(menu_func_import)
+    for cls in classes:
+        bpy.utils.unregister_class(cls)
+    bpy.types.MESH_MT_vertex_group_context_menu.remove(menu_func_vg)
+    bpy.types.TOPBAR_MT_file_export.remove(menu_func_export)
+    bpy.types.TOPBAR_MT_file_import.remove(menu_func_import)
     bpy.app.translations.unregister(__name__)
 
 
