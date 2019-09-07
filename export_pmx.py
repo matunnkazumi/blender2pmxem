@@ -472,7 +472,8 @@ def write_pmx_data(context, filepath="",
                 pmx_mat.EdgeSize = float(temp_mat.get("edge_size", "1.0"))
 
                 edge_c = temp_mat.find("edge_color")
-                pmx_mat.EdgeColor = Math.Vector((float(edge_c.get("r", "0.0")), float(edge_c.get("g", "0.0")), float(edge_c.get("b", "0.0")), float(edge_c.get("a", "1.0"))))
+                pmx_mat.EdgeColor = Math.Vector((float(edge_c.get("r", "0.0")), float(edge_c.get("g", "0.0")),
+                                                 float(edge_c.get("b", "0.0")), float(edge_c.get("a", "1.0"))))
 
             r, g, b = mat.diffuse_color
             pmx_mat.Deffuse = Math.Vector((r, g, b, mat.alpha))
@@ -610,12 +611,22 @@ def write_pmx_data(context, filepath="",
 
             # Apply Modifiers
             if use_mesh_modifiers == True:
-                mesh = apply_mod.Get_Apply_Mesh(mesh_obj)
+                try:
+                    mesh = apply_mod.Get_Apply_Mesh(mesh_obj)
+                except object_applymodifier.ShapeVertexError as e:
+                    bpy.ops.b2pmxe.message(
+                        'INVOKE_DEFAULT',
+                        type='ERROR',
+                        line1="Failed to create some shape keys.",
+                        line2="maybe cause is merge vertex by Mirror modifier.",
+                        use_console=True
+                    )
+                    mesh = e.data
 
             # Custom Normals
             normals = {}
             if use_custom_normals == True and hasattr(mesh, "has_custom_normals"):
-                if mesh.has_custom_normals == True:
+                if mesh.has_custom_normals and mesh.use_auto_smooth:
                     OK_normal_list.append(mesh_obj.name)
 
                     mesh.calc_normals_split()
@@ -824,9 +835,17 @@ def write_pmx_data(context, filepath="",
 
         # print OK_normal_list
         if len(OK_normal_list):
-            print("Export with Custom Normals:")
+            print("Exported using custom normals:")
             for data in OK_normal_list:
                 print("   --> %s" % data)
+        elif use_custom_normals:
+            bpy.ops.b2pmxe.message(
+                'INVOKE_DEFAULT',
+                type='ERROR',
+                line1="Could not use custom split normals data.",
+                line2="Enable 'Auto Smooth' option.",
+                line3="or settings of modifier is incorrect."
+            )
 
         # Set Face
         # print("Get Face")

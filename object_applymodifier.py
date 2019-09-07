@@ -24,6 +24,7 @@
 #**********************************
 
 import bpy
+from bpy.app.translations import pgettext_iface as iface_
 from blender2pmxe import global_variable
 
 # global_variable
@@ -31,6 +32,12 @@ GV = global_variable.Init()
 
 
 ######################################################
+
+class ShapeVertexError(Exception):
+
+    def __init__(self, data):
+        self.data = data
+
 
 class Init(object):
 
@@ -125,22 +132,30 @@ class Init(object):
             self.Set_Apply_Target(target_obj, target_modifiers)
 
         shape_keys = target_obj.data.shape_keys
-
         self.Set_MasterObj(scn, target_obj, shape_keys)
+
+        to_raise = False
 
         # has shape_keys
         if shape_keys is not None:
-            vert_array = [0 for x in range(len(self.MasterObj.data.vertices) * 3)]
+            pre_vertex_num = len(self.MasterObj.data.vertices)
+            vert_array = [0 for x in range(pre_vertex_num * 3)]
             pre_anim_data = shape_keys.animation_data
 
             for i in range(1, len(shape_keys.key_blocks)):
                 target_obj.active_shape_key_index = i
-
-                # add shape_keys
                 tmp_name = shape_keys.key_blocks[i].name
-                tmp_block = self.MasterObj.shape_key_add(tmp_name, False)
 
                 tmp_mesh = target_obj.to_mesh(scn, True, 'PREVIEW')
+                new_vertex_num = len(tmp_mesh.vertices)
+
+                if pre_vertex_num != new_vertex_num:
+                    to_raise = True
+                    print("Failed to create shape key '{0:s}'".format(tmp_name))
+                    continue
+
+                # add shape_keys
+                tmp_block = self.MasterObj.shape_key_add(tmp_name, False)
 
                 # modify shape_keys
                 tmp_mesh.vertices.foreach_get('co', vert_array)
@@ -156,6 +171,9 @@ class Init(object):
 
         # Set copy keyframes
         self.Set_AnimData(pre_anim_data)
+
+        if to_raise:
+            raise ShapeVertexError(self.MasterObj.data)
 
         return self.MasterObj.data
 
@@ -201,7 +219,12 @@ class B2PmxeApplyModifier(bpy.types.Operator):
                 continue
 
             # get modifier applied mesh
-            new_mesh = apply_mod.Get_Apply_Mesh(obj)
+            try:
+                new_mesh = apply_mod.Get_Apply_Mesh(obj)
+            except ShapeVertexError as e:
+                self.report({'ERROR'}, "{0:s} {1:s}".format(iface_("Failed to create some shape keys."),
+                                                            iface_("maybe cause is merge vertex by Mirror modifier.")))
+                new_mesh = e.data
 
             # same mesh
             if new_mesh == obj.data:

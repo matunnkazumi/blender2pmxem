@@ -211,6 +211,7 @@ def Set_Bone_Position(pmx_data, arm_dat, blender_bone_list, fix=False):
 
 def read_pmx_data(context, filepath="",
                   adjust_bone_position=False,
+                  bone_transfer=False,
                   ):
 
     prefs = context.user_preferences.addons[GV.FolderName].preferences
@@ -565,6 +566,10 @@ def read_pmx_data(context, filepath="",
 
         mesh.update()
 
+        if bone_transfer:
+            scene.update()
+            return arm_obj, obj_mesh
+
         # Add Textures
         #image_dic = {}
         textures_dic = {}
@@ -586,10 +591,9 @@ def read_pmx_data(context, filepath="",
 
         # print NG_tex_list
         if len(NG_tex_list):
-            print("Texture file not found:")
+            bpy.ops.b2pmxe.message('INVOKE_DEFAULT', type='INFO', line1="Some Texture file not found.", use_console=True)
             for data in NG_tex_list:
-                print("   %s" % data)
-            bpy.ops.b2pmxe.message('INVOKE_DEFAULT', message="Some Texture file not found.", use_console=True)
+                print("   --> %s" % data)
 
         mesh.update()
 
@@ -733,7 +737,7 @@ def read_pmx_data(context, filepath="",
         GV.SetVertCount(len(pmx_data.Vertices))
         GV.PrintTime(filepath, type='import')
 
-    return {'FINISHED'}
+    return
 
 
 def make_xml(pmx_data, filepath, use_japanese_name, xml_save_versions):
@@ -761,15 +765,14 @@ def make_xml(pmx_data, filepath, use_japanese_name, xml_save_versions):
         xml_exist_list.append(bpy.path.basename(xml_path))
         xml_path = root + str(index) + ".xml"
 
+    save_message = 'Save As "%s"' % bpy.path.basename(xml_path)
+    bpy.ops.b2pmxe.message('INVOKE_DEFAULT', type='INFO', line1=save_message)
+
     # print xml_exist_list
     if len(xml_exist_list):
         print("xml_file is exist:")
         for data in xml_exist_list:
-            print("   %s" % data)
-
-    save_message = 'Save As "%s"' % bpy.path.basename(xml_path)
-    bpy.ops.b2pmxe.message('INVOKE_DEFAULT', message=save_message)
-    print(save_message)
+            print("   --> %s" % data)
 
     #
     # XML

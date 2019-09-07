@@ -263,33 +263,3 @@ class B2PmxeSolidifySetMod(bpy.types.Operator):
             solidify_copy(scn, obj, mode='set', type='mod')
 
         return {"FINISHED"}
-
-
-class B2PmxeToggleBFCulling(bpy.types.Operator):
-
-    '''Toggle Backface Culling'''
-    bl_idname = "b2pmxe.toggle_bf_culling"
-    bl_label = "Toggle Backface Culling"
-
-    def execute(self, context):
-        context.space_data.show_backface_culling = not context.space_data.show_backface_culling
-        return {"FINISHED"}
-
-
-class B2PmxeToggleShadeless(bpy.types.Operator):
-
-    '''Toggle Textured Shadeless'''
-    bl_idname = "b2pmxe.toggle_shadeless"
-    bl_label = "Toggle Textured Shadeless"
-
-    def execute(self, context):
-        toggle = not context.space_data.show_textured_shadeless
-        context.space_data.show_textured_shadeless = toggle
-
-        # Toggle Material Shadeless
-        for mat in bpy.data.materials:
-            if mat is None:
-                continue
-            mat.use_shadeless = toggle
-
-        return {"FINISHED"}

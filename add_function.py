@@ -4,6 +4,7 @@ import csv
 from mathutils import Color, Vector
 import math
 import re
+from bpy.app.translations import pgettext_iface as iface_
 from bpy.props import StringProperty, BoolProperty, EnumProperty, FloatProperty, PointerProperty, IntProperty
 from blender2pmxe import object_applymodifier, global_variable
 
@@ -25,7 +26,6 @@ def Get_Edit_Bone(edit_bones, jp_name, en_name):
 
 
 class B2PmxeRenameChain(bpy.types.Operator):
-
     '''Rename chain bone names'''
     bl_idname = "b2pmxe.rename_chain"
     bl_label = "Rename Chain"
@@ -42,7 +42,7 @@ class B2PmxeRenameChain(bpy.types.Operator):
             name_base = name_list[0]
 
             if len(name_list) != 3:
-                self.report({'WARNING'}, "Bone name['" + bone.name + "'] is different. Example 'skirt_0_0'")
+                self.report({'ERROR'}, iface_("Bone name format incorrect (e.g. %s)") % "skirt_0_0")
                 continue
 
             tmp_bone = bone
@@ -58,7 +58,6 @@ class B2PmxeRenameChain(bpy.types.Operator):
 
 
 class B2PmxeRenameChainToLR(bpy.types.Operator):
-
     '''Rename chain bone names to L/R'''
     bl_idname = "b2pmxe.rename_chain_lr"
     bl_label = "Rename Chain to L/R"
@@ -79,7 +78,7 @@ class B2PmxeRenameChainToLR(bpy.types.Operator):
         name_list = active_bone.name.rsplit('_')
 
         if len(name_list) != 3:
-            self.report({'WARNING'}, "Bone name['" + active_bone.name + "'] is different. Example 'skirt_0_0'")
+            self.report({'ERROR'}, iface_("Bone name format incorrect (e.g. %s)") % "skirt_0_0")
             return {'FINISHED'}
 
         name_base = name_list[0]
@@ -174,7 +173,7 @@ class B2PmxeRenameChainToNum(bpy.types.Operator):
         name_list = active_bone.name.rsplit('_')
 
         if len(name_list) != 4:
-            self.report({'WARNING'}, "Bone name['" + active_bone.name + "'] is different. Example 'skirt_0_0_L'")
+            self.report({'ERROR'}, iface_("Bone name format incorrect (e.g. %s)") % "skirt_0_0_L")
             return {'FINISHED'}
 
         name_base = name_list[0]
@@ -306,7 +305,7 @@ def get_target_bones(self, context):
     bones = context.selected_pose_bones
 
     if len(bones) != 2:
-        self.report({'WARNING'}, "Need select 2 bones")
+        self.report({'ERROR'}, iface_("Select %d bones") % 2)
     else:
         active_pose = context.active_pose_bone
         target_pose = bones[1] if bones[0] == active_pose else bones[0]
@@ -320,7 +319,7 @@ def get_active_bone(self, context):
     bones = context.selected_pose_bones if obj.mode == 'POSE' else context.selected_editable_bones
 
     if len(bones) != 1:
-        self.report({'WARNING'}, "Need select 1 bone")
+        self.report({'ERROR'}, iface_("Select %d bones") % 1)
     else:
         active_bone = context.active_pose_bone if obj.mode == 'POSE' else context.active_bone
 
@@ -380,11 +379,19 @@ class B2PmxeRecalculateRoll(bpy.types.Operator):
 
 
 class B2PmxeAddIK(bpy.types.Operator):
-
     '''Add IK Constraint to the active Bone for MMD'''
     bl_idname = "b2pmxe.add_ik"
     bl_label = "Add IK"
     bl_options = {'REGISTER', 'UNDO'}
+
+    type = EnumProperty(
+        name="Type",
+        items=(
+            ('LEG', "Leg", ""),
+            ('TOE', "Toe", ""),
+            ('HAIR', "Hair", ""),
+            ('NECKTIE', "Necktie", ""),
+        ))
 
     @classmethod
     def poll(cls, context):
@@ -407,9 +414,7 @@ class B2PmxeAddIK(bpy.types.Operator):
         ik.target = context.active_object
         ik.subtarget = target_pose.name
 
-        settings = context.scene.b2pmxe_properties.ik
-
-        if settings == 'leg':
+        if self.type == 'LEG':
             active_pose.use_ik_limit_x = True
             active_pose.ik_min_x = -3.14159
             active_pose.ik_max_x = 0
@@ -419,17 +424,17 @@ class B2PmxeAddIK(bpy.types.Operator):
             target_pose["IKLoops"] = 40
             ik.chain_count = 2
 
-        elif settings == 'toe':
+        elif self.type == 'TOE':
             target_pose["IKLimit"] = 4.0
             target_pose["IKLoops"] = 3
             ik.chain_count = 1
 
-        elif settings == 'hair':
+        elif self.type == 'HAIR':
             target_pose["IKLimit"] = 0.120
             target_pose["IKLoops"] = 8
             # ik.chain_count = 1
 
-        else:   # necktie
+        elif self.type == 'NECKTIE':
             target_pose["IKLimit"] = 0.120
             target_pose["IKLoops"] = 15
             # ik.chain_count = 1
@@ -438,7 +443,6 @@ class B2PmxeAddIK(bpy.types.Operator):
 
 
 class B2PmxeMuteIK(bpy.types.Operator):
-
     '''Toggle Mute IK Constraint'''
     bl_idname = "b2pmxe.mute_ik"
     bl_label = "Toggle Mute IK"
@@ -479,7 +483,6 @@ def add_copy_rotation(context, active, target_name, influence=1.0):
 
 
 class B2PmxeAddCopyRot(bpy.types.Operator):
-
     '''Add Copy Rotation Constraint to the active Bone for MMD'''
     bl_idname = "b2pmxe.add_rotation"
     bl_label = "Add Copy Rotation"
@@ -513,7 +516,6 @@ def add_copy_location(context, active, target_name, influence=1.0):
 
 
 class B2PmxeAddCopyLoc(bpy.types.Operator):
-
     '''Add Copy Location Constraint to the active Bone for MMD'''
     bl_idname = "b2pmxe.add_location"
     bl_label = "Add Copy Location"
@@ -546,7 +548,6 @@ def add_limit_rotation(context, active):
 
 
 class B2PmxeAddLimit(bpy.types.Operator):
-
     '''Add Limit Rotation Constraint to the active Bone for MMD'''
     bl_idname = "b2pmxe.limit_rotation"
     bl_label = "Add Limit Rotation"
@@ -709,8 +710,8 @@ class B2PmxeRebindArmature(bpy.types.Operator):
                     obj_list.append(obj)
 
         if len(obj_list) == 0:
-            self.report({'WARNING'}, "Not found armature applied object")
-            return {'FINISHED'}
+            # self.report({'WARNING'}, "Not found armature applied object")
+            return {'CANCELLED'}
 
         apply_mod = object_applymodifier.Init()
 
@@ -915,7 +916,6 @@ class B2PmxeTwistBones(bpy.types.Operator):
 
 # Auto Bone
 class B2PmxeAutoBone(bpy.types.Operator):
-
     '''Add bone automatically rotate'''
     bl_idname = "b2pmxe.auto_bone"
     bl_label = "Add Auto Bone"
@@ -937,7 +937,7 @@ class B2PmxeAutoBone(bpy.types.Operator):
         # if has parent?
         parent_bone = active_bone.parent
         if parent_bone is None:
-            self.report({'WARNING'}, "Need parent bone")
+            self.report({'ERROR'}, iface_("'%s' No parent bone found") % active_bone.name)
             return {'CANCELLED'}
 
         active_name = active_bone.name
@@ -1002,7 +1002,6 @@ class B2PmxeAutoBone(bpy.types.Operator):
 
 
 class B2PmxeSleeveBones(bpy.types.Operator):
-
     '''Add sleeve IK bones'''
     bl_idname = "b2pmxe.sleeve_bones"
     bl_label = "Add Sleeve IK Bones"
@@ -1082,7 +1081,7 @@ class B2PmxeSleeveBones(bpy.types.Operator):
         if bone is not None:
             # if has parent?
             if bone.parent is None or len(bone.children) == 0:
-                self.report({'WARNING'}, "[%s] Need parent bone and child bone" % bone.name)
+                self.report({'ERROR'}, iface_("'%s' No parent bone and child bone found") % bone.name)
 
             else:
                 parent_name = self.add_sleeve(context, bone)
@@ -1092,7 +1091,7 @@ class B2PmxeSleeveBones(bpy.types.Operator):
         if bone is not None:
             # if has parent?
             if bone.parent is None or len(bone.children) == 0:
-                self.report({'WARNING'}, "[%s] Need parent bone and child bone" % bone.name)
+                self.report({'ERROR'}, iface_("'%s' No parent bone and child bone found") % bone.name)
 
             else:
                 self.add_sleeve(context, bone, parent_name)
@@ -1105,7 +1104,7 @@ class B2PmxeSleeveBones(bpy.types.Operator):
         if bone is not None:
             # if has parent?
             if bone.parent is None or len(bone.children) == 0:
-                self.report({'WARNING'}, "[%s] Need parent bone and child bone" % bone.name)
+                self.report({'ERROR'}, iface_("'%s' No parent bone and child bone found") % bone.name)
 
             else:
                 parent_name = self.add_sleeve(context, bone)
@@ -1115,7 +1114,7 @@ class B2PmxeSleeveBones(bpy.types.Operator):
         if bone is not None:
             # if has parent?
             if bone.parent is None or len(bone.children) == 0:
-                self.report({'WARNING'}, "[%s] Need parent bone and child bone" % bone.name)
+                self.report({'ERROR'}, iface_("'%s' No parent bone and child bone found") % bone.name)
 
             else:
                 self.add_sleeve(context, bone, parent_name)
@@ -1145,34 +1144,29 @@ def append_object(objname, activeflag=True):
 
 
 class B2PmxeAppendTemplate(bpy.types.Operator):
-
     '''Append basic template armature'''
     bl_idname = "b2pmxe.append_template"
     bl_label = "Append Template Armature"
     bl_options = {'REGISTER', 'UNDO'}
 
+    type = EnumProperty(
+        name="Type",
+        items=(
+            ('Type1', "Standard", ""),
+            ('Type2', "Large", ""),
+            ('Type3', "Small", ""),
+            ('Type4', "Chibi", ""),
+        ))
+
     def execute(self, context):
         prefs = context.user_preferences.addons[GV.FolderName].preferences
-        template = context.scene.b2pmxe_properties.template
 
-        name = template + '_Arm'
-
-        dict_template = {
-            "Type1": prefs.textType1,
-            "Type2": prefs.textType2,
-            "Type3": prefs.textType3,
-            "Type4": prefs.textType4,
-        }
-
+        name = self.type + '_Arm'
         append_object(name)
 
         ao = context.selected_objects
         if len(ao):
             context.scene.objects.active = ao[0]
-
-            name = dict_template.get(template) + '_Arm'
-            ao[0].name = name
-            ao[0].data.name = name
 
             toJP = {}
             if prefs.use_japanese_name == True:
@@ -1255,8 +1249,7 @@ class B2PmxeSelectLeft(bpy.types.Operator):
 
 
 class B2PmxeMirrorVertexGroup(bpy.types.Operator):
-
-    '''Mirror active vertex group'''
+    '''Mirror active vertex group (L/R)'''
     bl_idname = "b2pmxe.mirror_vertexgroup"
     bl_label = "Mirror active group"
     bl_options = {'REGISTER', 'UNDO'}
@@ -1320,7 +1313,8 @@ def rotate_pose(context, to_A_stance):
         # find shoulder
         if bone is not None:
             pose_bones.active = bone
-            bpy.ops.transform.rotate(value=settings.rotShoulder * sign, axis=(0, 1, 0), constraint_axis=(False, True, False), constraint_orientation='GLOBAL')
+            bpy.ops.transform.rotate(value=settings.rotShoulder * sign, axis=(0, 1, 0),
+                                     constraint_axis=(False, True, False), constraint_orientation='GLOBAL')
             bpy.ops.pose.copy()
             bpy.ops.pose.paste(flipped=True)
             break
@@ -1333,7 +1327,8 @@ def rotate_pose(context, to_A_stance):
         # find arm
         if bone is not None:
             pose_bones.active = bone
-            bpy.ops.transform.rotate(value=settings.rotArm * sign, axis=(0, 1, 0), constraint_axis=(False, True, False), constraint_orientation='GLOBAL')
+            bpy.ops.transform.rotate(value=settings.rotArm * sign, axis=(0, 1, 0),
+                                     constraint_axis=(False, True, False), constraint_orientation='GLOBAL')
             bpy.ops.pose.copy()
             bpy.ops.pose.paste(flipped=True)
             break
@@ -1361,10 +1356,9 @@ class B2PmxeToStance(bpy.types.Operator):
 
 
 class B2PmxeLockLoc(bpy.types.Operator):
-
     '''Toggle Lock XYZ location of selected bones'''
     bl_idname = "b2pmxe.lock_location"
-    bl_label = "Toggle Lock Location"
+    bl_label = "Lock Location"
     bl_options = {'REGISTER', 'UNDO'}
 
     flag = BoolProperty(name="Lock", description="Set Lock Flag", default=True, options={'SKIP_SAVE'})
@@ -1385,10 +1379,9 @@ class B2PmxeLockLoc(bpy.types.Operator):
 
 
 class B2PmxeLockRot(bpy.types.Operator):
-
     '''Toggle Lock XYZ rotation of selected bones'''
     bl_idname = "b2pmxe.lock_rotation"
-    bl_label = "Toggle Lock Rotation"
+    bl_label = "Lock Rotation"
     bl_options = {'REGISTER', 'UNDO'}
 
     flag = BoolProperty(name="Lock", description="Set Lock Flag", default=True, options={'SKIP_SAVE'})
