@@ -1,8 +1,8 @@
 bl_info = {
     "name": "MMD PMX Format (Extend)",
-    "author": "NaNashi",
-    "version": (1, 0, 6),
-    "blender": (2, 76, 0),
+    "author": "matunnkazumi",
+    "version": (0, 0, 1),
+    "blender": (2, 80, 0),
     "location": "File > Import-Export",
     "description": "Import-Export PMX model data",
     "warning": "",
