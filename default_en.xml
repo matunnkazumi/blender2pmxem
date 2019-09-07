@@ -1,0 +1,290 @@
+<ns0:pmxstatus xmlns:ns0="local" xml:lang="jp"><pmdinfo><name>モデル名</name><name_e>Model Name</name_e><comment>コメント</comment><comment_e>Comment</comment_e></pmdinfo>
+<morphs><!--表情グループ 0:使用不可 1:まゆ 2:目 3:リップ 4:その他-->
+<morph b_name="A" group="3" name="あ" name_e="A" />
+<morph b_name="I" group="3" name="い" name_e="I" />
+<morph b_name="U" group="3" name="う" name_e="U" />
+<morph b_name="E" group="3" name="え" name_e="E" />
+<morph b_name="O" group="3" name="お" name_e="O" />
+<morph b_name="N" group="3" name="ん" name_e="N" />
+<morph b_name="Wa" group="3" name="ワ" name_e="Wa" />
+<morph b_name="Corner Up" group="3" name="口角上げ" name_e="Corner Up" />
+<morph b_name="Corner Down" group="3" name="口角下げ" name_e="Corner Down" />
+<morph b_name="Corner Wide" group="3" name="口横広げ" name_e="Corner Wide" />
+<morph b_name="Mouth Up" group="3" name="口上げ" name_e="Mouth Up" />
+<morph b_name="Mouth Down" group="3" name="口下げ" name_e="Mouth Down" />
+<morph b_name="Triangle" group="3" name="▲" name_e="Triangle" />
+<morph b_name="Regret" group="3" name="∧" name_e="Regret" />
+<morph b_name="W" group="3" name="ω" name_e="W" />
+<morph b_name="W Open" group="3" name="ω□" name_e="W Open" />
+<morph b_name="Open" group="3" name="□" name_e="Open" />
+<morph b_name="Puff" group="3" name="もぐもぐ" name_e="Puff" />
+<morph b_name="Happy" group="3" name="にっこり" name_e="Happy" />
+<morph b_name="Fool" group="3" name="はんっ！" name_e="Fool" />
+<morph b_name="Tongue" group="3" name="ぺろっ" name_e="Tongue" />
+<morph b_name="E-" group="3" name="えー" name_e="E-" />
+<morph b_name="Smirk" group="3" name="にやり" name_e="Smirk" />
+<morph b_name="Blink" group="2" name="まばたき" name_e="Blink" />
+<morph b_name="Smile" group="2" name="笑い" name_e="Smile" />
+<morph b_name="Wink_L" group="2" name="ウィンク" name_e="Wink_L" />
+<morph b_name="Wink2_L" group="2" name="ウィンク２" name_e="Wink2_L" />
+<morph b_name="Wink_R" group="2" name="ウィンク右" name_e="Wink_R" />
+<morph b_name="Wink2_R" group="2" name="ｳｨﾝｸ２右" name_e="Wink2_R" />
+<morph b_name="Surprised" group="2" name="びっくり" name_e="Surprised" />
+<morph b_name="Doubt" group="2" name="じと目" name_e="Doubt" />
+<morph b_name="Confused" group="2" name="なぬ！" name_e="Confused" />
+<morph b_name="Focus" group="2" name="ｷﾘｯ" name_e="Focus" />
+<morph b_name="Camera Eyes" group="2" name="ｺｯﾁﾐﾝﾅ" name_e="Camera Eyes" />
+<morph b_name="&gt; &lt;" group="2" name="はぅ" name_e="&gt; &lt;" />
+<morph b_name="- -" group="2" name="なごみ" name_e="- -" />
+<morph b_name="O O" group="2" name="はちゅ目" name_e="O O" />
+<morph b_name="Star Eyes" group="2" name="星目" name_e="Star Eyes" />
+<morph b_name="Heart Eyes" group="2" name="ハート目" name_e="Heart Eyes" />
+<morph b_name="No Eyes" group="2" name="白目" name_e="No Eyes" />
+<morph b_name="Scared" group="2" name="瞳小" name_e="Scared" />
+<morph b_name="Serious" group="1" name="真面目" name_e="Serious" />
+<morph b_name="Troubled" group="1" name="困る" name_e="Troubled" />
+<morph b_name="Cheerful" group="1" name="にこり" name_e="Cheerful" />
+<morph b_name="Angry" group="1" name="怒り" name_e="Angry" />
+<morph b_name="Up" group="1" name="上" name_e="Up" />
+<morph b_name="Down" group="1" name="下" name_e="Down" />
+<morph b_name="Front" group="1" name="前" name_e="Front" />
+<morph b_name="Tears" group="4" name="涙" name_e="Tears" />
+<morph b_name="Sweat" group="4" name="汗" name_e="Sweat" />
+<morph b_name="Blush" group="4" name="照れ" name_e="Blush" />
+<morph b_name="Shock" group="4" name="青ざめ" name_e="Shock" />
+</morphs>
+<bones><bone add_move="0" add_rot="0" after_physical="0" b_name="master" fixed_axis="0" ik="0" level="0" local_axis="0" movable="1" name="全ての親" name_e="master" operational="1" power="1.0" rotatable="1" visible="1"><local_x x="0.0000000" y="0.0000000" z="0.0000000" /><local_z x="0.0000000" y="0.0000000" z="0.0000000" /></bone>
+<bone add_move="0" add_rot="0" after_physical="0" b_name="center" fixed_axis="0" ik="0" level="0" local_axis="0" movable="1" name="センター" name_e="center" operational="1" power="1.0" rotatable="1" visible="1"><local_x x="0.0000000" y="0.0000000" z="0.0000000" /><local_z x="0.0000000" y="0.0000000" z="0.0000000" /></bone>
+<bone add_move="0" add_rot="0" after_physical="0" b_name="upper body" fixed_axis="0" ik="0" level="0" local_axis="0" movable="0" name="上半身" name_e="upper body" operational="1" power="1.0" rotatable="1" visible="1"><local_x x="0.0000000" y="0.0000000" z="0.0000000" /><local_z x="0.0000000" y="0.0000000" z="0.0000000" /></bone>
+<bone add_move="0" add_rot="0" after_physical="0" b_name="upper body2" fixed_axis="0" ik="0" level="0" local_axis="0" movable="0" name="上半身2" name_e="upper body2" operational="1" power="1.0" rotatable="1" visible="1"><local_x x="0.0000000" y="0.0000000" z="0.0000000" /><local_z x="0.0000000" y="0.0000000" z="0.0000000" /></bone>
+<bone add_move="0" add_rot="0" after_physical="0" b_name="neck" fixed_axis="0" ik="0" level="0" local_axis="0" movable="0" name="首" name_e="neck" operational="1" power="1.0" rotatable="1" visible="1"><local_x x="0.0000000" y="0.0000000" z="0.0000000" /><local_z x="0.0000000" y="0.0000000" z="0.0000000" /></bone>
+<bone add_move="0" add_rot="0" after_physical="0" b_name="head" fixed_axis="0" ik="0" level="0" local_axis="0" movable="0" name="頭" name_e="head" operational="1" power="1.0" rotatable="1" visible="1"><local_x x="0.0000000" y="0.0000000" z="0.0000000" /><local_z x="0.0000000" y="0.0000000" z="0.0000000" /></bone>
+<bone add_move="0" add_rot="0" after_physical="0" b_name="eyes" fixed_axis="0" ik="0" level="0" local_axis="0" movable="0" name="両目" name_e="eyes" operational="1" power="1.0" rotatable="1" visible="1"><local_x x="0.0000000" y="0.0000000" z="0.0000000" /><local_z x="0.0000000" y="0.0000000" z="0.0000000" /></bone>
+<bone add_move="0" add_rot="1" after_physical="0" b_name="eye_L" fixed_axis="0" ik="0" level="2" local_axis="0" movable="0" name="左目" name_e="eye_L" operational="1" power="1.0" rotatable="1" target="eyes" visible="1"><local_x x="0.0000000" y="0.0000000" z="0.0000000" /><local_z x="0.0000000" y="0.0000000" z="0.0000000" /></bone>
+<bone add_move="0" add_rot="1" after_physical="0" b_name="eye_R" fixed_axis="0" ik="0" level="2" local_axis="0" movable="0" name="右目" name_e="eye_R" operational="1" power="1.0" rotatable="1" target="eyes" visible="1"><local_x x="0.0000000" y="0.0000000" z="0.0000000" /><local_z x="0.0000000" y="0.0000000" z="0.0000000" /></bone>
+<bone add_move="0" add_rot="0" after_physical="0" b_name="shoulder_L" fixed_axis="0" ik="0" level="0" local_axis="0" movable="0" name="左肩" name_e="shoulder_L" operational="1" power="1.0" rotatable="1" visible="1"><local_x x="0.0000000" y="0.0000000" z="0.0000000" /><local_z x="0.0000000" y="0.0000000" z="0.0000000" /></bone>
+<bone add_move="0" add_rot="1" after_physical="0" b_name="shoulder auto_L" fixed_axis="0" ik="0" level="2" local_axis="0" movable="0" name="左肩自動" name_e="shoulder auto_L" operational="1" power="0.5" rotatable="1" target="shoulder_L" visible="0"><local_x x="0.0000000" y="0.0000000" z="0.0000000" /><local_z x="0.0000000" y="0.0000000" z="0.0000000" /></bone>
+<bone add_move="0" add_rot="0" after_physical="0" b_name="arm_L" fixed_axis="0" ik="0" level="0" local_axis="1" movable="0" name="左腕" name_e="arm_L" operational="1" power="1.0" rotatable="1" visible="1"><local_x x="0.0000000" y="0.0000000" z="0.0000000" /><local_z x="0.0000000" y="0.0000000" z="0.0000000" /></bone>
+<bone add_move="0" add_rot="1" after_physical="0" b_name="arm auto_L" fixed_axis="0" ik="0" level="2" local_axis="0" movable="0" name="左腕自動" name_e="arm auto_L" operational="1" power="0.5" rotatable="1" target="arm_L" visible="0"><local_x x="0.0000000" y="0.0000000" z="0.0000000" /><local_z x="0.0000000" y="0.0000000" z="0.0000000" /></bone>
+<bone add_move="0" add_rot="0" after_physical="0" b_name="arm twist_L" fixed_axis="1" ik="0" level="0" local_axis="0" movable="0" name="左腕捩" name_e="arm twist_L" operational="1" power="1.0" rotatable="1" visible="1"><local_x x="0.0000000" y="0.0000000" z="0.0000000" /><local_z x="0.0000000" y="0.0000000" z="0.0000000" /></bone>
+<bone add_move="0" add_rot="1" after_physical="0" b_name="arm twist1_L" fixed_axis="0" ik="0" level="0" local_axis="0" movable="0" name="左腕捩1" name_e="arm twist1_L" operational="1" power="0.25" rotatable="1" target="arm twist_L" visible="0"><local_x x="0.0000000" y="0.0000000" z="0.0000000" /><local_z x="0.0000000" y="0.0000000" z="0.0000000" /></bone>
+<bone add_move="0" add_rot="1" after_physical="0" b_name="arm twist2_L" fixed_axis="0" ik="0" level="0" local_axis="0" movable="0" name="左腕捩2" name_e="arm twist2_L" operational="1" power="0.5" rotatable="1" target="arm twist_L" visible="0"><local_x x="0.0000000" y="0.0000000" z="0.0000000" /><local_z x="0.0000000" y="0.0000000" z="0.0000000" /></bone>
+<bone add_move="0" add_rot="1" after_physical="0" b_name="arm twist3_L" fixed_axis="0" ik="0" level="0" local_axis="0" movable="0" name="左腕捩3" name_e="arm twist3_L" operational="1" power="0.75" rotatable="1" target="arm twist_L" visible="0"><local_x x="0.0000000" y="0.0000000" z="0.0000000" /><local_z x="0.0000000" y="0.0000000" z="0.0000000" /></bone>
+<bone add_move="0" add_rot="0" after_physical="0" b_name="elbow_L" fixed_axis="0" ik="0" level="0" local_axis="1" movable="0" name="左ひじ" name_e="elbow_L" operational="1" power="1.0" rotatable="1" visible="1"><local_x x="0.0000000" y="0.0000000" z="0.0000000" /><local_z x="0.0000000" y="0.0000000" z="0.0000000" /></bone>
+<bone add_move="0" add_rot="1" after_physical="0" b_name="elbow auto_L" fixed_axis="0" ik="0" level="2" local_axis="0" movable="0" name="左ひじ自動" name_e="elbow auto_L" operational="1" power="0.5" rotatable="1" target="elbow_L" visible="0"><local_x x="0.0000000" y="0.0000000" z="0.0000000" /><local_z x="0.0000000" y="0.0000000" z="0.0000000" /></bone>
+<bone add_move="0" add_rot="0" after_physical="0" b_name="wrist twist_L" fixed_axis="1" ik="0" level="0" local_axis="0" movable="0" name="左手捩" name_e="wrist twist_L" operational="1" power="1.0" rotatable="1" visible="1"><local_x x="0.0000000" y="0.0000000" z="0.0000000" /><local_z x="0.0000000" y="0.0000000" z="0.0000000" /></bone>
+<bone add_move="0" add_rot="1" after_physical="0" b_name="wrist twist1_L" fixed_axis="0" ik="0" level="0" local_axis="0" movable="0" name="左手捩1" name_e="wrist twist1_L" operational="1" power="0.25" rotatable="1" target="wrist twist_L" visible="0"><local_x x="0.0000000" y="0.0000000" z="0.0000000" /><local_z x="0.0000000" y="0.0000000" z="0.0000000" /></bone>
+<bone add_move="0" add_rot="1" after_physical="0" b_name="wrist twist2_L" fixed_axis="0" ik="0" level="0" local_axis="0" movable="0" name="左手捩2" name_e="wrist twist2_L" operational="1" power="0.5" rotatable="1" target="wrist twist_L" visible="0"><local_x x="0.0000000" y="0.0000000" z="0.0000000" /><local_z x="0.0000000" y="0.0000000" z="0.0000000" /></bone>
+<bone add_move="0" add_rot="1" after_physical="0" b_name="wrist twist3_L" fixed_axis="0" ik="0" level="0" local_axis="0" movable="0" name="左手捩3" name_e="wrist twist3_L" operational="1" power="0.75" rotatable="1" target="wrist twist_L" visible="0"><local_x x="0.0000000" y="0.0000000" z="0.0000000" /><local_z x="0.0000000" y="0.0000000" z="0.0000000" /></bone>
+<bone add_move="0" add_rot="0" after_physical="0" b_name="wrist_L" fixed_axis="0" ik="0" level="0" local_axis="1" movable="0" name="左手首" name_e="wrist_L" operational="1" power="1.0" rotatable="1" visible="1"><local_x x="0.0000000" y="0.0000000" z="0.0000000" /><local_z x="0.0000000" y="0.0000000" z="0.0000000" /></bone>
+<bone add_move="0" add_rot="1" after_physical="0" b_name="wrist auto_L" fixed_axis="0" ik="0" level="2" local_axis="0" movable="0" name="左手首自動" name_e="wrist auto_L" operational="1" power="0.5" rotatable="1" target="wrist_L" visible="0"><local_x x="0.0000000" y="0.0000000" z="0.0000000" /><local_z x="0.0000000" y="0.0000000" z="0.0000000" /></bone>
+<bone add_move="0" add_rot="0" after_physical="0" b_name="arm+_L" fixed_axis="0" ik="0" level="0" local_axis="0" movable="0" name="左腕+" name_e="arm+_L" operational="1" power="1.0" rotatable="1" visible="0"><local_x x="0.0000000" y="0.0000000" z="0.0000000" /><local_z x="0.0000000" y="0.0000000" z="0.0000000" /></bone>
+<bone add_move="0" add_rot="0" after_physical="0" b_name="arm+ tip_L" fixed_axis="0" ik="0" level="0" local_axis="0" movable="0" name="左腕+先" name_e="arm+ tip_L" operational="0" power="1.0" rotatable="0" visible="0"><local_x x="0.0000000" y="0.0000000" z="0.0000000" /><local_z x="0.0000000" y="0.0000000" z="0.0000000" /></bone>
+<bone add_move="0" add_rot="0" after_physical="0" b_name="arm+IK_L" fixed_axis="0" ik="1" level="1" local_axis="0" movable="1" name="左腕+IK" name_e="arm+IK_L" operational="1" power="1.0" rotatable="1" visible="0"><local_x x="0.0000000" y="0.0000000" z="0.0000000" /><local_z x="0.0000000" y="0.0000000" z="0.0000000" /></bone>
+<bone add_move="0" add_rot="0" after_physical="0" b_name="elbow+_L" fixed_axis="0" ik="0" level="0" local_axis="0" movable="0" name="左ひじ+" name_e="elbow+_L" operational="1" power="1.0" rotatable="1" visible="0"><local_x x="0.0000000" y="0.0000000" z="0.0000000" /><local_z x="0.0000000" y="0.0000000" z="0.0000000" /></bone>
+<bone add_move="0" add_rot="0" after_physical="0" b_name="elbow+ tip_L" fixed_axis="0" ik="0" level="0" local_axis="0" movable="0" name="左ひじ+先" name_e="elbow+ tip_L" operational="0" power="1.0" rotatable="0" visible="0"><local_x x="0.0000000" y="0.0000000" z="0.0000000" /><local_z x="0.0000000" y="0.0000000" z="0.0000000" /></bone>
+<bone add_move="0" add_rot="0" after_physical="0" b_name="elbow+IK_L" fixed_axis="0" ik="1" level="1" local_axis="0" movable="1" name="左ひじ+IK" name_e="elbow+IK_L" operational="1" power="1.0" rotatable="1" visible="0"><local_x x="0.0000000" y="0.0000000" z="0.0000000" /><local_z x="0.0000000" y="0.0000000" z="0.0000000" /></bone>
+<bone add_move="0" add_rot="0" after_physical="0" b_name="thumb0_L" fixed_axis="0" ik="0" level="0" local_axis="1" movable="0" name="左親指０" name_e="thumb0_L" operational="1" power="1.0" rotatable="1" visible="1"><local_x x="0.0000000" y="0.0000000" z="0.0000000" /><local_z x="0.0000000" y="0.0000000" z="0.0000000" /></bone>
+<bone add_move="0" add_rot="0" after_physical="0" b_name="thumb1_L" fixed_axis="0" ik="0" level="0" local_axis="1" movable="0" name="左親指１" name_e="thumb1_L" operational="1" power="1.0" rotatable="1" visible="1"><local_x x="0.0000000" y="0.0000000" z="0.0000000" /><local_z x="0.0000000" y="0.0000000" z="0.0000000" /></bone>
+<bone add_move="0" add_rot="0" after_physical="0" b_name="thumb2_L" fixed_axis="0" ik="0" level="0" local_axis="1" movable="0" name="左親指２" name_e="thumb2_L" operational="1" power="1.0" rotatable="1" visible="1"><local_x x="0.0000000" y="0.0000000" z="0.0000000" /><local_z x="0.0000000" y="0.0000000" z="0.0000000" /></bone>
+<bone add_move="0" add_rot="0" after_physical="0" b_name="fore1_L" fixed_axis="0" ik="0" level="0" local_axis="1" movable="0" name="左人指１" name_e="fore1_L" operational="1" power="1.0" rotatable="1" visible="1"><local_x x="0.0000000" y="0.0000000" z="0.0000000" /><local_z x="0.0000000" y="0.0000000" z="0.0000000" /></bone>
+<bone add_move="0" add_rot="0" after_physical="0" b_name="fore2_L" fixed_axis="0" ik="0" level="0" local_axis="1" movable="0" name="左人指２" name_e="fore2_L" operational="1" power="1.0" rotatable="1" visible="1"><local_x x="0.0000000" y="0.0000000" z="0.0000000" /><local_z x="0.0000000" y="0.0000000" z="0.0000000" /></bone>
+<bone add_move="0" add_rot="0" after_physical="0" b_name="fore3_L" fixed_axis="0" ik="0" level="0" local_axis="1" movable="0" name="左人指３" name_e="fore3_L" operational="1" power="1.0" rotatable="1" visible="1"><local_x x="0.0000000" y="0.0000000" z="0.0000000" /><local_z x="0.0000000" y="0.0000000" z="0.0000000" /></bone>
+<bone add_move="0" add_rot="0" after_physical="0" b_name="middle1_L" fixed_axis="0" ik="0" level="0" local_axis="1" movable="0" name="左中指１" name_e="middle1_L" operational="1" power="1.0" rotatable="1" visible="1"><local_x x="0.0000000" y="0.0000000" z="0.0000000" /><local_z x="0.0000000" y="0.0000000" z="0.0000000" /></bone>
+<bone add_move="0" add_rot="0" after_physical="0" b_name="middle2_L" fixed_axis="0" ik="0" level="0" local_axis="1" movable="0" name="左中指２" name_e="middle2_L" operational="1" power="1.0" rotatable="1" visible="1"><local_x x="0.0000000" y="0.0000000" z="0.0000000" /><local_z x="0.0000000" y="0.0000000" z="0.0000000" /></bone>
+<bone add_move="0" add_rot="0" after_physical="0" b_name="middle3_L" fixed_axis="0" ik="0" level="0" local_axis="1" movable="0" name="左中指３" name_e="middle3_L" operational="1" power="1.0" rotatable="1" visible="1"><local_x x="0.0000000" y="0.0000000" z="0.0000000" /><local_z x="0.0000000" y="0.0000000" z="0.0000000" /></bone>
+<bone add_move="0" add_rot="0" after_physical="0" b_name="third1_L" fixed_axis="0" ik="0" level="0" local_axis="1" movable="0" name="左薬指１" name_e="third1_L" operational="1" power="1.0" rotatable="1" visible="1"><local_x x="0.0000000" y="0.0000000" z="0.0000000" /><local_z x="0.0000000" y="0.0000000" z="0.0000000" /></bone>
+<bone add_move="0" add_rot="0" after_physical="0" b_name="third2_L" fixed_axis="0" ik="0" level="0" local_axis="1" movable="0" name="左薬指２" name_e="third2_L" operational="1" power="1.0" rotatable="1" visible="1"><local_x x="0.0000000" y="0.0000000" z="0.0000000" /><local_z x="0.0000000" y="0.0000000" z="0.0000000" /></bone>
+<bone add_move="0" add_rot="0" after_physical="0" b_name="third3_L" fixed_axis="0" ik="0" level="0" local_axis="1" movable="0" name="左薬指３" name_e="third3_L" operational="1" power="1.0" rotatable="1" visible="1"><local_x x="0.0000000" y="0.0000000" z="0.0000000" /><local_z x="0.0000000" y="0.0000000" z="0.0000000" /></bone>
+<bone add_move="0" add_rot="0" after_physical="0" b_name="little1_L" fixed_axis="0" ik="0" level="0" local_axis="1" movable="0" name="左小指１" name_e="little1_L" operational="1" power="1.0" rotatable="1" visible="1"><local_x x="0.0000000" y="0.0000000" z="0.0000000" /><local_z x="0.0000000" y="0.0000000" z="0.0000000" /></bone>
+<bone add_move="0" add_rot="0" after_physical="0" b_name="little2_L" fixed_axis="0" ik="0" level="0" local_axis="1" movable="0" name="左小指２" name_e="little2_L" operational="1" power="1.0" rotatable="1" visible="1"><local_x x="0.0000000" y="0.0000000" z="0.0000000" /><local_z x="0.0000000" y="0.0000000" z="0.0000000" /></bone>
+<bone add_move="0" add_rot="0" after_physical="0" b_name="little3_L" fixed_axis="0" ik="0" level="0" local_axis="1" movable="0" name="左小指３" name_e="little3_L" operational="1" power="1.0" rotatable="1" visible="1"><local_x x="0.0000000" y="0.0000000" z="0.0000000" /><local_z x="0.0000000" y="0.0000000" z="0.0000000" /></bone>
+<bone add_move="0" add_rot="0" after_physical="0" b_name="shoulder_R" fixed_axis="0" ik="0" level="0" local_axis="0" movable="0" name="右肩" name_e="shoulder_R" operational="1" power="1.0" rotatable="1" visible="1"><local_x x="0.0000000" y="0.0000000" z="0.0000000" /><local_z x="0.0000000" y="0.0000000" z="0.0000000" /></bone>
+<bone add_move="0" add_rot="1" after_physical="0" b_name="shoulder auto_R" fixed_axis="0" ik="0" level="2" local_axis="0" movable="0" name="右肩自動" name_e="shoulder auto_R" operational="1" power="0.5" rotatable="1" target="shoulder_R" visible="0"><local_x x="0.0000000" y="0.0000000" z="0.0000000" /><local_z x="0.0000000" y="0.0000000" z="0.0000000" /></bone>
+<bone add_move="0" add_rot="0" after_physical="0" b_name="arm_R" fixed_axis="0" ik="0" level="0" local_axis="1" movable="0" name="右腕" name_e="arm_R" operational="1" power="1.0" rotatable="1" visible="1"><local_x x="0.0000000" y="0.0000000" z="0.0000000" /><local_z x="0.0000000" y="0.0000000" z="0.0000000" /></bone>
+<bone add_move="0" add_rot="1" after_physical="0" b_name="arm auto_R" fixed_axis="0" ik="0" level="2" local_axis="0" movable="0" name="右腕自動" name_e="arm auto_R" operational="1" power="0.5" rotatable="1" target="arm_R" visible="0"><local_x x="0.0000000" y="0.0000000" z="0.0000000" /><local_z x="0.0000000" y="0.0000000" z="0.0000000" /></bone>
+<bone add_move="0" add_rot="0" after_physical="0" b_name="arm twist_R" fixed_axis="1" ik="0" level="0" local_axis="0" movable="0" name="右腕捩" name_e="arm twist_R" operational="1" power="1.0" rotatable="1" visible="1"><local_x x="0.0000000" y="0.0000000" z="0.0000000" /><local_z x="0.0000000" y="0.0000000" z="0.0000000" /></bone>
+<bone add_move="0" add_rot="1" after_physical="0" b_name="arm twist1_R" fixed_axis="0" ik="0" level="0" local_axis="0" movable="0" name="右腕捩1" name_e="arm twist1_R" operational="1" power="0.25" rotatable="1" target="arm twist_R" visible="0"><local_x x="0.0000000" y="0.0000000" z="0.0000000" /><local_z x="0.0000000" y="0.0000000" z="0.0000000" /></bone>
+<bone add_move="0" add_rot="1" after_physical="0" b_name="arm twist2_R" fixed_axis="0" ik="0" level="0" local_axis="0" movable="0" name="右腕捩2" name_e="arm twist2_R" operational="1" power="0.5" rotatable="1" target="arm twist_R" visible="0"><local_x x="0.0000000" y="0.0000000" z="0.0000000" /><local_z x="0.0000000" y="0.0000000" z="0.0000000" /></bone>
+<bone add_move="0" add_rot="1" after_physical="0" b_name="arm twist3_R" fixed_axis="0" ik="0" level="0" local_axis="0" movable="0" name="右腕捩3" name_e="arm twist3_R" operational="1" power="0.75" rotatable="1" target="arm twist_R" visible="0"><local_x x="0.0000000" y="0.0000000" z="0.0000000" /><local_z x="0.0000000" y="0.0000000" z="0.0000000" /></bone>
+<bone add_move="0" add_rot="0" after_physical="0" b_name="elbow_R" fixed_axis="0" ik="0" level="0" local_axis="1" movable="0" name="右ひじ" name_e="elbow_R" operational="1" power="1.0" rotatable="1" visible="1"><local_x x="0.0000000" y="0.0000000" z="0.0000000" /><local_z x="0.0000000" y="0.0000000" z="0.0000000" /></bone>
+<bone add_move="0" add_rot="1" after_physical="0" b_name="elbow auto_R" fixed_axis="0" ik="0" level="2" local_axis="0" movable="0" name="右ひじ自動" name_e="elbow auto_R" operational="1" power="0.5" rotatable="1" target="elbow_R" visible="0"><local_x x="0.0000000" y="0.0000000" z="0.0000000" /><local_z x="0.0000000" y="0.0000000" z="0.0000000" /></bone>
+<bone add_move="0" add_rot="0" after_physical="0" b_name="wrist twist_R" fixed_axis="1" ik="0" level="0" local_axis="0" movable="0" name="右手捩" name_e="wrist twist_R" operational="1" power="1.0" rotatable="1" visible="1"><local_x x="0.0000000" y="0.0000000" z="0.0000000" /><local_z x="0.0000000" y="0.0000000" z="0.0000000" /></bone>
+<bone add_move="0" add_rot="1" after_physical="0" b_name="wrist twist1_R" fixed_axis="0" ik="0" level="0" local_axis="0" movable="0" name="右手捩1" name_e="wrist twist1_R" operational="1" power="0.25" rotatable="1" target="wrist twist_R" visible="0"><local_x x="0.0000000" y="0.0000000" z="0.0000000" /><local_z x="0.0000000" y="0.0000000" z="0.0000000" /></bone>
+<bone add_move="0" add_rot="1" after_physical="0" b_name="wrist twist2_R" fixed_axis="0" ik="0" level="0" local_axis="0" movable="0" name="右手捩2" name_e="wrist twist2_R" operational="1" power="0.5" rotatable="1" target="wrist twist_R" visible="0"><local_x x="0.0000000" y="0.0000000" z="0.0000000" /><local_z x="0.0000000" y="0.0000000" z="0.0000000" /></bone>
+<bone add_move="0" add_rot="1" after_physical="0" b_name="wrist twist3_R" fixed_axis="0" ik="0" level="0" local_axis="0" movable="0" name="右手捩3" name_e="wrist twist3_R" operational="1" power="0.75" rotatable="1" target="wrist twist_R" visible="0"><local_x x="0.0000000" y="0.0000000" z="0.0000000" /><local_z x="0.0000000" y="0.0000000" z="0.0000000" /></bone>
+<bone add_move="0" add_rot="0" after_physical="0" b_name="wrist_R" fixed_axis="0" ik="0" level="0" local_axis="1" movable="0" name="右手首" name_e="wrist_R" operational="1" power="1.0" rotatable="1" visible="1"><local_x x="0.0000000" y="0.0000000" z="0.0000000" /><local_z x="0.0000000" y="0.0000000" z="0.0000000" /></bone>
+<bone add_move="0" add_rot="1" after_physical="0" b_name="wrist auto_R" fixed_axis="0" ik="0" level="2" local_axis="0" movable="0" name="右手首自動" name_e="wrist auto_R" operational="1" power="0.5" rotatable="1" target="wrist_R" visible="0"><local_x x="0.0000000" y="0.0000000" z="0.0000000" /><local_z x="0.0000000" y="0.0000000" z="0.0000000" /></bone>
+<bone add_move="0" add_rot="0" after_physical="0" b_name="arm+_R" fixed_axis="0" ik="0" level="0" local_axis="0" movable="0" name="右腕+" name_e="arm+_R" operational="1" power="1.0" rotatable="1" visible="0"><local_x x="0.0000000" y="0.0000000" z="0.0000000" /><local_z x="0.0000000" y="0.0000000" z="0.0000000" /></bone>
+<bone add_move="0" add_rot="0" after_physical="0" b_name="arm+ tip_R" fixed_axis="0" ik="0" level="0" local_axis="0" movable="0" name="右腕+先" name_e="arm+ tip_R" operational="0" power="1.0" rotatable="0" visible="0"><local_x x="0.0000000" y="0.0000000" z="0.0000000" /><local_z x="0.0000000" y="0.0000000" z="0.0000000" /></bone>
+<bone add_move="0" add_rot="0" after_physical="0" b_name="arm+IK_R" fixed_axis="0" ik="1" level="1" local_axis="0" movable="1" name="右腕+IK" name_e="arm+IK_R" operational="1" power="1.0" rotatable="1" visible="0"><local_x x="0.0000000" y="0.0000000" z="0.0000000" /><local_z x="0.0000000" y="0.0000000" z="0.0000000" /></bone>
+<bone add_move="0" add_rot="0" after_physical="0" b_name="elbow+_R" fixed_axis="0" ik="0" level="0" local_axis="0" movable="0" name="右ひじ+" name_e="elbow+_R" operational="1" power="1.0" rotatable="1" visible="0"><local_x x="0.0000000" y="0.0000000" z="0.0000000" /><local_z x="0.0000000" y="0.0000000" z="0.0000000" /></bone>
+<bone add_move="0" add_rot="0" after_physical="0" b_name="elbow+ tip_R" fixed_axis="0" ik="0" level="0" local_axis="0" movable="0" name="右ひじ+先" name_e="elbow+ tip_R" operational="0" power="1.0" rotatable="0" visible="0"><local_x x="0.0000000" y="0.0000000" z="0.0000000" /><local_z x="0.0000000" y="0.0000000" z="0.0000000" /></bone>
+<bone add_move="0" add_rot="0" after_physical="0" b_name="elbow+IK_R" fixed_axis="0" ik="1" level="1" local_axis="0" movable="1" name="右ひじ+IK" name_e="elbow+IK_R" operational="1" power="1.0" rotatable="1" visible="0"><local_x x="0.0000000" y="0.0000000" z="0.0000000" /><local_z x="0.0000000" y="0.0000000" z="0.0000000" /></bone>
+<bone add_move="0" add_rot="0" after_physical="0" b_name="thumb0_R" fixed_axis="0" ik="0" level="0" local_axis="1" movable="0" name="右親指０" name_e="thumb0_R" operational="1" power="1.0" rotatable="1" visible="1"><local_x x="0.0000000" y="0.0000000" z="0.0000000" /><local_z x="0.0000000" y="0.0000000" z="0.0000000" /></bone>
+<bone add_move="0" add_rot="0" after_physical="0" b_name="thumb1_R" fixed_axis="0" ik="0" level="0" local_axis="1" movable="0" name="右親指１" name_e="thumb1_R" operational="1" power="1.0" rotatable="1" visible="1"><local_x x="0.0000000" y="0.0000000" z="0.0000000" /><local_z x="0.0000000" y="0.0000000" z="0.0000000" /></bone>
+<bone add_move="0" add_rot="0" after_physical="0" b_name="thumb2_R" fixed_axis="0" ik="0" level="0" local_axis="1" movable="0" name="右親指２" name_e="thumb2_R" operational="1" power="1.0" rotatable="1" visible="1"><local_x x="0.0000000" y="0.0000000" z="0.0000000" /><local_z x="0.0000000" y="0.0000000" z="0.0000000" /></bone>
+<bone add_move="0" add_rot="0" after_physical="0" b_name="fore1_R" fixed_axis="0" ik="0" level="0" local_axis="1" movable="0" name="右人指１" name_e="fore1_R" operational="1" power="1.0" rotatable="1" visible="1"><local_x x="0.0000000" y="0.0000000" z="0.0000000" /><local_z x="0.0000000" y="0.0000000" z="0.0000000" /></bone>
+<bone add_move="0" add_rot="0" after_physical="0" b_name="fore2_R" fixed_axis="0" ik="0" level="0" local_axis="1" movable="0" name="右人指２" name_e="fore2_R" operational="1" power="1.0" rotatable="1" visible="1"><local_x x="0.0000000" y="0.0000000" z="0.0000000" /><local_z x="0.0000000" y="0.0000000" z="0.0000000" /></bone>
+<bone add_move="0" add_rot="0" after_physical="0" b_name="fore3_R" fixed_axis="0" ik="0" level="0" local_axis="1" movable="0" name="右人指３" name_e="fore3_R" operational="1" power="1.0" rotatable="1" visible="1"><local_x x="0.0000000" y="0.0000000" z="0.0000000" /><local_z x="0.0000000" y="0.0000000" z="0.0000000" /></bone>
+<bone add_move="0" add_rot="0" after_physical="0" b_name="middle1_R" fixed_axis="0" ik="0" level="0" local_axis="1" movable="0" name="右中指１" name_e="middle1_R" operational="1" power="1.0" rotatable="1" visible="1"><local_x x="0.0000000" y="0.0000000" z="0.0000000" /><local_z x="0.0000000" y="0.0000000" z="0.0000000" /></bone>
+<bone add_move="0" add_rot="0" after_physical="0" b_name="middle2_R" fixed_axis="0" ik="0" level="0" local_axis="1" movable="0" name="右中指２" name_e="middle2_R" operational="1" power="1.0" rotatable="1" visible="1"><local_x x="0.0000000" y="0.0000000" z="0.0000000" /><local_z x="0.0000000" y="0.0000000" z="0.0000000" /></bone>
+<bone add_move="0" add_rot="0" after_physical="0" b_name="middle3_R" fixed_axis="0" ik="0" level="0" local_axis="1" movable="0" name="右中指３" name_e="middle3_R" operational="1" power="1.0" rotatable="1" visible="1"><local_x x="0.0000000" y="0.0000000" z="0.0000000" /><local_z x="0.0000000" y="0.0000000" z="0.0000000" /></bone>
+<bone add_move="0" add_rot="0" after_physical="0" b_name="third1_R" fixed_axis="0" ik="0" level="0" local_axis="1" movable="0" name="右薬指１" name_e="third1_R" operational="1" power="1.0" rotatable="1" visible="1"><local_x x="0.0000000" y="0.0000000" z="0.0000000" /><local_z x="0.0000000" y="0.0000000" z="0.0000000" /></bone>
+<bone add_move="0" add_rot="0" after_physical="0" b_name="third2_R" fixed_axis="0" ik="0" level="0" local_axis="1" movable="0" name="右薬指２" name_e="third2_R" operational="1" power="1.0" rotatable="1" visible="1"><local_x x="0.0000000" y="0.0000000" z="0.0000000" /><local_z x="0.0000000" y="0.0000000" z="0.0000000" /></bone>
+<bone add_move="0" add_rot="0" after_physical="0" b_name="third3_R" fixed_axis="0" ik="0" level="0" local_axis="1" movable="0" name="右薬指３" name_e="third3_R" operational="1" power="1.0" rotatable="1" visible="1"><local_x x="0.0000000" y="0.0000000" z="0.0000000" /><local_z x="0.0000000" y="0.0000000" z="0.0000000" /></bone>
+<bone add_move="0" add_rot="0" after_physical="0" b_name="little1_R" fixed_axis="0" ik="0" level="0" local_axis="1" movable="0" name="右小指１" name_e="little1_R" operational="1" power="1.0" rotatable="1" visible="1"><local_x x="0.0000000" y="0.0000000" z="0.0000000" /><local_z x="0.0000000" y="0.0000000" z="0.0000000" /></bone>
+<bone add_move="0" add_rot="0" after_physical="0" b_name="little2_R" fixed_axis="0" ik="0" level="0" local_axis="1" movable="0" name="右小指２" name_e="little2_R" operational="1" power="1.0" rotatable="1" visible="1"><local_x x="0.0000000" y="0.0000000" z="0.0000000" /><local_z x="0.0000000" y="0.0000000" z="0.0000000" /></bone>
+<bone add_move="0" add_rot="0" after_physical="0" b_name="little3_R" fixed_axis="0" ik="0" level="0" local_axis="1" movable="0" name="右小指３" name_e="little3_R" operational="1" power="1.0" rotatable="1" visible="1"><local_x x="0.0000000" y="0.0000000" z="0.0000000" /><local_z x="0.0000000" y="0.0000000" z="0.0000000" /></bone>
+<bone add_move="0" add_rot="0" after_physical="0" b_name="lower body" fixed_axis="0" ik="0" level="0" local_axis="0" movable="0" name="下半身" name_e="lower body" operational="1" power="1.0" rotatable="1" visible="1"><local_x x="0.0000000" y="0.0000000" z="0.0000000" /><local_z x="0.0000000" y="0.0000000" z="0.0000000" /></bone>
+<bone add_move="0" add_rot="0" after_physical="0" b_name="leg_L" fixed_axis="0" ik="0" level="0" local_axis="0" movable="0" name="左足" name_e="leg_L" operational="1" power="1.0" rotatable="1" visible="1"><local_x x="0.0000000" y="0.0000000" z="0.0000000" /><local_z x="0.0000000" y="0.0000000" z="0.0000000" /></bone>
+<bone add_move="0" add_rot="1" after_physical="0" b_name="leg auto_L" fixed_axis="0" ik="0" level="2" local_axis="0" movable="0" name="左足自動" name_e="leg auto_L" operational="1" power="0.5" rotatable="1" target="leg_L" visible="0"><local_x x="0.0000000" y="0.0000000" z="0.0000000" /><local_z x="0.0000000" y="0.0000000" z="0.0000000" /></bone>
+<bone add_move="0" add_rot="0" after_physical="0" b_name="knee_L" fixed_axis="0" ik="0" level="0" local_axis="0" movable="0" name="左ひざ" name_e="knee_L" operational="1" power="1.0" rotatable="1" visible="1"><local_x x="0.0000000" y="0.0000000" z="0.0000000" /><local_z x="0.0000000" y="0.0000000" z="0.0000000" /></bone>
+<bone add_move="0" add_rot="1" after_physical="0" b_name="knee auto_L" fixed_axis="0" ik="0" level="2" local_axis="0" movable="0" name="左ひざ自動" name_e="knee auto_L" operational="1" power="0.5" rotatable="1" target="knee_L" visible="0"><local_x x="0.0000000" y="0.0000000" z="0.0000000" /><local_z x="0.0000000" y="0.0000000" z="0.0000000" /></bone>
+<bone add_move="0" add_rot="0" after_physical="0" b_name="ankle_L" fixed_axis="0" ik="0" level="0" local_axis="0" movable="0" name="左足首" name_e="ankle_L" operational="1" power="1.0" rotatable="1" visible="1"><local_x x="0.0000000" y="0.0000000" z="0.0000000" /><local_z x="0.0000000" y="0.0000000" z="0.0000000" /></bone>
+<bone add_move="0" add_rot="0" after_physical="0" b_name="toe_L" fixed_axis="0" ik="0" level="0" local_axis="0" movable="0" name="左つま先" name_e="toe_L" operational="0" power="1.0" rotatable="0" visible="0"><local_x x="0.0000000" y="0.0000000" z="0.0000000" /><local_z x="0.0000000" y="0.0000000" z="0.0000000" /></bone>
+<bone add_move="0" add_rot="0" after_physical="0" b_name="leg_R" fixed_axis="0" ik="0" level="0" local_axis="0" movable="0" name="右足" name_e="leg_R" operational="1" power="1.0" rotatable="1" visible="1"><local_x x="0.0000000" y="0.0000000" z="0.0000000" /><local_z x="0.0000000" y="0.0000000" z="0.0000000" /></bone>
+<bone add_move="0" add_rot="1" after_physical="0" b_name="leg auto_R" fixed_axis="0" ik="0" level="2" local_axis="0" movable="0" name="右足自動" name_e="leg auto_R" operational="1" power="0.5" rotatable="1" target="leg_R" visible="0"><local_x x="0.0000000" y="0.0000000" z="0.0000000" /><local_z x="0.0000000" y="0.0000000" z="0.0000000" /></bone>
+<bone add_move="0" add_rot="0" after_physical="0" b_name="knee_R" fixed_axis="0" ik="0" level="0" local_axis="0" movable="0" name="右ひざ" name_e="knee_R" operational="1" power="1.0" rotatable="1" visible="1"><local_x x="0.0000000" y="0.0000000" z="0.0000000" /><local_z x="0.0000000" y="0.0000000" z="0.0000000" /></bone>
+<bone add_move="0" add_rot="1" after_physical="0" b_name="knee auto_R" fixed_axis="0" ik="0" level="2" local_axis="0" movable="0" name="右ひざ自動" name_e="knee auto_R" operational="1" power="0.5" rotatable="1" target="knee_R" visible="0"><local_x x="0.0000000" y="0.0000000" z="0.0000000" /><local_z x="0.0000000" y="0.0000000" z="0.0000000" /></bone>
+<bone add_move="0" add_rot="0" after_physical="0" b_name="ankle_R" fixed_axis="0" ik="0" level="0" local_axis="0" movable="0" name="右足首" name_e="ankle_R" operational="1" power="1.0" rotatable="1" visible="1"><local_x x="0.0000000" y="0.0000000" z="0.0000000" /><local_z x="0.0000000" y="0.0000000" z="0.0000000" /></bone>
+<bone add_move="0" add_rot="0" after_physical="0" b_name="toe_R" fixed_axis="0" ik="0" level="0" local_axis="0" movable="0" name="右つま先" name_e="toe_R" operational="0" power="1.0" rotatable="0" visible="0"><local_x x="0.0000000" y="0.0000000" z="0.0000000" /><local_z x="0.0000000" y="0.0000000" z="0.0000000" /></bone>
+<bone add_move="0" add_rot="0" after_physical="0" b_name="leg IK_L" fixed_axis="0" ik="1" level="1" local_axis="0" movable="1" name="左足ＩＫ" name_e="leg IK_L" operational="1" power="1.0" rotatable="1" visible="1"><local_x x="0.0000000" y="0.0000000" z="0.0000000" /><local_z x="0.0000000" y="0.0000000" z="0.0000000" /></bone>
+<bone add_move="0" add_rot="0" after_physical="0" b_name="toe IK_L" fixed_axis="0" ik="1" level="1" local_axis="0" movable="1" name="左つま先ＩＫ" name_e="toe IK_L" operational="1" power="1.0" rotatable="1" visible="1"><local_x x="0.0000000" y="0.0000000" z="0.0000000" /><local_z x="0.0000000" y="0.0000000" z="0.0000000" /></bone>
+<bone add_move="0" add_rot="0" after_physical="0" b_name="leg IK_R" fixed_axis="0" ik="1" level="1" local_axis="0" movable="1" name="右足ＩＫ" name_e="leg IK_R" operational="1" power="1.0" rotatable="1" visible="1"><local_x x="0.0000000" y="0.0000000" z="0.0000000" /><local_z x="0.0000000" y="0.0000000" z="0.0000000" /></bone>
+<bone add_move="0" add_rot="0" after_physical="0" b_name="toe IK_R" fixed_axis="0" ik="1" level="1" local_axis="0" movable="1" name="右つま先ＩＫ" name_e="toe IK_R" operational="1" power="1.0" rotatable="1" visible="1"><local_x x="0.0000000" y="0.0000000" z="0.0000000" /><local_z x="0.0000000" y="0.0000000" z="0.0000000" /></bone>
+</bones>
+<labels>
+<label name="Root" name_e="Root" type="1"><tab name="master" type="bone" />
+</label>
+<label name="表情" name_e="Exp" type="1"><tab name="A" type="morph" />
+<tab name="I" type="morph" />
+<tab name="U" type="morph" />
+<tab name="E" type="morph" />
+<tab name="O" type="morph" />
+<tab name="N" type="morph" />
+<tab name="Wa" type="morph" />
+<tab name="Corner Up" type="morph" />
+<tab name="Corner Down" type="morph" />
+<tab name="Corner Wide" type="morph" />
+<tab name="Mouth Up" type="morph" />
+<tab name="Mouth Down" type="morph" />
+<tab name="Triangle" type="morph" />
+<tab name="Regret" type="morph" />
+<tab name="W" type="morph" />
+<tab name="W Open" type="morph" />
+<tab name="Open" type="morph" />
+<tab name="Puff" type="morph" />
+<tab name="Happy" type="morph" />
+<tab name="Fool" type="morph" />
+<tab name="Tongue" type="morph" />
+<tab name="E-" type="morph" />
+<tab name="Smirk" type="morph" />
+<tab name="Blink" type="morph" />
+<tab name="Smile" type="morph" />
+<tab name="Wink_L" type="morph" />
+<tab name="Wink2_L" type="morph" />
+<tab name="Wink_R" type="morph" />
+<tab name="Wink2_R" type="morph" />
+<tab name="Surprised" type="morph" />
+<tab name="Doubt" type="morph" />
+<tab name="Confused" type="morph" />
+<tab name="Focus" type="morph" />
+<tab name="Camera Eyes" type="morph" />
+<tab name="&gt; &lt;" type="morph" />
+<tab name="- -" type="morph" />
+<tab name="O O" type="morph" />
+<tab name="Star Eyes" type="morph" />
+<tab name="Heart Eyes" type="morph" />
+<tab name="No Eyes" type="morph" />
+<tab name="Scared" type="morph" />
+<tab name="Serious" type="morph" />
+<tab name="Troubled" type="morph" />
+<tab name="Cheerful" type="morph" />
+<tab name="Angry" type="morph" />
+<tab name="Up" type="morph" />
+<tab name="Down" type="morph" />
+<tab name="Front" type="morph" />
+<tab name="Tears" type="morph" />
+<tab name="Sweat" type="morph" />
+<tab name="Blush" type="morph" />
+<tab name="Shock" type="morph" />
+</label>
+<label name="センター" name_e="Center" type="0"><tab name="center" type="bone" />
+</label>
+<label name="ＩＫ" name_e="IK" type="0"><tab name="leg IK_L" type="bone" />
+<tab name="toe IK_L" type="bone" />
+<tab name="leg IK_R" type="bone" />
+<tab name="toe IK_R" type="bone" />
+</label>
+<label name="体" name_e="Body" type="0"><tab name="lower body" type="bone" />
+<tab name="upper body" type="bone" />
+<tab name="upper body2" type="bone" />
+<tab name="neck" type="bone" />
+<tab name="head" type="bone" />
+<tab name="eye_L" type="bone" />
+<tab name="eye_R" type="bone" />
+<tab name="eyes" type="bone" />
+</label>
+<label name="腕" name_e="Arms" type="0"><tab name="shoulder_L" type="bone" />
+<tab name="arm_L" type="bone" />
+<tab name="arm twist_L" type="bone" />
+<tab name="elbow_L" type="bone" />
+<tab name="wrist twist_L" type="bone" />
+<tab name="wrist_L" type="bone" />
+<tab name="shoulder_R" type="bone" />
+<tab name="arm_R" type="bone" />
+<tab name="arm twist_R" type="bone" />
+<tab name="elbow_R" type="bone" />
+<tab name="wrist twist_R" type="bone" />
+<tab name="wrist_R" type="bone" />
+</label>
+<label name="左指" name_e="Fingers[L]" type="0"><tab name="thumb0_L" type="bone" />
+<tab name="thumb1_L" type="bone" />
+<tab name="thumb2_L" type="bone" />
+<tab name="fore1_L" type="bone" />
+<tab name="fore2_L" type="bone" />
+<tab name="fore3_L" type="bone" />
+<tab name="middle1_L" type="bone" />
+<tab name="middle2_L" type="bone" />
+<tab name="middle3_L" type="bone" />
+<tab name="third1_L" type="bone" />
+<tab name="third2_L" type="bone" />
+<tab name="third3_L" type="bone" />
+<tab name="little1_L" type="bone" />
+<tab name="little2_L" type="bone" />
+<tab name="little3_L" type="bone" />
+</label>
+<label name="右指" name_e="Fingers[R]" type="0"><tab name="thumb0_R" type="bone" />
+<tab name="thumb1_R" type="bone" />
+<tab name="thumb2_R" type="bone" />
+<tab name="fore1_R" type="bone" />
+<tab name="fore2_R" type="bone" />
+<tab name="fore3_R" type="bone" />
+<tab name="middle1_R" type="bone" />
+<tab name="middle2_R" type="bone" />
+<tab name="middle3_R" type="bone" />
+<tab name="third1_R" type="bone" />
+<tab name="third2_R" type="bone" />
+<tab name="third3_R" type="bone" />
+<tab name="little1_R" type="bone" />
+<tab name="little2_R" type="bone" />
+<tab name="little3_R" type="bone" />
+</label>
+<label name="足" name_e="Legs" type="0"><tab name="leg_L" type="bone" />
+<tab name="knee_L" type="bone" />
+<tab name="ankle_L" type="bone" />
+<tab name="leg_R" type="bone" />
+<tab name="knee_R" type="bone" />
+<tab name="ankle_R" type="bone" />
+</label>
+<label name="髪" name_e="Hair" type="0" />
+<label name="その他" name_e="Other" type="0" />
+</labels>
+<materials><material b_name="箱" both="0" drop_shadow="1" edge_size="1.0" ground_shadow="1" name="箱" name_e="箱" on_edge="1" on_shadow="1" toon="0" use_systemtoon="1"><edge_color a="1.0" b="0.0" g="0.0" r="0.0" /></material>
+</materials>
+<rigid_bodies>
+</rigid_bodies>
+<constraints>
+</constraints>
+</ns0:pmxstatus>
