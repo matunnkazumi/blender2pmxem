@@ -298,7 +298,7 @@ class ExportBlender2Pmx(bpy.types.Operator, ExportHelper):
         layout = self.layout
 
         box = layout.box()
-        row = box.split(percentage=0.3)
+        row = box.split(factor=0.3)
         row.label(text="Encode:")
         row.prop(self, "encode_type", text="")
 
@@ -740,7 +740,7 @@ class Blender2PmxeObjectPanel(bpy.types.Panel):
         # Tools
         # Solidify Edge
         box = layout.box()
-        row = box.split(percentage=0.6)
+        row = box.split(factor=0.6)
         row.label("Solidify Edge:", icon='MOD_SOLIDIFY')
 
         row = row.row(align=True)
