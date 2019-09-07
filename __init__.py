@@ -836,22 +836,29 @@ def menu_func_export(self, context):
 
 def menu_func_vg(self, context):
     self.layout.separator()
-    self.layout.operator("b2pmxe.mirror_vertexgroup", text=iface_("Mirror active vertex group (L/R)"), icon='ZOOMIN')
+    self.layout.operator("b2pmxe.mirror_vertexgroup", text=iface_("Mirror active vertex group (L/R)"), icon='ZOOM_IN')
 
+classes = [
+    ExportBlender2Pmx,
+    ImportBlender2Pmx,
+    add_function.B2PmxeMirrorVertexGroup,
+]
 
 def register():
-    bpy.utils.register_module(__name__)
-    bpy.types.MESH_MT_vertex_group_specials.append(menu_func_vg)
-    bpy.types.INFO_MT_file_export.append(menu_func_export)
-    bpy.types.INFO_MT_file_import.append(menu_func_import)
+    for cls in classes:
+        bpy.utils.register_class(cls)
+    bpy.types.MESH_MT_vertex_group_context_menu.append(menu_func_vg)
+    bpy.types.TOPBAR_MT_file_export.append(menu_func_export)
+    bpy.types.TOPBAR_MT_file_import.append(menu_func_import)
     bpy.app.translations.register(__name__, translation_dict)
 
 
 def unregister():
-    bpy.utils.unregister_module(__name__)
-    bpy.types.MESH_MT_vertex_group_specials.remove(menu_func_vg)
-    bpy.types.INFO_MT_file_export.remove(menu_func_export)
-    bpy.types.INFO_MT_file_import.remove(menu_func_import)
+    for cls in classes:
+        bpy.utils.unregister_class(cls)
+    bpy.types.MESH_MT_vertex_group_context_menu.remove(menu_func_vg)
+    bpy.types.TOPBAR_MT_file_export.remove(menu_func_export)
+    bpy.types.TOPBAR_MT_file_import.remove(menu_func_import)
     bpy.app.translations.unregister(__name__)
 
 
