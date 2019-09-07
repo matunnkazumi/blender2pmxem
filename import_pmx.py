@@ -214,7 +214,7 @@ def read_pmx_data(context, filepath="",
                   bone_transfer=False,
                   ):
 
-    prefs = context.user_preferences.addons[GV.FolderName].preferences
+    prefs = context.preferences.addons[GV.FolderName].preferences
     use_japanese_name = prefs.use_japanese_name
     use_custom_shape = prefs.use_custom_shape
     xml_save_versions = prefs.saveVersions

@@ -419,7 +419,7 @@ class B2PmxeSaveAsXML(bpy.types.Operator):
         return (bpy.data.is_saved) and (obj and obj.type == 'ARMATURE')
 
     def execute(self, context):
-        prefs = context.user_preferences.addons[GV.FolderName].preferences
+        prefs = context.preferences.addons[GV.FolderName].preferences
         use_japanese_name = prefs.use_japanese_name
         xml_save_versions = prefs.saveVersions
         props = context.scene.b2pmxe_properties

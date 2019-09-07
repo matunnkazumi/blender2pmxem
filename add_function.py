@@ -82,7 +82,7 @@ class B2PmxeRenameChainToLR(bpy.types.Operator):
             return {'FINISHED'}
 
         name_base = name_list[0]
-        threshold = context.user_preferences.addons[GV.FolderName].preferences.threshold
+        threshold = context.preferences.addons[GV.FolderName].preferences.threshold
 
         # get max bone num
         bone_max = 0
@@ -177,7 +177,7 @@ class B2PmxeRenameChainToNum(bpy.types.Operator):
             return {'FINISHED'}
 
         name_base = name_list[0]
-        threshold = context.user_preferences.addons[GV.FolderName].preferences.threshold
+        threshold = context.preferences.addons[GV.FolderName].preferences.threshold
 
         # get max bone num
         bone_max = 0
@@ -744,7 +744,7 @@ class B2PmxeRebindArmature(bpy.types.Operator):
 # Set Custom Shape
 def set_custom_shape(context, pose_bone, shape):
     arm_obj = context.active_object
-    use_custom_shape = context.user_preferences.addons[GV.FolderName].preferences.use_custom_shape
+    use_custom_shape = context.preferences.addons[GV.FolderName].preferences.use_custom_shape
 
     if use_custom_shape:
         shape_obj = bpy.data.objects.get(shape)
@@ -843,7 +843,7 @@ class B2PmxeTwistBones(bpy.types.Operator):
         set_custom_shape(context, twist_master, shape=GV.ShapeTwist1)
 
         # Add Twist Bones
-        n = context.user_preferences.addons[GV.FolderName].preferences.twistBones
+        n = context.preferences.addons[GV.FolderName].preferences.twistBones
         inc = round(1 / (n + 1), 2)
         for i in range(0, n):
             bpy.ops.object.mode_set(mode='EDIT')
@@ -988,7 +988,7 @@ class B2PmxeAutoBone(bpy.types.Operator):
         # Add COPY_ROTATION
         pb = arm_obj.pose.bones[bone_name]
         pb.lock_location = [True, True, True]
-        autoInfluence = context.user_preferences.addons[GV.FolderName].preferences.autoInfluence
+        autoInfluence = context.preferences.addons[GV.FolderName].preferences.autoInfluence
         add_copy_rotation(context, active=pb, target_name=active_name, influence=autoInfluence)
 
         # Custom Shape
@@ -1159,7 +1159,7 @@ class B2PmxeAppendTemplate(bpy.types.Operator):
         ))
 
     def execute(self, context):
-        prefs = context.user_preferences.addons[GV.FolderName].preferences
+        prefs = context.preferences.addons[GV.FolderName].preferences
 
         name = self.type + '_Arm'
         append_object(name)
@@ -1298,7 +1298,7 @@ class B2PmxeMirrorVertexGroup(bpy.types.Operator):
 
 
 def rotate_pose(context, to_A_stance):
-    settings = context.user_preferences.addons[GV.FolderName].preferences
+    settings = context.preferences.addons[GV.FolderName].preferences
     pose_bones = context.object.data.bones
     sign = 1 if to_A_stance == True else -1
 

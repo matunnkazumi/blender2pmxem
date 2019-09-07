@@ -49,7 +49,7 @@ def write_pmx_data(context, filepath="",
                    use_custom_normals=False,
                    ):
 
-    prefs = context.user_preferences.addons[GV.FolderName].preferences
+    prefs = context.preferences.addons[GV.FolderName].preferences
     use_japanese_name = prefs.use_japanese_name
 
     GV.SetStartTime()
