@@ -183,11 +183,11 @@ class Blender2PmxeAddonPreferences(bpy.types.AddonPreferences):
         row.prop(self, "use_T_stance")
 
         col = layout.column_flow(columns=2)
-        col.label("Number of .xml old versions:")
-        col.label("Angle of T stance and A stance:")
-        col.label("Number of Twist link bones:")
-        col.label("Auto Bone influence:")
-        col.label("Rename Chain threshold:")
+        col.label(text="Number of .xml old versions:")
+        col.label(text="Angle of T stance and A stance:")
+        col.label(text="Number of Twist link bones:")
+        col.label(text="Auto Bone influence:")
+        col.label(text="Rename Chain threshold:")
 
         col.prop(self, "saveVersions")
         row = col.row(align=True)
@@ -842,6 +842,7 @@ classes = [
     ExportBlender2Pmx,
     ImportBlender2Pmx,
     add_function.B2PmxeMirrorVertexGroup,
+    Blender2PmxeAddonPreferences,
 ]
 
 def register():
