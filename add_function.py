@@ -6,7 +6,7 @@ import math
 import re
 from bpy.app.translations import pgettext_iface as iface_
 from bpy.props import StringProperty, BoolProperty, EnumProperty, FloatProperty, PointerProperty, IntProperty
-from blender2pmxem import object_applymodifier, global_variable
+from . import object_applymodifier, global_variable
 
 # global_variable
 GV = global_variable.Init()

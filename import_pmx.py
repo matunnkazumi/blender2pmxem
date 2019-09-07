@@ -9,7 +9,7 @@ import math
 import xml.etree.ElementTree as etree
 import re
 
-from blender2pmxem import add_function, global_variable
+from . import add_function, global_variable
 
 # global_variable
 GV = global_variable.Init()

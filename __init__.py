@@ -17,9 +17,9 @@ from glob import glob
 from bpy.app.translations import pgettext_iface as iface_
 from bpy_extras.io_utils import ExportHelper, ImportHelper
 from bpy.props import StringProperty, BoolProperty, EnumProperty, FloatProperty, FloatVectorProperty, PointerProperty, IntProperty
-from blender2pmxem import import_pmx, export_pmx
-from blender2pmxem import add_function, solidify_edge, global_variable
-from blender2pmxem import space_view3d_materials_utils
+from . import import_pmx, export_pmx
+from . import add_function, solidify_edge, global_variable
+from . import space_view3d_materials_utils
 
 # global_variable
 GV = global_variable.Init()

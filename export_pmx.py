@@ -3,8 +3,8 @@ import mathutils as Math
 import os
 from math import radians
 
-from blender2pmxem import pmx
-from blender2pmxem import object_applymodifier, global_variable
+from . import pmx
+from . import object_applymodifier, global_variable
 
 # global_variable
 GV = global_variable.Init()
