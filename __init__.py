@@ -1,8 +1,8 @@
 bl_info = {
     "name": "MMD PMX Format (Extend)",
     "author": "NaNashi",
-    "version": (1, 0, 0),
-    "blender": (2, 7, 3),
+    "version": (1, 0, 3),
+    "blender": (2, 7, 6),
     "api": 38019,
     "location": "File > Import-Export",
     "description": "Import-Export PMX model data. give priority to english name.",

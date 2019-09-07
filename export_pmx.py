@@ -65,7 +65,7 @@ def write_pmx_data(context, filepath="",
         #
         file_name = bpy.path.basename(filepath)
 
-        xml_path = bpy.path.ensure_ext(filepath, ".xml", True)
+        xml_path = os.path.splitext(filepath)[0] + ".xml"
         has_xml_file = os.path.isfile(xml_path)
 
         default_xml = "default_jp.xml" if use_japanese_name == True else "default_en.xml"
@@ -800,11 +800,10 @@ def write_pmx_data(context, filepath="",
                             pmd_morph.Offsets.append(v)
 
                             if v.Index in copy_vert.keys():
-                                v2 = pmx.PMMorphOffset()
-                                v2.Move = v.Move
-
                                 for i in copy_vert[v.Index]:
+                                    v2 = pmx.PMMorphOffset()
                                     v2.Index = i
+                                    v2.Move = v.Move
                                     pmd_morph.Offsets.append(v2)
 
                         morph_index += 1

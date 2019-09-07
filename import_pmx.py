@@ -523,35 +523,28 @@ def read_pmx_data(context, filepath="",
 
             # BDEF2
             elif vert_data.Type == 1:
-                vert_group[vert_group_index[vert_data.Bones[0]]].add([vert_index], vert_data.Weights[0], 'REPLACE')
-                vert_group[vert_group_index[vert_data.Bones[1]]].add([vert_index], 1.0 - vert_data.Weights[0], 'REPLACE')
+                vert_group[vert_group_index[vert_data.Bones[0]]].add([vert_index], vert_data.Weights[0], 'ADD')
+                vert_group[vert_group_index[vert_data.Bones[1]]].add([vert_index], 1.0 - vert_data.Weights[0], 'ADD')
 
             # BDEF4
             elif vert_data.Type == 2:
-                if vert_data.Weights[0] != 0:
-                    vert_group[vert_group_index[vert_data.Bones[0]]].add([vert_index], vert_data.Weights[0], 'REPLACE')
-
-                if vert_data.Weights[1] != 0:
-                    vert_group[vert_group_index[vert_data.Bones[1]]].add([vert_index], vert_data.Weights[1], 'REPLACE')
-
-                if vert_data.Weights[2] != 0:
-                    vert_group[vert_group_index[vert_data.Bones[2]]].add([vert_index], vert_data.Weights[2], 'REPLACE')
-
-                if vert_data.Weights[3] != 0:
-                    vert_group[vert_group_index[vert_data.Bones[3]]].add([vert_index], vert_data.Weights[3], 'REPLACE')
+                vert_group[vert_group_index[vert_data.Bones[0]]].add([vert_index], vert_data.Weights[0], 'ADD')
+                vert_group[vert_group_index[vert_data.Bones[1]]].add([vert_index], vert_data.Weights[1], 'ADD')
+                vert_group[vert_group_index[vert_data.Bones[2]]].add([vert_index], vert_data.Weights[2], 'ADD')
+                vert_group[vert_group_index[vert_data.Bones[3]]].add([vert_index], vert_data.Weights[3], 'ADD')
 
             # SDEF
             elif vert_data.Type == 3:
-                vert_group[vert_group_index[vert_data.Bones[0]]].add([vert_index], vert_data.Weights[0], 'REPLACE')
-                vert_group[vert_group_index[vert_data.Bones[1]]].add([vert_index], 1.0 - vert_data.Weights[0], 'REPLACE')
+                vert_group[vert_group_index[vert_data.Bones[0]]].add([vert_index], vert_data.Weights[0], 'ADD')
+                vert_group[vert_group_index[vert_data.Bones[1]]].add([vert_index], 1.0 - vert_data.Weights[0], 'ADD')
                 # Todo? SDEF
 
             # QDEF
             elif vert_data.Type == 4:
-                vert_group[vert_group_index[vert_data.Bones[0]]].add([vert_index], vert_data.Weights[0], 'REPLACE')
-                vert_group[vert_group_index[vert_data.Bones[1]]].add([vert_index], vert_data.Weights[1], 'REPLACE')
-                vert_group[vert_group_index[vert_data.Bones[2]]].add([vert_index], vert_data.Weights[2], 'REPLACE')
-                vert_group[vert_group_index[vert_data.Bones[3]]].add([vert_index], vert_data.Weights[3], 'REPLACE')
+                vert_group[vert_group_index[vert_data.Bones[0]]].add([vert_index], vert_data.Weights[0], 'ADD')
+                vert_group[vert_group_index[vert_data.Bones[1]]].add([vert_index], vert_data.Weights[1], 'ADD')
+                vert_group[vert_group_index[vert_data.Bones[2]]].add([vert_index], vert_data.Weights[2], 'ADD')
+                vert_group[vert_group_index[vert_data.Bones[3]]].add([vert_index], vert_data.Weights[3], 'ADD')
                 # Todo? QDEF
 
         mesh.update()

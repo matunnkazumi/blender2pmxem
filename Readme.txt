@@ -1,10 +1,10 @@
 [アドオン名]
-Blender2Pmxe 1.0.0
+Blender2Pmxe 1.0.3
 (改変Blender2Pmx)
 
 [動作環境]
-Blender2.75a
-(Win7 64bitで動作確認)
+Blender2.76b
+(Win10 64bitで動作確認)
 
 
 [本家Blender2Pmxとの違い]
@@ -72,6 +72,17 @@ Blender2.75a
 	「保存→開き直す」を2~3回繰り返せばデータから完全に消えます。
 
 [更新履歴]
+2015/12/28
+インポート時のウェイト読み込みの不具合を修正。
+（重複したボーンのウェイトは足し算するようにした）
+
+2015/12/16
+Blender2.76bで(PMXファイル名).xmlを取得できない不具合を修正。
+（bpy.path.ensure_extの処理が変わったのでos.path.splitextに変更）
+
+2015/11/26
+UVの切れ目の箇所にシェイプをつけてエクスポートすると、PMXでモーフが崩れる不具合を修整。（本家にこの不具合はありません）
+
 2015/10/29
 ・Blender2Pmxのimporter 1.26 exporter 1.25をベースにして作成
 ・space_view3d_materials_utils.pyはmichaelwさんのソースコードを流用
