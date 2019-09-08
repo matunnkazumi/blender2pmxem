@@ -26,7 +26,7 @@ def GT(vec, mat):  # GlobalTransformation
     v = vec.copy()
     v.resize_4d()
 
-    w = mat * v
+    w = mat @ v
     w = w / w.w
     w.resize_3d()
     return w
@@ -36,7 +36,7 @@ def GT_normal(vec, mat):  # GlobalTransformation
     v = vec.copy()
     v.resize_4d()
 
-    w = mat * v
+    w = mat @ v
     w = w / w.w
     w.resize_3d()
     w.normalize()
