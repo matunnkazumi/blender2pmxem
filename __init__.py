@@ -593,7 +593,7 @@ class B2PmxeSaveAsXML(bpy.types.Operator):
         return {'FINISHED'}
 
 
-class Blender2PmxeEditPanel(bpy.types.Panel):
+class B2PMXEM_PT_EditPanel(bpy.types.Panel):
     bl_label = "Blender2Pmxe Tools"
     bl_space_type = "VIEW_3D"
     bl_region_type = "TOOLS"
@@ -641,7 +641,7 @@ class Blender2PmxeEditPanel(bpy.types.Panel):
         col.prop(obj.data, "use_mirror_x", text="X Mirror")
 
 
-class Blender2PmxePosePanel(bpy.types.Panel):
+class B2PMXEM_PT_PosePanel(bpy.types.Panel):
     bl_label = "Blender2Pmxe Tools"
     bl_space_type = "VIEW_3D"
     bl_region_type = "TOOLS"
@@ -701,7 +701,7 @@ class Blender2PmxePosePanel(bpy.types.Panel):
         col.prop(obj.pose, "use_auto_ik")
 
 
-class Blender2PmxeObjectPanel(bpy.types.Panel):
+class B2PMXEM_PT_ObjectPanel(bpy.types.Panel):
     bl_label = "Blender2Pmxe Tools"
     bl_space_type = "VIEW_3D"
     bl_region_type = "TOOLS"
@@ -879,9 +879,9 @@ classes = [
     Blender2PmxeAddonPreferences,
     B2PmxeMessageOperator,
     Blender2PmxeProperties,
-    Blender2PmxeEditPanel,
-    Blender2PmxePosePanel,
-    Blender2PmxeObjectPanel,
+    B2PMXEM_PT_EditPanel,
+    B2PMXEM_PT_PosePanel,
+    B2PMXEM_PT_ObjectPanel,
 ]
 
 def register():
