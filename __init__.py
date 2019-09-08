@@ -608,13 +608,13 @@ class Blender2PmxeEditPanel(bpy.types.Panel):
 
         row = col.row(align=True)
         row.operator("b2pmxe.delete_right", text="Delete _R", icon="X")
-        row.operator("b2pmxe.select_left", text="Select _L", icon="BORDER_RECT")
+        row.operator("b2pmxe.select_left", text="Select _L", icon="UV_SYNC_SELECT")
 
-        col.operator("b2pmxe.calculate_roll", icon="MANIPUL")
+        col.operator("b2pmxe.calculate_roll", icon="EMPTY_DATA")
         col.separator()
-        col.operator("b2pmxe.sleeve_bones", icon="CONSTRAINT_DATA")
-        col.operator("b2pmxe.twist_bones", icon="CONSTRAINT_DATA")
-        col.operator("b2pmxe.auto_bone", icon="CONSTRAINT_DATA")
+        col.operator("b2pmxe.sleeve_bones", icon="LIBRARY_DATA_DIRECT")
+        col.operator("b2pmxe.twist_bones", icon="LIBRARY_DATA_DIRECT")
+        col.operator("b2pmxe.auto_bone", icon="LIBRARY_DATA_DIRECT")
         col.separator()
         col.operator("b2pmxe.mirror_bones", icon="MOD_MIRROR")
 
@@ -668,12 +668,12 @@ class Blender2PmxePosePanel(bpy.types.Panel):
         col = layout.column(align=True)
         col.label(text="Constraints:")
 
-        col.operator("b2pmxe.add_location", icon="CONSTRAINT_DATA")
-        col.operator("b2pmxe.add_rotation", icon="CONSTRAINT_DATA")
-        col.operator("b2pmxe.limit_rotation", icon="CONSTRAINT_DATA")
+        col.operator("b2pmxe.add_location", icon="LIBRARY_DATA_DIRECT")
+        col.operator("b2pmxe.add_rotation", icon="LIBRARY_DATA_DIRECT")
+        col.operator("b2pmxe.limit_rotation", icon="LIBRARY_DATA_DIRECT")
 
         row = col.row(align=True)
-        row.operator_menu_enum("b2pmxe.add_ik", 'type', icon="CONSTRAINT_DATA")
+        row.operator_menu_enum("b2pmxe.add_ik", 'type', icon="LIBRARY_DATA_DIRECT")
 
         mute_type = True
         for bone in context.active_object.pose.bones:
@@ -686,7 +686,7 @@ class Blender2PmxePosePanel(bpy.types.Panel):
         row.operator(
             "b2pmxe.mute_ik",
             text="",
-            icon="VISIBLE_IPO_ON" if mute_type == True else "VISIBLE_IPO_OFF"
+            icon="HIDE_OFF" if mute_type == True else "HIDE_ON"
         ).flag = mute_type
 
         # Display
@@ -788,7 +788,7 @@ class Blender2PmxeObjectPanel(bpy.types.Panel):
         row.operator(
             "b2pmxe.add_solidify",
             text="Add" if active_mat is None else "Reload",
-            icon='ZOOMIN' if active_mat is None else 'FILE_REFRESH'
+            icon='ZOOM_IN' if active_mat is None else 'FILE_REFRESH'
         )
 
         col = layout.column(align=True)
@@ -796,7 +796,7 @@ class Blender2PmxeObjectPanel(bpy.types.Panel):
         # Material to Texface
         row = col.row(align=True)
         row.operator("b2pmxe.texface_remove", text="Delete", icon="X")
-        row.operator("b2pmxe.material_to_texface", text="Mat to Tex", icon='POTATO')
+        row.operator("b2pmxe.material_to_texface", text="Mat to Tex", icon='MATERIAL')
 
         # WeightType Group
         row = col.row(align=True)
@@ -810,7 +810,7 @@ class Blender2PmxeObjectPanel(bpy.types.Panel):
         # Add Driver
         row = col.row(align=True)
         row.operator("b2pmxe.add_driver", text="Delete", icon="X").delete = True
-        row.operator("b2pmxe.add_driver", text="Add Driver", icon="LOGIC")
+        row.operator("b2pmxe.add_driver", text="Add Driver", icon="DRIVER")
 
         col.operator("b2pmxe.make_xml", icon="FILE_TEXT")
         col.operator("b2pmxe.apply_modifier", icon="FILE_TICK")
