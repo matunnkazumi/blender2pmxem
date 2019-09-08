@@ -229,14 +229,14 @@ def read_pmx_data(context, filepath="",
 
     with open(filepath, "rb") as f:
 
-        from blender2pmxe import pmx
+        from . import pmx
         pmx_data = pmx.Model()
         pmx_data.Load(f)
 
         if pmx_data.Status.Magic == 0:
             #Echo("Loading Pmd ")
-            from blender2pmxe import pmd
-            from blender2pmxe import pmd2pmx
+            from . import pmd
+            from . import pmd2pmx
             f.seek(0)
             d_pmd = pmd.Model()
             d_pmd.Load(f)
