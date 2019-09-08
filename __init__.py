@@ -637,7 +637,7 @@ class Blender2PmxeEditPanel(bpy.types.Panel):
         col = col.column_flow(columns=2)
         col.prop(obj.data, "show_names", text="Name")
         col.prop(obj.data, "show_axes", text="Axis")
-        col.prop(obj, "show_x_ray")
+        col.prop(obj, "show_in_front")
         col.prop(obj.data, "use_mirror_x", text="X Mirror")
 
 
@@ -697,8 +697,8 @@ class Blender2PmxePosePanel(bpy.types.Panel):
         col = col.column_flow(columns=2)
         col.prop(obj.data, "show_names", text="Name")
         col.prop(obj.data, "show_axes", text="Axis")
-        col.prop(obj, "show_x_ray")
-        col.prop(obj.data, "use_auto_ik")
+        col.prop(obj, "show_in_front")
+        col.prop(obj.pose, "use_auto_ik")
 
 
 class Blender2PmxeObjectPanel(bpy.types.Panel):
@@ -821,7 +821,7 @@ class Blender2PmxeObjectPanel(bpy.types.Panel):
 
         # Shading
         row = layout.row()
-        row.prop(context.space_data, 'show_backface_culling')
+        row.prop(scn.display.shading, 'show_backface_culling')
         row.prop(scn.b2pmxe_properties, 'shadeless')
 
 
