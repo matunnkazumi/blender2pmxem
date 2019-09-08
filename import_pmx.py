@@ -253,7 +253,7 @@ def read_pmx_data(context, filepath="",
         arm_dat = bpy.data.armatures.new(tmp_name + "_Arm")
         arm_obj = bpy.data.objects.new(tmp_name + "_Arm", arm_dat)
 
-        arm_obj.show_x_ray = True
+        arm_obj.show_in_front = True
         arm_dat.draw_type = "STICK"
 
         scn = bpy.context.scene
