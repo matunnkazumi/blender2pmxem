@@ -103,7 +103,7 @@ class Blender2PmxeProperties(bpy.types.PropertyGroup):
 
     @classmethod
     def register(cls):
-        bpy.types.Scene.b2pmxe_properties: PointerProperty(type=cls)
+        bpy.types.Scene.b2pmxe_properties = PointerProperty(type=cls)
 
         def toggle_shadeless(self, context):
             context.space_data.show_textured_shadeless = self.shadeless
@@ -113,23 +113,23 @@ class Blender2PmxeProperties(bpy.types.PropertyGroup):
                 if mat:
                     mat.use_shadeless = self.shadeless
 
-        cls.edge_color: FloatVectorProperty(
+        cls.edge_color = FloatVectorProperty(
             name="Color",
             default=(0.0, 0.0, 0.0),
             min=0.0, max=1.0, step=10, precision=3,
             subtype='COLOR'
         )
-        cls.edge_thickness: FloatProperty(
+        cls.edge_thickness = FloatProperty(
             name="Thickness",
             default=0.01, min=0.0025, max=0.05, step=0.01, precision=4,
             unit='LENGTH'
         )
-        cls.shadeless: BoolProperty(
+        cls.shadeless = BoolProperty(
             name="Shadeless",
             update=toggle_shadeless,
             default=False
         )
-        cls.make_xml_option: EnumProperty(
+        cls.make_xml_option = EnumProperty(
             name="Make XML Option",
             items=(
                 ('NONE', "None", ""),
@@ -593,7 +593,7 @@ class B2PmxeSaveAsXML(bpy.types.Operator):
         return {'FINISHED'}
 
 
-class Blender2PmxeEditPanel(bpy.types.Panel):
+class B2PMXEM_PT_EditPanel(bpy.types.Panel):
     bl_label = "Blender2Pmxe Tools"
     bl_space_type = "VIEW_3D"
     bl_region_type = "TOOLS"
@@ -608,13 +608,13 @@ class Blender2PmxeEditPanel(bpy.types.Panel):
 
         row = col.row(align=True)
         row.operator("b2pmxe.delete_right", text="Delete _R", icon="X")
-        row.operator("b2pmxe.select_left", text="Select _L", icon="BORDER_RECT")
+        row.operator("b2pmxe.select_left", text="Select _L", icon="UV_SYNC_SELECT")
 
-        col.operator("b2pmxe.calculate_roll", icon="MANIPUL")
+        col.operator("b2pmxe.calculate_roll", icon="EMPTY_DATA")
         col.separator()
-        col.operator("b2pmxe.sleeve_bones", icon="CONSTRAINT_DATA")
-        col.operator("b2pmxe.twist_bones", icon="CONSTRAINT_DATA")
-        col.operator("b2pmxe.auto_bone", icon="CONSTRAINT_DATA")
+        col.operator("b2pmxe.sleeve_bones", icon="LIBRARY_DATA_DIRECT")
+        col.operator("b2pmxe.twist_bones", icon="LIBRARY_DATA_DIRECT")
+        col.operator("b2pmxe.auto_bone", icon="LIBRARY_DATA_DIRECT")
         col.separator()
         col.operator("b2pmxe.mirror_bones", icon="MOD_MIRROR")
 
@@ -637,11 +637,11 @@ class Blender2PmxeEditPanel(bpy.types.Panel):
         col = col.column_flow(columns=2)
         col.prop(obj.data, "show_names", text="Name")
         col.prop(obj.data, "show_axes", text="Axis")
-        col.prop(obj, "show_x_ray")
+        col.prop(obj, "show_in_front")
         col.prop(obj.data, "use_mirror_x", text="X Mirror")
 
 
-class Blender2PmxePosePanel(bpy.types.Panel):
+class B2PMXEM_PT_PosePanel(bpy.types.Panel):
     bl_label = "Blender2Pmxe Tools"
     bl_space_type = "VIEW_3D"
     bl_region_type = "TOOLS"
@@ -668,12 +668,12 @@ class Blender2PmxePosePanel(bpy.types.Panel):
         col = layout.column(align=True)
         col.label(text="Constraints:")
 
-        col.operator("b2pmxe.add_location", icon="CONSTRAINT_DATA")
-        col.operator("b2pmxe.add_rotation", icon="CONSTRAINT_DATA")
-        col.operator("b2pmxe.limit_rotation", icon="CONSTRAINT_DATA")
+        col.operator("b2pmxe.add_location", icon="LIBRARY_DATA_DIRECT")
+        col.operator("b2pmxe.add_rotation", icon="LIBRARY_DATA_DIRECT")
+        col.operator("b2pmxe.limit_rotation", icon="LIBRARY_DATA_DIRECT")
 
         row = col.row(align=True)
-        row.operator_menu_enum("b2pmxe.add_ik", 'type', icon="CONSTRAINT_DATA")
+        row.operator_menu_enum("b2pmxe.add_ik", 'type', icon="LIBRARY_DATA_DIRECT")
 
         mute_type = True
         for bone in context.active_object.pose.bones:
@@ -686,8 +686,8 @@ class Blender2PmxePosePanel(bpy.types.Panel):
         row.operator(
             "b2pmxe.mute_ik",
             text="",
-            icon="VISIBLE_IPO_ON" if mute_type == True else "VISIBLE_IPO_OFF"
-        ).flag = mute_type
+            icon="HIDE_OFF" if mute_type == True else "HIDE_ON"
+        )#.flag = mute_type
 
         # Display
         obj = context.object
@@ -697,11 +697,11 @@ class Blender2PmxePosePanel(bpy.types.Panel):
         col = col.column_flow(columns=2)
         col.prop(obj.data, "show_names", text="Name")
         col.prop(obj.data, "show_axes", text="Axis")
-        col.prop(obj, "show_x_ray")
-        col.prop(obj.data, "use_auto_ik")
+        col.prop(obj, "show_in_front")
+        col.prop(obj.pose, "use_auto_ik")
 
 
-class Blender2PmxeObjectPanel(bpy.types.Panel):
+class B2PMXEM_PT_ObjectPanel(bpy.types.Panel):
     bl_label = "Blender2Pmxe Tools"
     bl_space_type = "VIEW_3D"
     bl_region_type = "TOOLS"
@@ -741,7 +741,7 @@ class Blender2PmxeObjectPanel(bpy.types.Panel):
         # Solidify Edge
         box = layout.box()
         row = box.split(factor=0.6)
-        row.label("Solidify Edge:", icon='MOD_SOLIDIFY')
+        row.label(text="Solidify Edge:", icon='MOD_SOLIDIFY')
 
         row = row.row(align=True)
         row.alignment = 'RIGHT'
@@ -761,23 +761,23 @@ class Blender2PmxeObjectPanel(bpy.types.Panel):
         col = box.column()
 
         row = col.row(align=True)
-        row.label("Color:")
+        row.label(text="Color:")
         row.prop(scn.b2pmxe_properties, "edge_color", text="")
 
         if active_mat is None:
-            row.label("")
-            row.label("", icon='BLANK1')
+            row.label(text="")
+            row.label(text="", icon='BLANK1')
         else:
             row.prop(active_mat, "diffuse_color", text="")
             row.operator("b2pmxe.set_solidify_mat", text="", icon='STYLUS_PRESSURE')
 
         row = col.row(align=True)
-        row.label("Thickness:")
+        row.label(text="Thickness:")
         row.prop(scn.b2pmxe_properties, "edge_thickness", text="", slider=True)
 
         if active_mod is None:
-            row.label("")
-            row.label("", icon='BLANK1')
+            row.label(text="")
+            row.label(text="", icon='BLANK1')
         else:
             row.prop(active_mod, "thickness", text="")
             row.operator("b2pmxe.set_solidify_mod", text="", icon='STYLUS_PRESSURE')
@@ -788,7 +788,7 @@ class Blender2PmxeObjectPanel(bpy.types.Panel):
         row.operator(
             "b2pmxe.add_solidify",
             text="Add" if active_mat is None else "Reload",
-            icon='ZOOMIN' if active_mat is None else 'FILE_REFRESH'
+            icon='ZOOM_IN' if active_mat is None else 'FILE_REFRESH'
         )
 
         col = layout.column(align=True)
@@ -796,7 +796,7 @@ class Blender2PmxeObjectPanel(bpy.types.Panel):
         # Material to Texface
         row = col.row(align=True)
         row.operator("b2pmxe.texface_remove", text="Delete", icon="X")
-        row.operator("b2pmxe.material_to_texface", text="Mat to Tex", icon='POTATO')
+        row.operator("b2pmxe.material_to_texface", text="Mat to Tex", icon='MATERIAL')
 
         # WeightType Group
         row = col.row(align=True)
@@ -810,7 +810,7 @@ class Blender2PmxeObjectPanel(bpy.types.Panel):
         # Add Driver
         row = col.row(align=True)
         row.operator("b2pmxe.add_driver", text="Delete", icon="X").delete = True
-        row.operator("b2pmxe.add_driver", text="Add Driver", icon="LOGIC")
+        row.operator("b2pmxe.add_driver", text="Add Driver", icon="DRIVER")
 
         col.operator("b2pmxe.make_xml", icon="FILE_TEXT")
         col.operator("b2pmxe.apply_modifier", icon="FILE_TICK")
@@ -821,7 +821,7 @@ class Blender2PmxeObjectPanel(bpy.types.Panel):
 
         # Shading
         row = layout.row()
-        row.prop(context.space_data, 'show_backface_culling')
+        row.prop(scn.display.shading, 'show_backface_culling')
         row.prop(scn.b2pmxe_properties, 'shadeless')
 
 
@@ -841,10 +841,47 @@ def menu_func_vg(self, context):
 classes = [
     ExportBlender2Pmx,
     ImportBlender2Pmx,
+    B2PmxeMakeXML,
     add_function.B2PmxeMirrorVertexGroup,
     add_function.B2PmxeRecalculateRoll,
+    add_function.B2PmxeAddDriver,
+    add_function.B2PmxeCreateWeightType,
+    add_function.B2PmxeDeleteWeightType,
+    add_function.B2PmxeAppendTemplate,
+    add_function.B2PmxeToStance,
+    add_function.B2PmxeDeleteRight,
+    add_function.B2PmxeSelectLeft,
+    add_function.B2PmxeReplacePeriod,
+    add_function.B2PmxeRenameChain,
+    add_function.B2PmxeRenameChainToLR,
+    add_function.B2PmxeRenameChainToNum,
+    add_function.B2PmxeMirrorBones,
+    add_function.B2PmxeAutoBone,
+    add_function.B2PmxeSleeveBones,
+    add_function.B2PmxeTwistBones,
+    add_function.B2PmxeClearPose,
+    add_function.B2PmxeRebindArmature,
+    add_function.B2PmxeLockRot,
+    add_function.B2PmxeLockLoc,
+    add_function.B2PmxeAddCopyLoc,
+    add_function.B2PmxeAddCopyRot,
+    add_function.B2PmxeAddLimit,
+    add_function.B2PmxeAddIK,
+    add_function.B2PmxeMuteIK,
+    solidify_edge.B2PmxeSolidifyRender,
+    solidify_edge.B2PmxeSolidifyView,
+    solidify_edge.B2PmxeSolidifyGetParam,
+    solidify_edge.B2PmxeSolidifyAdd,
+    solidify_edge.B2PmxeSolidifyDelete,
+    space_view3d_materials_utils.VIEW3D_OT_material_to_texface,
+    space_view3d_materials_utils.VIEW3D_OT_texface_remove,
+    object_applymodifier.B2PmxeApplyModifier,
     Blender2PmxeAddonPreferences,
     B2PmxeMessageOperator,
+    Blender2PmxeProperties,
+    B2PMXEM_PT_EditPanel,
+    B2PMXEM_PT_PosePanel,
+    B2PMXEM_PT_ObjectPanel,
 ]
 
 def register():
