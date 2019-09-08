@@ -741,7 +741,7 @@ class Blender2PmxeObjectPanel(bpy.types.Panel):
         # Solidify Edge
         box = layout.box()
         row = box.split(factor=0.6)
-        row.label("Solidify Edge:", icon='MOD_SOLIDIFY')
+        row.label(text="Solidify Edge:", icon='MOD_SOLIDIFY')
 
         row = row.row(align=True)
         row.alignment = 'RIGHT'
@@ -761,23 +761,23 @@ class Blender2PmxeObjectPanel(bpy.types.Panel):
         col = box.column()
 
         row = col.row(align=True)
-        row.label("Color:")
+        row.label(text="Color:")
         row.prop(scn.b2pmxe_properties, "edge_color", text="")
 
         if active_mat is None:
-            row.label("")
-            row.label("", icon='BLANK1')
+            row.label(text="")
+            row.label(text="", icon='BLANK1')
         else:
             row.prop(active_mat, "diffuse_color", text="")
             row.operator("b2pmxe.set_solidify_mat", text="", icon='STYLUS_PRESSURE')
 
         row = col.row(align=True)
-        row.label("Thickness:")
+        row.label(text="Thickness:")
         row.prop(scn.b2pmxe_properties, "edge_thickness", text="", slider=True)
 
         if active_mod is None:
-            row.label("")
-            row.label("", icon='BLANK1')
+            row.label(text="")
+            row.label(text="", icon='BLANK1')
         else:
             row.prop(active_mod, "thickness", text="")
             row.operator("b2pmxe.set_solidify_mod", text="", icon='STYLUS_PRESSURE')
