@@ -495,6 +495,7 @@ def write_pmx_data(context, filepath="",
             if tex_base_path == "":
                 tex_base_path = os.path.dirname(filepath)
 
+            '''
             texture_0 = None if mat.texture_slots[0] is None else mat.texture_slots[0].texture
 
             if texture_0 is not None and texture_0.type == "IMAGE" and texture_0.image is not None:
@@ -522,6 +523,7 @@ def write_pmx_data(context, filepath="",
 
                 elif mat.texture_slots[1].blend_type == 'MULTIPLY':
                     pmx_mat.SphereType = 1
+            '''
 
             faceTemp[mat.name] = []
             mat_list[mat.name] = pmx_mat
