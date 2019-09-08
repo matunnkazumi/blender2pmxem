@@ -27,7 +27,7 @@ def GT(vec, mat):  # GlobalTransformation
     v = vec.copy()
     v.resize_4d()
 
-    w = GlobalMatrix * mat * v
+    w = GlobalMatrix @ mat @ v
     w = w / w.w
     w.resize_3d()
     return w
@@ -37,7 +37,7 @@ def GT_normal(vec, mat):  # GlobalTransformation
     v = vec.copy()
     v.resize_4d()
 
-    w = GlobalMatrix * mat.to_3x3().to_4x4() * v
+    w = GlobalMatrix @ mat.to_3x3().to_4x4() @ v
     w.resize_3d()
     w.normalize()
     return w
@@ -49,7 +49,7 @@ def write_pmx_data(context, filepath="",
                    use_custom_normals=False,
                    ):
 
-    prefs = context.user_preferences.addons[GV.FolderName].preferences
+    prefs = context.preferences.addons[GV.FolderName].preferences
     use_japanese_name = prefs.use_japanese_name
 
     GV.SetStartTime()
@@ -475,12 +475,13 @@ def write_pmx_data(context, filepath="",
                 pmx_mat.EdgeColor = Math.Vector((float(edge_c.get("r", "0.0")), float(edge_c.get("g", "0.0")),
                                                  float(edge_c.get("b", "0.0")), float(edge_c.get("a", "1.0"))))
 
-            r, g, b = mat.diffuse_color
-            pmx_mat.Deffuse = Math.Vector((r, g, b, mat.alpha))
+            r, g, b, a = mat.diffuse_color
+            pmx_mat.Deffuse = Math.Vector((r, g, b, a))
 
             r, g, b = mat.specular_color
             pmx_mat.Specular = Math.Vector((r, g, b))
-            pmx_mat.Power = mat.specular_hardness
+            #pmx_mat.Power = mat.specular_hardness
+            pmx_mat.Power = 1
 
             if "Ambient" in mat:
                 pmx_mat.Ambient = Math.Vector(mat["Ambient"].to_list())
@@ -494,6 +495,7 @@ def write_pmx_data(context, filepath="",
             if tex_base_path == "":
                 tex_base_path = os.path.dirname(filepath)
 
+            '''
             texture_0 = None if mat.texture_slots[0] is None else mat.texture_slots[0].texture
 
             if texture_0 is not None and texture_0.type == "IMAGE" and texture_0.image is not None:
@@ -521,6 +523,7 @@ def write_pmx_data(context, filepath="",
 
                 elif mat.texture_slots[1].blend_type == 'MULTIPLY':
                     pmx_mat.SphereType = 1
+            '''
 
             faceTemp[mat.name] = []
             mat_list[mat.name] = pmx_mat
@@ -703,7 +706,7 @@ def write_pmx_data(context, filepath="",
             # Get Face & UV
             uv_data = None
             add_vertex_count = 0
-            if len(mesh.uv_textures) > 0:
+            if len(mesh.uv_layers) > 0:
                 # mesh.uv_textures.active_index = 0
                 uv_data = mesh.uv_layers.active.data[:]
 

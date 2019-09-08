@@ -183,11 +183,11 @@ class Blender2PmxeAddonPreferences(bpy.types.AddonPreferences):
         row.prop(self, "use_T_stance")
 
         col = layout.column_flow(columns=2)
-        col.label("Number of .xml old versions:")
-        col.label("Angle of T stance and A stance:")
-        col.label("Number of Twist link bones:")
-        col.label("Auto Bone influence:")
-        col.label("Rename Chain threshold:")
+        col.label(text="Number of .xml old versions:")
+        col.label(text="Angle of T stance and A stance:")
+        col.label(text="Number of Twist link bones:")
+        col.label(text="Auto Bone influence:")
+        col.label(text="Rename Chain threshold:")
 
         col.prop(self, "saveVersions")
         row = col.row(align=True)
@@ -298,7 +298,7 @@ class ExportBlender2Pmx(bpy.types.Operator, ExportHelper):
         layout = self.layout
 
         box = layout.box()
-        row = box.split(percentage=0.3)
+        row = box.split(factor=0.3)
         row.label(text="Encode:")
         row.prop(self, "encode_type", text="")
 
@@ -419,7 +419,7 @@ class B2PmxeSaveAsXML(bpy.types.Operator):
         return (bpy.data.is_saved) and (obj and obj.type == 'ARMATURE')
 
     def execute(self, context):
-        prefs = context.user_preferences.addons[GV.FolderName].preferences
+        prefs = context.preferences.addons[GV.FolderName].preferences
         use_japanese_name = prefs.use_japanese_name
         xml_save_versions = prefs.saveVersions
         props = context.scene.b2pmxe_properties
@@ -740,7 +740,7 @@ class Blender2PmxeObjectPanel(bpy.types.Panel):
         # Tools
         # Solidify Edge
         box = layout.box()
-        row = box.split(percentage=0.6)
+        row = box.split(factor=0.6)
         row.label("Solidify Edge:", icon='MOD_SOLIDIFY')
 
         row = row.row(align=True)
@@ -842,6 +842,7 @@ classes = [
     ExportBlender2Pmx,
     ImportBlender2Pmx,
     add_function.B2PmxeMirrorVertexGroup,
+    Blender2PmxeAddonPreferences,
 ]
 
 def register():
