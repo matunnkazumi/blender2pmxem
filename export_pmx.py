@@ -27,7 +27,7 @@ def GT(vec, mat):  # GlobalTransformation
     v = vec.copy()
     v.resize_4d()
 
-    w = GlobalMatrix * mat * v
+    w = GlobalMatrix @ mat @ v
     w = w / w.w
     w.resize_3d()
     return w
