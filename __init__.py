@@ -335,14 +335,14 @@ class B2PmxeMessageOperator(bpy.types.Operator):
         layout = self.layout
 
         if self.type == 'ERROR':
-            layout.label(iface_("Error") + ":", icon='ERROR')
+            layout.label(text=iface_("Error") + ":", icon='ERROR')
         elif self.type == 'INFO':
-            layout.label(iface_("Info") + ":", icon='INFO')
+            layout.label(text=iface_("Info") + ":", icon='INFO')
 
-        row = layout.split(0.05)
-        row.label("")
+        row = layout.split(factor=0.05)
+        row.label(text="")
         col = row.column(align=True)
-        col.label(self.line1)
+        col.label(text=self.line1)
 
         type_text = "[{0:s}]".format(self.type)
         print("{0:s} {1:s}".format(type_text, self.line1))
@@ -842,7 +842,9 @@ classes = [
     ExportBlender2Pmx,
     ImportBlender2Pmx,
     add_function.B2PmxeMirrorVertexGroup,
+    add_function.B2PmxeRecalculateRoll,
     Blender2PmxeAddonPreferences,
+    B2PmxeMessageOperator,
 ]
 
 def register():
