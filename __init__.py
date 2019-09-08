@@ -842,6 +842,7 @@ classes = [
     ExportBlender2Pmx,
     ImportBlender2Pmx,
     add_function.B2PmxeMirrorVertexGroup,
+    add_function.B2PmxeRecalculateRoll,
     Blender2PmxeAddonPreferences,
     B2PmxeMessageOperator,
 ]
