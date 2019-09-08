@@ -103,7 +103,7 @@ class Blender2PmxeProperties(bpy.types.PropertyGroup):
 
     @classmethod
     def register(cls):
-        bpy.types.Scene.b2pmxe_properties: PointerProperty(type=cls)
+        bpy.types.Scene.b2pmxe_properties = PointerProperty(type=cls)
 
         def toggle_shadeless(self, context):
             context.space_data.show_textured_shadeless = self.shadeless
@@ -113,23 +113,23 @@ class Blender2PmxeProperties(bpy.types.PropertyGroup):
                 if mat:
                     mat.use_shadeless = self.shadeless
 
-        cls.edge_color: FloatVectorProperty(
+        cls.edge_color = FloatVectorProperty(
             name="Color",
             default=(0.0, 0.0, 0.0),
             min=0.0, max=1.0, step=10, precision=3,
             subtype='COLOR'
         )
-        cls.edge_thickness: FloatProperty(
+        cls.edge_thickness = FloatProperty(
             name="Thickness",
             default=0.01, min=0.0025, max=0.05, step=0.01, precision=4,
             unit='LENGTH'
         )
-        cls.shadeless: BoolProperty(
+        cls.shadeless = BoolProperty(
             name="Shadeless",
             update=toggle_shadeless,
             default=False
         )
-        cls.make_xml_option: EnumProperty(
+        cls.make_xml_option = EnumProperty(
             name="Make XML Option",
             items=(
                 ('NONE', "None", ""),
