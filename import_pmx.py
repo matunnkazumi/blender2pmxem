@@ -246,7 +246,7 @@ def read_pmx_data(context, filepath="",
         base_path = os.path.dirname(filepath)
 
         for ob in scene.objects:
-            ob.select = False
+            ob.select_set(False)
 
         tmp_name = Get_JP_or_EN_Name(pmx_data.Name, pmx_data.Name_E, use_japanese_name)
 
