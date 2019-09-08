@@ -687,7 +687,7 @@ class Blender2PmxePosePanel(bpy.types.Panel):
             "b2pmxe.mute_ik",
             text="",
             icon="HIDE_OFF" if mute_type == True else "HIDE_ON"
-        ).flag = mute_type
+        )#.flag = mute_type
 
         # Display
         obj = context.object
