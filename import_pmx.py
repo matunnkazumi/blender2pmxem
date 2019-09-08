@@ -254,17 +254,16 @@ def read_pmx_data(context, filepath="",
         arm_obj = bpy.data.objects.new(tmp_name + "_Arm", arm_dat)
 
         arm_obj.show_in_front = True
-        arm_dat.draw_type = "STICK"
+        arm_dat.display_type = "STICK"
 
-        scn = bpy.context.scene
-        scn.objects.link(arm_obj)
-        scn.objects.active = arm_obj
-        scn.update()
+        bpy.context.collection.objects.link(arm_obj)
+        bpy.context.view_layer.objects.active = arm_obj
+        bpy.context.view_layer.update()
 
         # Make XML
         blender_bone_list = make_xml(pmx_data, filepath, use_japanese_name, xml_save_versions)
 
-        arm_obj.select = True
+        arm_obj.select_set(True)
         bone_id = {}
 
         # Set Bone Position
@@ -489,7 +488,7 @@ def read_pmx_data(context, filepath="",
         # Create Mash
         mesh = bpy.data.meshes.new(tmp_name)
         obj_mesh = bpy.data.objects.new(mesh.name, mesh)
-        scene.objects.link(obj_mesh)
+        bpy.context.collection.objects.link(obj_mesh)
 
         # Link Parent
         mod = obj_mesh.modifiers.new('RigModif', 'ARMATURE')
@@ -506,7 +505,7 @@ def read_pmx_data(context, filepath="",
             vert_group_index[bone_index] = target_name
 
             if not target_name in vert_group.keys():
-                vert_group[target_name] = obj_mesh.vertex_groups.new(target_name)
+                vert_group[target_name] = obj_mesh.vertex_groups.new(name=target_name)
 
         mesh.update()
 
@@ -603,12 +602,11 @@ def read_pmx_data(context, filepath="",
             blender_mat_name = Get_JP_or_EN_Name(mat_data.Name, mat_data.Name_E, use_japanese_name)
 
             temp_mattrial = bpy.data.materials.new(blender_mat_name)
-            temp_mattrial.diffuse_color = mat_data.Deffuse.xyz
-            temp_mattrial.alpha = mat_data.Deffuse.w
+            temp_mattrial.diffuse_color = mat_data.Deffuse.xyzw
             temp_mattrial.specular_color = mat_data.Specular
-            temp_mattrial.specular_hardness = mat_data.Power
+            #temp_mattrial.specular_hardness = mat_data.Power
             temp_mattrial["Ambient"] = mat_data.Ambient
-            temp_mattrial.use_transparency = True
+            temp_mattrial.blend_method = 'BLEND'
 
             mat_status.append((len(mat_status), mat_data.FaceLength))
 
@@ -671,10 +669,10 @@ def read_pmx_data(context, filepath="",
 
         # Set Material & UV
         # Set UV Layer
-        if mesh.uv_textures.active_index < 0:
-            mesh.uv_textures.new("UV_Data")
+        if mesh.uv_layers.active_index < 0:
+            mesh.uv_layers.new(name="UV_Data")
 
-        mesh.uv_textures.active_index = 0
+        mesh.uv_layers.active_index = 0
 
         uv_data = mesh.uv_layers.active.data[:]
 
@@ -732,7 +730,7 @@ def read_pmx_data(context, filepath="",
             # To activate "Basis" shape
             obj_mesh.active_shape_key_index = 0
 
-        scene.update()
+        bpy.context.view_layer.update()
 
         GV.SetVertCount(len(pmx_data.Vertices))
         GV.PrintTime(filepath, type='import')
