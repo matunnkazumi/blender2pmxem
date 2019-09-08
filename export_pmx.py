@@ -37,7 +37,7 @@ def GT_normal(vec, mat):  # GlobalTransformation
     v = vec.copy()
     v.resize_4d()
 
-    w = GlobalMatrix * mat.to_3x3().to_4x4() * v
+    w = GlobalMatrix @ mat.to_3x3().to_4x4() @ v
     w.resize_3d()
     w.normalize()
     return w
