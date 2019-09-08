@@ -475,8 +475,8 @@ def write_pmx_data(context, filepath="",
                 pmx_mat.EdgeColor = Math.Vector((float(edge_c.get("r", "0.0")), float(edge_c.get("g", "0.0")),
                                                  float(edge_c.get("b", "0.0")), float(edge_c.get("a", "1.0"))))
 
-            r, g, b = mat.diffuse_color
-            pmx_mat.Deffuse = Math.Vector((r, g, b, mat.alpha))
+            r, g, b, a = mat.diffuse_color
+            pmx_mat.Deffuse = Math.Vector((r, g, b, a))
 
             r, g, b = mat.specular_color
             pmx_mat.Specular = Math.Vector((r, g, b))
