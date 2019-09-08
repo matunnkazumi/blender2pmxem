@@ -706,7 +706,7 @@ def write_pmx_data(context, filepath="",
             # Get Face & UV
             uv_data = None
             add_vertex_count = 0
-            if len(mesh.uv_textures) > 0:
+            if len(mesh.uv_layers) > 0:
                 # mesh.uv_textures.active_index = 0
                 uv_data = mesh.uv_layers.active.data[:]
 
