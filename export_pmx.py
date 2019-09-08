@@ -480,7 +480,8 @@ def write_pmx_data(context, filepath="",
 
             r, g, b = mat.specular_color
             pmx_mat.Specular = Math.Vector((r, g, b))
-            pmx_mat.Power = mat.specular_hardness
+            #pmx_mat.Power = mat.specular_hardness
+            pmx_mat.Power = 1
 
             if "Ambient" in mat:
                 pmx_mat.Ambient = Math.Vector(mat["Ambient"].to_list())
