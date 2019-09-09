@@ -1139,7 +1139,7 @@ def append_object(objname, activeflag=True):
         relative_path=True,
         link=False,
         autoselect=activeflag,
-        active_layer=activeflag)
+        active_collection=activeflag)
 
 
 class B2PmxeAppendTemplate(bpy.types.Operator):
