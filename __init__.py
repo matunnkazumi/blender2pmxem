@@ -386,19 +386,19 @@ class B2PmxeMakeXML(bpy.types.Operator):
         files = [os.path.relpath(x, directory) for x in glob(os.path.join(directory, '*.pmx'))]
 
         layout = self.layout
-        row = layout.split(0.01)
-        row.label("")
+        row = layout.split(factor=0.01)
+        row.label(text="")
 
-        split = row.split(0.968)
+        split = row.split(factor=0.968)
         col = split.column(align=True)
 
-        col.label("Fix Bones:")
+        col.label(text="Fix Bones:")
         props = context.scene.b2pmxe_properties
         row = col.row(align=True)
         row.prop(props, "make_xml_option", expand=True)
         col.separator()
 
-        col.label("File Select:")
+        col.label(text="File Select:")
         for file in files:
             col.operator("b2pmxe.save_as_xml", text=file).filename = file
 
@@ -878,6 +878,7 @@ classes = [
     object_applymodifier.B2PmxeApplyModifier,
     Blender2PmxeAddonPreferences,
     B2PmxeMessageOperator,
+    B2PmxeSaveAsXML,
     Blender2PmxeProperties,
     B2PMXEM_PT_EditPanel,
     B2PMXEM_PT_PosePanel,

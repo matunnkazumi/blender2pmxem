@@ -591,7 +591,7 @@ class B2PmxeCreateWeightType(bpy.types.Operator):
                 continue
             if obj.type != 'MESH':
                 continue
-            if obj.hide == True:
+            if obj.hide_viewport == True:
                 continue
 
             mesh = obj.data
@@ -607,7 +607,7 @@ class B2PmxeCreateWeightType(bpy.types.Operator):
 
             # create new vertex_color group
             if color_map is None:
-                color_map = mesh.vertex_colors.new(GV.WeightTypeName)
+                color_map = mesh.vertex_colors.new(name=GV.WeightTypeName)
 
             # Set active group
             color_map.active = True
@@ -634,7 +634,8 @@ class B2PmxeCreateWeightType(bpy.types.Operator):
                     loop = mesh.loops[idx]
                     v = loop.vertex_index
 
-                    color_map.data[i].color = self.color_dict.get(color_list[v], Color((1.0, 0.0, 0.0)))
+                    c = self.color_dict.get(color_list[v], Color((1.0, 0.0, 0.0)))
+                    color_map.data[i].color = (c.r, c.g, c.b, 1.0)
                     i += 1
 
         return {'FINISHED'}
@@ -1139,7 +1140,7 @@ def append_object(objname, activeflag=True):
         relative_path=True,
         link=False,
         autoselect=activeflag,
-        active_layer=activeflag)
+        active_collection=activeflag)
 
 
 class B2PmxeAppendTemplate(bpy.types.Operator):
