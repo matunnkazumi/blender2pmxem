@@ -1299,7 +1299,7 @@ class B2PmxeMirrorVertexGroup(bpy.types.Operator):
 def rotate_pose(context, to_A_stance):
     settings = context.preferences.addons[GV.FolderName].preferences
     pose_bones = context.object.data.bones
-    sign = 1 if to_A_stance == True else -1
+    sign = -1 if to_A_stance == True else 1
 
     str_shoulder = ("shoulder_L", "shoulder.L", "肩_L", "肩.L")
     str_arm = ("arm_L", "arm.L", "腕_L", "腕.L")
@@ -1312,8 +1312,10 @@ def rotate_pose(context, to_A_stance):
         # find shoulder
         if bone is not None:
             pose_bones.active = bone
-            bpy.ops.transform.rotate(value=settings.rotShoulder * sign, axis=(0, 1, 0),
-                                     constraint_axis=(False, True, False), constraint_orientation='GLOBAL')
+            bpy.ops.transform.rotate(value=settings.rotShoulder * sign,
+                                     orient_axis='Y',
+                                     constraint_axis=(False, True, False),
+                                     orient_type='GLOBAL')
             bpy.ops.pose.copy()
             bpy.ops.pose.paste(flipped=True)
             break
@@ -1326,8 +1328,10 @@ def rotate_pose(context, to_A_stance):
         # find arm
         if bone is not None:
             pose_bones.active = bone
-            bpy.ops.transform.rotate(value=settings.rotArm * sign, axis=(0, 1, 0),
-                                     constraint_axis=(False, True, False), constraint_orientation='GLOBAL')
+            bpy.ops.transform.rotate(value=settings.rotArm * sign,
+                                     orient_axis='Y',
+                                     constraint_axis=(False, True, False),
+                                     orient_type='GLOBAL')
             bpy.ops.pose.copy()
             bpy.ops.pose.paste(flipped=True)
             break
