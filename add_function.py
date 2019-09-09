@@ -270,11 +270,10 @@ class B2PmxeMirrorBones(bpy.types.Operator):
         for i, area in enumerate(context.screen.areas):
             areas[area.type] = i
 
-        view3d = context.screen.areas[areas['VIEW_3D']].spaces[0]
-        before_pivot = view3d.pivot_point
-        before_location = view3d.cursor_location
-        view3d.pivot_point = 'CURSOR'
-        view3d.cursor_location = (0.0, 0.0, 0.0)
+        before_pivot = context.tool_settings.transform_pivot_point
+        before_location = context.scene.cursor.location
+        context.tool_settings.transform_pivot_point = 'CURSOR'
+        context.scene.cursor.location = (0.0, 0.0, 0.0)
 
         # mirror & L/R naming
         bname = context.selected_editable_bones[0].name
@@ -293,8 +292,8 @@ class B2PmxeMirrorBones(bpy.types.Operator):
         replace_period(context)
 
         # reset pivot
-        view3d.pivot_point = before_pivot
-        view3d.cursor_location = before_location
+        context.tool_settings.transform_pivot_point = before_pivot
+        context.scene.cursor.location = before_location
 
         return {'FINISHED'}
 
