@@ -591,7 +591,7 @@ class B2PmxeCreateWeightType(bpy.types.Operator):
                 continue
             if obj.type != 'MESH':
                 continue
-            if obj.hide == True:
+            if obj.hide_viewport == True:
                 continue
 
             mesh = obj.data
