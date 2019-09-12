@@ -153,28 +153,30 @@ class Init(object):
                 tmp_name = shape_keys.key_blocks[i].name
 
                 depsgraph = bpy.context.evaluated_depsgraph_get()
+                
                 for oi in depsgraph.object_instances:
                     oiname = oi.object.name
-                    if oiname != target_obj.name:
-                        continue
+                    if oiname == target_obj.name:
+                        target_obj_eval = oi.object
+                        break
 
-                    tmp_mesh = oi.object.to_mesh()
-                    new_vertex_num = len(tmp_mesh.vertices)
+                tmp_mesh = target_obj_eval.to_mesh()
+                new_vertex_num = len(tmp_mesh.vertices)
 
-                    if pre_vertex_num != new_vertex_num:
-                        to_raise = True
-                        print("Failed to create shape key '{0:s}'".format(tmp_name))
-                        continue
+                if pre_vertex_num != new_vertex_num:
+                    to_raise = True
+                    print("Failed to create shape key '{0:s}'".format(tmp_name))
+                    continue
 
-                    # add shape_keys
-                    tmp_block = self.MasterObj.shape_key_add(name=tmp_name, from_mix=False)
+                # add shape_keys
+                tmp_block = self.MasterObj.shape_key_add(name=tmp_name, from_mix=False)
 
-                    # modify shape_keys
-                    tmp_mesh.vertices.foreach_get('co', vert_array)
-                    tmp_block.data.foreach_set('co', vert_array)
+                # modify shape_keys
+                tmp_mesh.vertices.foreach_get('co', vert_array)
+                tmp_block.data.foreach_set('co', vert_array)
 
-                    # remove tmp_mesh
-                    oi.object.to_mesh_clear()
+                # remove tmp_mesh
+                target_obj_eval.to_mesh_clear()
 
         # Set pre flag
         target_obj.show_only_shape_key = pre_only_shape
