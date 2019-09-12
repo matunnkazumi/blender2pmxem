@@ -38,6 +38,14 @@ class ShapeVertexError(Exception):
     def __init__(self, data):
         self.data = data
 
+def make_evaluated_object(target_obj):
+    depsgraph = bpy.context.evaluated_depsgraph_get()
+    for oi in depsgraph.object_instances:
+        oiname = oi.object.name
+        if oiname != target_obj.name:
+            continue
+        tmp_mesh = bpy.data.meshes.new_from_object(oi.object)
+        return bpy.data.objects.new(tmp_mesh.name, tmp_mesh)
 
 class Init(object):
 
@@ -50,16 +58,14 @@ class Init(object):
             target_obj.show_only_shape_key = True
             target_obj.active_shape_key_index = 0
 
-            tmp_mesh = target_obj.to_mesh(scn, True, 'PREVIEW')
-            self.MasterObj = bpy.data.objects.new(tmp_mesh.name, tmp_mesh)
+            self.MasterObj = make_evaluated_object(target_obj)
 
             # add 'basis' shape_key
             tmp_name = shape_keys.key_blocks[0].name
             self.MasterObj.shape_key_add(tmp_name, False)
         # no shape_key
         else:
-            tmp_mesh = target_obj.to_mesh(scn, True, 'PREVIEW')
-            self.MasterObj = bpy.data.objects.new(tmp_mesh.name, tmp_mesh)
+            self.MasterObj = make_evaluated_object(target_obj)
 
     def Set_AnimData(self, pre_anim_data):
         if pre_anim_data is not None:
