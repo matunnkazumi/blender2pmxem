@@ -62,7 +62,7 @@ class Init(object):
 
             # add 'basis' shape_key
             tmp_name = shape_keys.key_blocks[0].name
-            self.MasterObj.shape_key_add(tmp_name, False)
+            self.MasterObj.shape_key_add(name=tmp_name, from_mix=False)
         # no shape_key
         else:
             self.MasterObj = make_evaluated_object(target_obj)
@@ -152,23 +152,29 @@ class Init(object):
                 target_obj.active_shape_key_index = i
                 tmp_name = shape_keys.key_blocks[i].name
 
-                tmp_mesh = target_obj.to_mesh(scn, True, 'PREVIEW')
-                new_vertex_num = len(tmp_mesh.vertices)
+                depsgraph = bpy.context.evaluated_depsgraph_get()
+                for oi in depsgraph.object_instances:
+                    oiname = oi.object.name
+                    if oiname != target_obj.name:
+                        continue
 
-                if pre_vertex_num != new_vertex_num:
-                    to_raise = True
-                    print("Failed to create shape key '{0:s}'".format(tmp_name))
-                    continue
+                    tmp_mesh = oi.object.to_mesh()
+                    new_vertex_num = len(tmp_mesh.vertices)
 
-                # add shape_keys
-                tmp_block = self.MasterObj.shape_key_add(tmp_name, False)
+                    if pre_vertex_num != new_vertex_num:
+                        to_raise = True
+                        print("Failed to create shape key '{0:s}'".format(tmp_name))
+                        continue
 
-                # modify shape_keys
-                tmp_mesh.vertices.foreach_get('co', vert_array)
-                tmp_block.data.foreach_set('co', vert_array)
+                    # add shape_keys
+                    tmp_block = self.MasterObj.shape_key_add(name=tmp_name, from_mix=False)
 
-                # remove tmp_mesh
-                bpy.data.meshes.remove(tmp_mesh)
+                    # modify shape_keys
+                    tmp_mesh.vertices.foreach_get('co', vert_array)
+                    tmp_block.data.foreach_set('co', vert_array)
+
+                    # remove tmp_mesh
+                    oi.object.to_mesh_clear()
 
         # Set pre flag
         target_obj.show_only_shape_key = pre_only_shape
