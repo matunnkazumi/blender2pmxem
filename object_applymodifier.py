@@ -38,6 +38,14 @@ class ShapeVertexError(Exception):
     def __init__(self, data):
         self.data = data
 
+def make_evaluated_object(target_obj):
+    depsgraph = bpy.context.evaluated_depsgraph_get()
+    for oi in depsgraph.object_instances:
+        oiname = oi.object.name
+        if oiname != target_obj.name:
+            continue
+        tmp_mesh = bpy.data.meshes.new_from_object(oi.object)
+        return bpy.data.objects.new(tmp_mesh.name, tmp_mesh)
 
 class Init(object):
 
@@ -50,16 +58,14 @@ class Init(object):
             target_obj.show_only_shape_key = True
             target_obj.active_shape_key_index = 0
 
-            tmp_mesh = target_obj.to_mesh(scn, True, 'PREVIEW')
-            self.MasterObj = bpy.data.objects.new(tmp_mesh.name, tmp_mesh)
+            self.MasterObj = make_evaluated_object(target_obj)
 
             # add 'basis' shape_key
             tmp_name = shape_keys.key_blocks[0].name
-            self.MasterObj.shape_key_add(tmp_name, False)
+            self.MasterObj.shape_key_add(name=tmp_name, from_mix=False)
         # no shape_key
         else:
-            tmp_mesh = target_obj.to_mesh(scn, True, 'PREVIEW')
-            self.MasterObj = bpy.data.objects.new(tmp_mesh.name, tmp_mesh)
+            self.MasterObj = make_evaluated_object(target_obj)
 
     def Set_AnimData(self, pre_anim_data):
         if pre_anim_data is not None:
@@ -146,7 +152,15 @@ class Init(object):
                 target_obj.active_shape_key_index = i
                 tmp_name = shape_keys.key_blocks[i].name
 
-                tmp_mesh = target_obj.to_mesh(scn, True, 'PREVIEW')
+                depsgraph = bpy.context.evaluated_depsgraph_get()
+                
+                for oi in depsgraph.object_instances:
+                    oiname = oi.object.name
+                    if oiname == target_obj.name:
+                        target_obj_eval = oi.object
+                        break
+
+                tmp_mesh = target_obj_eval.to_mesh()
                 new_vertex_num = len(tmp_mesh.vertices)
 
                 if pre_vertex_num != new_vertex_num:
@@ -155,14 +169,14 @@ class Init(object):
                     continue
 
                 # add shape_keys
-                tmp_block = self.MasterObj.shape_key_add(tmp_name, False)
+                tmp_block = self.MasterObj.shape_key_add(name=tmp_name, from_mix=False)
 
                 # modify shape_keys
                 tmp_mesh.vertices.foreach_get('co', vert_array)
                 tmp_block.data.foreach_set('co', vert_array)
 
                 # remove tmp_mesh
-                bpy.data.meshes.remove(tmp_mesh)
+                target_obj_eval.to_mesh_clear()
 
         # Set pre flag
         target_obj.show_only_shape_key = pre_only_shape

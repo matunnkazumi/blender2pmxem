@@ -348,13 +348,13 @@ class B2PmxeMessageOperator(bpy.types.Operator):
         print("{0:s} {1:s}".format(type_text, self.line1))
 
         if self.line2:
-            col.label(self.line2)
+            col.label(text=self.line2)
             print("{0:s} {1:s}".format(" " * (len(type_text)), self.line2))
         if self.line3:
-            col.label(self.line3)
+            col.label(text=self.line3)
             print("{0:s} {1:s}".format(" " * (len(type_text)), self.line3))
         if self.use_console:
-            col.label("See the console log for more information.")
+            col.label(text="See the console log for more information.")
 
         layout.separator()
 
