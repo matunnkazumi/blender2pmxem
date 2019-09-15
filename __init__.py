@@ -610,9 +610,9 @@ class B2PmxeSaveAsXML(bpy.types.Operator):
 
 
 class B2PMXEM_PT_EditPanel(bpy.types.Panel):
-    bl_label = "Blender2Pmxe Tools"
+    bl_label = "Blender2Pmxem Tools"
     bl_space_type = "VIEW_3D"
-    bl_region_type = "TOOLS"
+    bl_region_type = "UI"
     bl_context = "armature_edit"
 
     def draw(self, context):
@@ -658,9 +658,9 @@ class B2PMXEM_PT_EditPanel(bpy.types.Panel):
 
 
 class B2PMXEM_PT_PosePanel(bpy.types.Panel):
-    bl_label = "Blender2Pmxe Tools"
+    bl_label = "Blender2Pmxem Tools"
     bl_space_type = "VIEW_3D"
-    bl_region_type = "TOOLS"
+    bl_region_type = "UI"
     bl_context = "posemode"
 
     def draw(self, context):
@@ -718,9 +718,9 @@ class B2PMXEM_PT_PosePanel(bpy.types.Panel):
 
 
 class B2PMXEM_PT_ObjectPanel(bpy.types.Panel):
-    bl_label = "Blender2Pmxe Tools"
+    bl_label = "Blender2Pmxem Tools"
     bl_space_type = "VIEW_3D"
-    bl_region_type = "TOOLS"
+    bl_region_type = "UI"
     bl_context = "objectmode"
 
     def draw(self, context):
