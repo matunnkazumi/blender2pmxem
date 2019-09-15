@@ -3,10 +3,11 @@ import os
 import csv
 from mathutils import Color, Vector
 import math
-import re
 from bpy.app.translations import pgettext_iface as iface_
-from bpy.props import StringProperty, BoolProperty, EnumProperty, FloatProperty, PointerProperty, IntProperty
-from . import object_applymodifier, global_variable
+from bpy.props import BoolProperty
+from bpy.props import EnumProperty
+from . import object_applymodifier
+from . import global_variable
 
 # global_variable
 GV = global_variable.Init()
@@ -115,7 +116,7 @@ class B2PmxeRenameChainToLR(bpy.types.Operator):
             name_list = bone.name.rsplit('_')
             LR = 'R' if bone.head[0] < 0 else 'L'
 
-            if is_center == True:
+            if is_center:
                 if name_list[2] == '0':
                     continue
 
@@ -206,7 +207,7 @@ class B2PmxeRenameChainToNum(bpy.types.Operator):
                         if abs(bone.head[0]) < threshold:
                             is_center = True
 
-        LR = 'R' if self.reverse == True else 'L'
+        LR = 'R' if self.reverse else 'L'
         quot, rem = divmod(bone_max, 2)
 
         for bone in bone_list:
@@ -217,7 +218,7 @@ class B2PmxeRenameChainToNum(bpy.types.Operator):
                 bone.name = bone.name.rstrip('_' + LR)
 
             # 'R' (center ON)
-            elif is_center == True:
+            elif is_center:
                 bone.name = '_'.join([name_list[0], name_list[1], str(bone_max - int(name_list[2]))])
 
             # (center OFF)
@@ -340,12 +341,10 @@ class B2PmxeRecalculateRoll(bpy.types.Operator):
 
     def execute(self, context):
         axis_x = Vector((1.0, 0.0, 0.0))  # x
-        axis_y = Vector((0.0, 0.0, 1.0))  # y
-        axis_z = Vector((0.0, 1.0, 0.0))  # z
 
         for eb in context.selected_editable_bones:
             eb.roll = 0
-            #local_matrix = mathutils.Matrix(eb.matrix)
+            # local_matrix = mathutils.Matrix(eb.matrix)
             local_y = eb.y_axis  # axis_y * local_matrix   #y'
             local_z = eb.z_axis  # axis_z * local_matrix   #z'
             target_z = axis_x.cross(local_y)  # Z''
@@ -591,7 +590,7 @@ class B2PmxeCreateWeightType(bpy.types.Operator):
                 continue
             if obj.type != 'MESH':
                 continue
-            if obj.hide_viewport == True:
+            if obj.hide_viewport:
                 continue
 
             mesh = obj.data
@@ -1169,7 +1168,7 @@ class B2PmxeAppendTemplate(bpy.types.Operator):
             context.scene.objects.active = ao[0]
 
             toJP = {}
-            if prefs.use_japanese_name == True:
+            if prefs.use_japanese_name:
                 filepath = os.path.join(os.path.dirname(__file__), "template_dict.csv")
 
                 with open(filepath) as csvfile:
@@ -1180,7 +1179,7 @@ class B2PmxeAppendTemplate(bpy.types.Operator):
 
             for pb in context.object.pose.bones:
                 # rename EN to JP name
-                if prefs.use_japanese_name == True:
+                if prefs.use_japanese_name:
                     pb.name = toJP.get(pb.name, pb.name)
 
                 # set custom shape
@@ -1191,7 +1190,7 @@ class B2PmxeAppendTemplate(bpy.types.Operator):
                     set_custom_shape(context, pb, GV.ShapeEyes)
 
             # want to A pose? then
-            if prefs.use_T_stance == False:
+            if prefs.use_T_stance:
                 bpy.ops.b2pmxe.to_stance(to_A_stance=True)
                 bpy.ops.pose.armature_apply()
 
@@ -1219,7 +1218,7 @@ class B2PmxeDeleteRight(bpy.types.Operator):
         bpy.ops.object.select_pattern(pattern="*.R", extend=True)
 
         if len(context.selected_editable_bones):
-            if arm_obj.data.use_mirror_x == True:
+            if arm_obj.data.use_mirror_x:
                 arm_obj.data.use_mirror_x = False
                 bpy.ops.armature.delete()
                 arm_obj.data.use_mirror_x = True
@@ -1300,7 +1299,7 @@ class B2PmxeMirrorVertexGroup(bpy.types.Operator):
 def rotate_pose(context, to_A_stance):
     settings = context.preferences.addons[GV.FolderName].preferences
     pose_bones = context.object.data.bones
-    sign = -1 if to_A_stance == True else 1
+    sign = -1 if to_A_stance else 1
 
     str_shoulder = ("shoulder_L", "shoulder.L", "肩_L", "肩.L")
     str_arm = ("arm_L", "arm.L", "腕_L", "腕.L")
@@ -1347,7 +1346,10 @@ class B2PmxeToStance(bpy.types.Operator):
     bl_label = "to A or T stance"
     bl_options = {'REGISTER', 'UNDO'}
 
-    to_A_stance: BoolProperty(name="to A stance", description="Rotate bones to A stance", default=True, options={'SKIP_SAVE'})
+    to_A_stance: BoolProperty(name="to A stance",
+                              description="Rotate bones to A stance",
+                              default=True,
+                              options={'SKIP_SAVE'})
 
     @classmethod
     def poll(cls, context):
@@ -1420,7 +1422,7 @@ class B2PmxeAddDriver(bpy.types.Operator):
         return (obj and obj.type == 'MESH' and obj.data.shape_keys is not None)
 
     def add_driver(self, active_keys, target_block, active_block):
-        if self.delete == True:
+        if self.delete:
             return
 
         # add driver
@@ -1472,7 +1474,7 @@ class B2PmxeAddDriver(bpy.types.Operator):
 
                             # find exist (Don't overlap created)
                             if fcurve_name == active_block.name:
-                                if self.delete == True:
+                                if self.delete:
                                     target_block.driver_remove('value')
                                 break
                         # not found

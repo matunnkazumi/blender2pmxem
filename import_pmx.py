@@ -46,10 +46,10 @@ def GT_normal(vec, mat):  # GlobalTransformation
 def Get_JP_or_EN_Name(jp_name, en_name, use_japanese_name, bone_mode=False):
     tmp_name = jp_name
 
-    if use_japanese_name == False and en_name != "":
+    if (not use_japanese_name) and en_name != "":
         tmp_name = en_name
 
-    if bone_mode == True:
+    if bone_mode:
         findR = re.compile("\u53f3")
         findL = re.compile("\u5de6")
 
@@ -144,13 +144,13 @@ def Set_Bone_Position(pmx_data, arm_dat, blender_bone_list, fix=False):
             tip_type1 = (data_bone.ToConnectType == 0 and data_bone.TailPosition == mathutils.Vector((0, 0, 0)))
             tip_type2 = (data_bone.ToConnectType == 1 and data_bone.ChildIndex <= 0)
 
-            if tip_type1 == True or tip_type2 == True:
+            if tip_type1 or tip_type2:
                 parent_id = bone_id.get(blender_bone_list.get(data_bone.Parent), -1)
                 bone_id[bone_name] = parent_id
                 continue
 
         eb = None
-        if fix == True:
+        if fix:
             eb = arm_dat.edit_bones.get(bone_name)
             if eb is None:
                 continue
@@ -234,7 +234,7 @@ def read_pmx_data(context, filepath="",
         pmx_data.Load(f)
 
         if pmx_data.Status.Magic == 0:
-            #Echo("Loading Pmd ")
+            # Echo("Loading Pmd ")
             from . import pmd
             from . import pmd2pmx
             f.seek(0)
@@ -286,7 +286,7 @@ def read_pmx_data(context, filepath="",
             find_twist_n = Search_Twist_Num(bone_name)
             find_auto = Search_Auto_Bone(bone_name)
 
-            if find_twist_n == True:
+            if find_twist_n:
                 pb.lock_rotation = [True, False, True]
 
             if data_bone.Rotatable == 0:
@@ -340,22 +340,22 @@ def read_pmx_data(context, filepath="",
                 pass
 
             # Set Custom Shape
-            if use_custom_shape == True:
+            if use_custom_shape:
                 len_const = len(pb.constraints)
 
-                if find_master == True:
+                if find_master:
                     add_function.set_custom_shape(context, pb, shape=GV.ShapeMaster)
 
-                elif find_eyes == True:
+                elif find_eyes:
                     add_function.set_custom_shape(context, pb, shape=GV.ShapeEyes)
 
-                elif find_twist_m == True and len_const:
+                elif find_twist_m and len_const:
                     add_function.set_custom_shape(context, pb, shape=GV.ShapeTwist1)
 
-                elif find_twist_n == True and len_const:
+                elif find_twist_n and len_const:
                     add_function.set_custom_shape(context, pb, shape=GV.ShapeTwist2)
 
-                elif find_auto == True and len_const:
+                elif find_auto and len_const:
                     add_function.set_custom_shape(context, pb, shape=GV.ShapeAuto)
 
             # Set IK
@@ -402,7 +402,7 @@ def read_pmx_data(context, filepath="",
         bpy.ops.object.mode_set(mode="EDIT", toggle=False)
 
         # Adjust Bone Position
-        if adjust_bone_position == True:
+        if adjust_bone_position:
             # Get_Adjust_Data(edit_bones, jp_name, en_name)
             arm_L, vec_arm_L, axis_arm_L, len_arm_L = Get_Adjust_Data(arm_dat.edit_bones, "腕_L", "arm_L")
             arm_R, vec_arm_R, axis_arm_R, len_arm_R = Get_Adjust_Data(arm_dat.edit_bones, "腕_R", "arm_R")
@@ -420,7 +420,7 @@ def read_pmx_data(context, filepath="",
                 find_leg_d = Search_Leg_Dummy(eb.name)
 
                 # Master
-                if find_master == True:
+                if find_master:
                     eb_center = Get_Edit_Bone(arm_dat.edit_bones, "センター", "center")
 
                     if eb_center is not None:
@@ -428,7 +428,7 @@ def read_pmx_data(context, filepath="",
                         eb.tail = eb_center.head
 
                 # Eyes
-                elif find_eyes == True:
+                elif find_eyes:
                     eb_eye = Get_Edit_Bone(arm_dat.edit_bones, "目_L", "eye_L")
 
                     if eb_eye is not None:
@@ -439,7 +439,7 @@ def read_pmx_data(context, filepath="",
                         eb.tail.y = -0.25
 
                 # Auto Bone (Sub Bone), Leg_D Bone
-                elif find_auto == True or find_leg_d == True:
+                elif find_auto or find_leg_d:
                     pb = arm_obj.pose.bones[eb.name]
 
                     for const in pb.constraints:
@@ -450,14 +450,14 @@ def read_pmx_data(context, filepath="",
                                 child.use_connect = False
 
                             eb_sub = arm_dat.edit_bones[const.subtarget]
-                            multi = 0.3 if find_auto == True else 1.0
+                            multi = 0.3 if find_auto else 1.0
                             axis = (eb_sub.tail - eb_sub.head) * multi
                             eb.head = eb_sub.head
                             eb.tail = eb_sub.head + axis
                             break
 
                 # Twist
-                elif find_twist_m == True or find_twist_n == True:
+                elif find_twist_m or find_twist_n:
                     eb.use_connect = False
 
                     for child in eb.children:
@@ -504,7 +504,7 @@ def read_pmx_data(context, filepath="",
             target_name = arm_dat.bones[bone_id[bone_name]].name
             vert_group_index[bone_index] = target_name
 
-            if not target_name in vert_group.keys():
+            if target_name not in vert_group.keys():
                 vert_group[target_name] = obj_mesh.vertex_groups.new(name=target_name)
 
         mesh.update()
@@ -515,7 +515,7 @@ def read_pmx_data(context, filepath="",
         for vert_index, vert_data in enumerate(pmx_data.Vertices):
             mesh.vertices[vert_index].co = GT(vert_data.Position, GlobalMatrix)
             mesh.vertices[vert_index].normal = GT_normal(vert_data.Normal, GlobalMatrix)
-            #mesh.vertices[vert_index].uv = pmx_data.Vertices[vert_index].UV
+            # mesh.vertices[vert_index].uv = pmx_data.Vertices[vert_index].UV
 
             # BDEF1
             if vert_data.Type == 0:
@@ -556,7 +556,7 @@ def read_pmx_data(context, filepath="",
         mesh.polygons.foreach_set("loop_total", (3,) * poly_count)
         mesh.polygons.foreach_set("use_smooth", (True,) * poly_count)
         mesh.loops.add(len(pmx_data.Faces))
-        #mesh.loops.foreach_set("vertex_index" ,pmx_data.Faces)
+        # mesh.loops.foreach_set("vertex_index" ,pmx_data.Faces)
 
         for faceIndex in range(poly_count):
             mesh.loops[faceIndex * 3].vertex_index = pmx_data.Faces[faceIndex * 3]
@@ -570,14 +570,14 @@ def read_pmx_data(context, filepath="",
             return arm_obj, obj_mesh
 
         # Add Textures
-        #image_dic = {}
+        # image_dic = {}
         textures_dic = {}
         NG_tex_list = []
         for (tex_index, tex_data) in enumerate(pmx_data.Textures):
             tex_path = os.path.join(base_path, tex_data.Path)
             try:
                 bpy.ops.image.open(filepath=tex_path)
-                #image_dic[tex_index] = bpy.data.images[len(bpy.data.images)-1]
+                # image_dic[tex_index] = bpy.data.images[len(bpy.data.images)-1]
                 textures_dic[tex_index] = bpy.data.textures.new(os.path.basename(tex_path), type='IMAGE')
                 textures_dic[tex_index].image = bpy.data.images[os.path.basename(tex_path)]
 
@@ -590,7 +590,10 @@ def read_pmx_data(context, filepath="",
 
         # print NG_tex_list
         if len(NG_tex_list):
-            bpy.ops.b2pmxe.message('INVOKE_DEFAULT', type='INFO', line1="Some Texture file not found.", use_console=True)
+            bpy.ops.b2pmxe.message('INVOKE_DEFAULT',
+                                   type='INFO',
+                                   line1="Some Texture file not found.",
+                                   use_console=True)
             for data in NG_tex_list:
                 print("   --> %s" % data)
 
@@ -604,7 +607,7 @@ def read_pmx_data(context, filepath="",
             temp_mattrial = bpy.data.materials.new(blender_mat_name)
             temp_mattrial.diffuse_color = mat_data.Deffuse.xyzw
             temp_mattrial.specular_color = mat_data.Specular
-            #temp_mattrial.specular_hardness = mat_data.Power
+            # temp_mattrial.specular_hardness = mat_data.Power
             temp_mattrial["Ambient"] = mat_data.Ambient
             temp_mattrial.blend_method = 'BLEND'
 
@@ -613,15 +616,15 @@ def read_pmx_data(context, filepath="",
             mesh.materials.append(temp_mattrial)
 
             # Flags
-            #self.Both = 0
-            #self.GroundShadow = 1
-            #self.DropShadow = 1
-            #self.OnShadow = 1
-            #self.OnEdge = 1
+            # self.Both = 0
+            # self.GroundShadow = 1
+            # self.DropShadow = 1
+            # self.OnShadow = 1
+            # self.OnEdge = 1
             #
             # Edge
-            #self.EdgeColor =  mathutils.Vector((0,0,0,1))
-            #self.EdgeSize = 1.0
+            # self.EdgeColor =  mathutils.Vector((0,0,0,1))
+            # self.EdgeSize = 1.0
 
             # Texture
             if mat_data.TextureIndex != -1:
@@ -651,7 +654,7 @@ def read_pmx_data(context, filepath="",
 
                 temp_mattrial.texture_slots[1].texture = textures_dic.get(mat_data.SphereIndex, None)
 
-                #[0:None 1:Multi 2:Add 3:SubTexture]
+                # [0:None 1:Multi 2:Add 3:SubTexture]
                 if mat_data.SphereType == 1:
                     temp_mattrial.texture_slots[1].texture_coords = 'NORMAL'
                     temp_mattrial.texture_slots[1].blend_type = 'MULTIPLY'
@@ -676,8 +679,8 @@ def read_pmx_data(context, filepath="",
 
         uv_data = mesh.uv_layers.active.data[:]
 
-        #uvtex = mesh.uv_textures.new("UV_Data")
-        #uv_data = uvtex.data
+        # uvtex = mesh.uv_textures.new("UV_Data")
+        # uv_data = uvtex.data
 
         index = 0
         for dat in mat_status:
@@ -757,7 +760,7 @@ def make_xml(pmx_data, filepath, use_japanese_name, xml_save_versions):
         root = root.rstrip(a.group())
 
     for index in range(num, xml_save_versions + 1):
-        if os.path.isfile(xml_path) != True:
+        if not os.path.isfile(xml_path):
             break
 
         xml_exist_list.append(bpy.path.basename(xml_path))
@@ -1036,6 +1039,7 @@ def set_Vector_Deg(_node, _data, _name):
     data.set("y", str("%.7f" % math.degrees(_data.y)))
     data.set("z", str("%.7f" % math.degrees(_data.z)))
     return True
+
 
 if __name__ == '__main__':
     filepath = "imput.pmx"

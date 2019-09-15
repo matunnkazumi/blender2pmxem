@@ -1,3 +1,24 @@
+from . import space_view3d_materials_utils
+from . import add_function
+from . import solidify_edge
+from . import global_variable
+from . import object_applymodifier
+from . import import_pmx
+from . import export_pmx
+from bpy.props import StringProperty
+from bpy.props import BoolProperty
+from bpy.props import EnumProperty
+from bpy.props import FloatProperty
+from bpy.props import FloatVectorProperty
+from bpy.props import PointerProperty
+from bpy.props import IntProperty
+from bpy_extras.io_utils import ExportHelper
+from bpy_extras.io_utils import ImportHelper
+from bpy.app.translations import pgettext_iface as iface_
+from glob import glob
+import os
+import bpy
+
 bl_info = {
     "name": "MMD PMX Format (Extend)",
     "author": "matunnkazumi",
@@ -11,15 +32,6 @@ bl_info = {
     "category": "Import-Export"
 }
 
-import bpy
-import os
-from glob import glob
-from bpy.app.translations import pgettext_iface as iface_
-from bpy_extras.io_utils import ExportHelper, ImportHelper
-from bpy.props import StringProperty, BoolProperty, EnumProperty, FloatProperty, FloatVectorProperty, PointerProperty, IntProperty
-from . import import_pmx, export_pmx
-from . import add_function, solidify_edge, global_variable
-from . import space_view3d_materials_utils
 
 # global_variable
 GV = global_variable.Init()
@@ -237,11 +249,11 @@ class ExportBlender2Pmx(bpy.types.Operator, ExportHelper):
 
     encode_type: EnumProperty(items=(('OPT_Utf-8', "UTF-8", "To use UTF-8 encoding."),
                                      ('OPT_Utf-16', "UTF-16", "To use UTF-16 encoding."),
-    ),
+                                     ),
                               name="Encode",
                               description="Select the encoding to use",
-                               default='OPT_Utf-16'
-    )
+                              default='OPT_Utf-16'
+                              )
 
     use_mesh_modifiers: BoolProperty(
         name="Apply Modifiers",
@@ -428,11 +440,11 @@ class B2PmxeSaveAsXML(bpy.types.Operator):
         directory = bpy.path.abspath("//")
         filepath = os.path.join(directory, self.filename)
 
-        if os.path.isfile(filepath) != True:
+        if not os.path.isfile(filepath):
             return {'CANCELLED'}
 
         with open(filepath, "rb") as f:
-            from blender2pmxe import pmx
+            from . import pmx
             pmx_data = pmx.Model()
             pmx_data.Load(f)
 
@@ -465,8 +477,13 @@ class B2PmxeSaveAsXML(bpy.types.Operator):
                     select_object(obj)
 
                     # Data Transfer
-                    bpy.ops.object.data_transfer(data_type='VGROUP_WEIGHTS', vert_mapping='NEAREST', ray_radius=0,
-                                                 layers_select_src='ALL', layers_select_dst='NAME', mix_mode='REPLACE', mix_factor=1)
+                    bpy.ops.object.data_transfer(data_type='VGROUP_WEIGHTS',
+                                                 vert_mapping='NEAREST',
+                                                 ray_radius=0,
+                                                 layers_select_src='ALL',
+                                                 layers_select_dst='NAME',
+                                                 mix_mode='REPLACE',
+                                                 mix_factor=1)
 
             # Unlink
             context.scene.objects.unlink(import_obj)
@@ -478,15 +495,14 @@ class B2PmxeSaveAsXML(bpy.types.Operator):
             # Make XML
             blender_bone_list = import_pmx.make_xml(pmx_data, filepath, use_japanese_name, xml_save_versions)
 
-            #--------------------
+            # --------------------
             # Fix Armature
-            #--------------------
+            # --------------------
             arm_obj = context.active_object
-            bone_id = {}
 
             if props.make_xml_option == 'POSITION':
                 # Set Bone Position
-                bone_id = import_pmx.Set_Bone_Position(pmx_data, arm_obj.data, blender_bone_list, fix=True)
+                import_pmx.Set_Bone_Position(pmx_data, arm_obj.data, blender_bone_list, fix=True)
 
                 # BoneItem Direction
                 bpy.ops.object.mode_set(mode="EDIT", toggle=False)
@@ -511,9 +527,9 @@ class B2PmxeSaveAsXML(bpy.types.Operator):
 
             bpy.ops.object.mode_set(mode='OBJECT')
 
-        #--------------------
+        # --------------------
         # Fix Materials
-        #--------------------
+        # --------------------
 
         # Rename Images
         for item in bpy.data.images:
@@ -572,7 +588,7 @@ class B2PmxeSaveAsXML(bpy.types.Operator):
 
                     temp_mattrial.texture_slots[1].texture = textures_dic.get(mat_data.SphereIndex, None)
 
-                    #[0:None 1:Multi 2:Add 3:SubTexture]
+                    # [0:None 1:Multi 2:Add 3:SubTexture]
                     if mat_data.SphereType == 1:
                         temp_mattrial.texture_slots[1].texture_coords = 'NORMAL'
                         temp_mattrial.texture_slots[1].blend_type = 'MULTIPLY'
@@ -679,14 +695,14 @@ class B2PMXEM_PT_PosePanel(bpy.types.Panel):
         for bone in context.active_object.pose.bones:
             for const in bone.constraints:
                 if const.type == 'IK':
-                    if const.mute == True:
+                    if const.mute:
                         mute_type = False
                         break
 
         row.operator(
             "b2pmxe.mute_ik",
             text="",
-            icon="HIDE_OFF" if mute_type == True else "HIDE_ON"
+            icon="HIDE_OFF" if mute_type else "HIDE_ON"
         ).flag = mute_type
 
         # Display
@@ -749,12 +765,12 @@ class B2PMXEM_PT_ObjectPanel(bpy.types.Panel):
         row.operator(
             "b2pmxe.toggle_solidify_render",
             text="",
-            icon='RESTRICT_RENDER_OFF' if isRender == True else 'RESTRICT_RENDER_ON'
+            icon='RESTRICT_RENDER_OFF' if isRender else 'RESTRICT_RENDER_ON'
         )
         row.operator(
             "b2pmxe.toggle_solidify_view",
             text="",
-            icon='RESTRICT_VIEW_OFF' if isView == True else 'RESTRICT_VIEW_ON'
+            icon='RESTRICT_VIEW_OFF' if isView else 'RESTRICT_VIEW_ON'
         )
         row.operator("b2pmxe.get_solidify_param", text="", icon='EYEDROPPER')
 
@@ -838,6 +854,7 @@ def menu_func_vg(self, context):
     self.layout.separator()
     self.layout.operator("b2pmxe.mirror_vertexgroup", text=iface_("Mirror active vertex group (L/R)"), icon='ZOOM_IN')
 
+
 classes = [
     ExportBlender2Pmx,
     ImportBlender2Pmx,
@@ -884,6 +901,7 @@ classes = [
     B2PMXEM_PT_PosePanel,
     B2PMXEM_PT_ObjectPanel,
 ]
+
 
 def register():
     for cls in classes:

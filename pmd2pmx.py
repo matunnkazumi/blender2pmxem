@@ -1,5 +1,5 @@
 #!/bin/python
-#-*- coding utf_8 -*-
+# -*- coding utf_8 -*-
 
 #
 # pmx.py : 20111204 v 1.0
@@ -112,7 +112,7 @@ def Convert(d_pmd):
         self.SphereType = 0  # [0:None 1:Multi 2:Add 3:SubTexture]
 
         if data.Texture != "":
-            if not data.Texture in tex_dic.keys():
+            if data.Texture not in tex_dic.keys():
                 newid = len(tex_dic)
                 tex_dic[data.Texture] = newid
                 new_tex = pmx.PMTexture()
@@ -122,7 +122,7 @@ def Convert(d_pmd):
             self.TextureIndex = tex_dic[data.Texture]
 
         if data.Sphere != "":
-            if not data.Sphere in tex_dic.keys():
+            if data.Sphere not in tex_dic.keys():
                 newid = len(tex_dic)
                 tex_dic[data.Sphere] = newid
                 new_tex = pmx.PMTexture()
@@ -153,7 +153,7 @@ def Convert(d_pmd):
 
             elif toon_name != "":
                 self.UseSystemToon = 0
-                if not toon_name in tex_dic.keys():
+                if toon_name not in tex_dic.keys():
                     newid = len(tex_dic)
                     tex_dic[toon_name] = newid
                     new_tex = pmx.PMTexture()
@@ -273,7 +273,7 @@ def Convert(d_pmd):
         for v in data.Verts:
             self1 = pmx.PMMorphOffset()
             self1.Index = basis.Verts[v.Index].Index
-            #self1.Index = v.Index
+            # self1.Index = v.Index
             self1.Move = v.Pos
             self.Offsets.append(self1)
 

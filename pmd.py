@@ -1,5 +1,5 @@
 #!/bin/python
-#-*- coding utf_8 -*-
+# -*- coding utf_8 -*-
 
 #
 # pmd.py : 20111203 v 5.0
@@ -448,7 +448,7 @@ class PMDMaterial(object):
 
     def Load(self, f):
         self.Deffuse = mathutils.Vector(ReadStruct(f, "4f"))
-        #self.Alpha   = ReadStruct(f,"f")
+        # self.Alpha   = ReadStruct(f,"f")
         self.Shiness = ReadStruct(f, "f")
         self.Specler = mathutils.Vector(ReadStruct(f, "3f"))
         self.Ambient = mathutils.Vector(ReadStruct(f, "3f"))
@@ -667,7 +667,7 @@ class PMDBoneIndex(object):
 
 
 class PMDRigid(object):
-    #(name,bone,group,noCollision,boundType,(size),(pos),(rot),mass,pos_loss,rot_loss,opposition,friction,physicaltype))
+    # (name,bone,group,noCollision,boundType,(size),(pos),(rot),mass,pos_loss,rot_loss,opposition,friction,physicaltype))
 
     def __init__(self):
         self.Name = ""
@@ -719,7 +719,7 @@ class PMDRigid(object):
 
 
 class PMDJoint(object):
-    #(name,parent,child,(pos),(rot),(pos_lower_rimit),(pos_upper_rimit),(rot_lower_rimit),(rot_upper_rimit),(pos_spring),(rot_spring)))
+    # (name,parent,child,(pos),(rot),(pos_lower_rimit),(pos_upper_rimit),(rot_lower_rimit),(rot_upper_rimit),(pos_spring),(rot_spring)))
 
     def __init__(self):
         self.Name = ""
