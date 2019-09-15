@@ -1130,7 +1130,7 @@ def append_object(objname, activeflag=True):
     file_name = "template.blend"
 
     opath = "//" + file_name + path_object + objname
-    dpath = path_script + "\\" + file_name + path_object
+    dpath = os.path.join(path_script, file_name + path_object)
 
     bpy.ops.wm.link(
         filepath=opath,     # "//filename.blend\\Folder\\"
@@ -1165,7 +1165,7 @@ class B2PmxeAppendTemplate(bpy.types.Operator):
 
         ao = context.selected_objects
         if len(ao):
-            context.scene.objects.active = ao[0]
+            context.view_layer.objects.active = ao[0]
 
             toJP = {}
             if prefs.use_japanese_name:
