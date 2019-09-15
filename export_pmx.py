@@ -68,7 +68,7 @@ def write_pmx_data(context, filepath="",
         xml_path = os.path.splitext(filepath)[0] + ".xml"
         has_xml_file = os.path.isfile(xml_path)
 
-        default_xml = "default_jp.xml" if use_japanese_name == True else "default_en.xml"
+        default_xml = "default_jp.xml" if use_japanese_name else "default_en.xml"
         def_path = os.path.join(os.path.dirname(__file__), default_xml)
         has_def_file = os.path.isfile(def_path)
 
@@ -480,7 +480,7 @@ def write_pmx_data(context, filepath="",
 
             r, g, b = mat.specular_color
             pmx_mat.Specular = Math.Vector((r, g, b))
-            #pmx_mat.Power = mat.specular_hardness
+            # pmx_mat.Power = mat.specular_hardness
             pmx_mat.Power = 1
 
             if "Ambient" in mat:
@@ -543,7 +543,7 @@ def write_pmx_data(context, filepath="",
         t_key.sort()
 
         for mat_name in t_key:
-            if not mat_name in xml_mat_list.keys():
+            if mat_name not in xml_mat_list.keys():
                 pmx_data.Materials.append(mat_list[mat_name])
                 mat_name_List.append(mat_name)
 
@@ -613,7 +613,7 @@ def write_pmx_data(context, filepath="",
                 continue
 
             # Apply Modifiers
-            if use_mesh_modifiers == True:
+            if use_mesh_modifiers:
                 try:
                     mesh = apply_mod.Get_Apply_Mesh(mesh_obj)
                 except object_applymodifier.ShapeVertexError as e:
@@ -628,7 +628,7 @@ def write_pmx_data(context, filepath="",
 
             # Custom Normals
             normals = {}
-            if use_custom_normals == True and hasattr(mesh, "has_custom_normals"):
+            if use_custom_normals and hasattr(mesh, "has_custom_normals"):
                 if mesh.has_custom_normals and mesh.use_auto_smooth:
                     OK_normal_list.append(mesh_obj.name)
 
@@ -731,7 +731,6 @@ def write_pmx_data(context, filepath="",
                 else:
                     for loop in loops:
                         temp_index = loop.vertex_index + base_vert_index
-                        target_vert = mesh.vertices[loop.vertex_index]
                         target_uv = uv_data[loop.index].uv
                         vert_key = (temp_index, target_uv[0], target_uv[1])
 
@@ -827,7 +826,7 @@ def write_pmx_data(context, filepath="",
             base_vert_index += (len(mesh.vertices) + add_vertex_count)
 
             # remove modifier applied mesh
-            if use_mesh_modifiers == True:
+            if use_mesh_modifiers:
                 apply_mod.Remove()
 
         # print NG_object_list
@@ -952,7 +951,7 @@ def write_pmx_data(context, filepath="",
                 pmx_rigid.Name = rigid.get("name")
                 pmx_rigid.Name_E = rigid.get("name_e")
                 attach = rigid.get("attach")
-                #print (attach,end="  ")
+                # print (attach,end="  ")
 
                 if attach == "World":
                     pmx_rigid.Bone = -1
@@ -966,7 +965,9 @@ def write_pmx_data(context, filepath="",
                 pmx_rigid.BoundType = int(rigid.get("shape"))
 
                 rigid_size = rigid.find("size")
-                pmx_rigid.Size = Math.Vector((float(rigid_size.get("a")), float(rigid_size.get("b")), float(rigid_size.get("c"))))
+                pmx_rigid.Size = Math.Vector((float(rigid_size.get("a")),
+                                              float(rigid_size.get("b")),
+                                              float(rigid_size.get("c"))))
 
                 pmx_rigid.Position = get_Vector(rigid.find("pos"))
                 pmx_rigid.Rotate = get_Vector_Rad(rigid.find("rot"))

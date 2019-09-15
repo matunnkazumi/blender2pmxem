@@ -21,7 +21,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 #
-#**********************************
+# **********************************
 
 import bpy
 from bpy.app.translations import pgettext_iface as iface_
@@ -38,6 +38,7 @@ class ShapeVertexError(Exception):
     def __init__(self, data):
         self.data = data
 
+
 def make_evaluated_object(target_obj):
     depsgraph = bpy.context.evaluated_depsgraph_get()
     for oi in depsgraph.object_instances:
@@ -46,6 +47,7 @@ def make_evaluated_object(target_obj):
             continue
         tmp_mesh = bpy.data.meshes.new_from_object(oi.object)
         return bpy.data.objects.new(tmp_mesh.name, tmp_mesh)
+
 
 class Init(object):
 
@@ -153,7 +155,7 @@ class Init(object):
                 tmp_name = shape_keys.key_blocks[i].name
 
                 depsgraph = bpy.context.evaluated_depsgraph_get()
-                
+
                 for oi in depsgraph.object_instances:
                     oiname = oi.object.name
                     if oiname == target_obj.name:
