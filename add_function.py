@@ -1165,7 +1165,7 @@ class B2PmxeAppendTemplate(bpy.types.Operator):
 
         ao = context.selected_objects
         if len(ao):
-            context.scene.objects.active = ao[0]
+            context.view_layer.objects.active = ao[0]
 
             toJP = {}
             if prefs.use_japanese_name:
