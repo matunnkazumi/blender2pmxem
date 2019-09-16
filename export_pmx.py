@@ -71,6 +71,68 @@ def exist_object_using_material(material:Material, target_armature:Object, objec
     return False
 
 
+def create_PMMaterial(mat:Material, xml_mat_list) -> pmx.PMMaterial:
+
+    pmx_mat = pmx.PMMaterial()
+    pmx_mat.Name = mat.name
+    pmx_mat.Name_E = mat.name
+
+    # Load XML Status
+    if pmx_mat.Name in xml_mat_list.keys():
+        temp_mat = xml_mat_list[pmx_mat.Name]
+        pmx_mat.Name = temp_mat.get("name", mat.name)
+        pmx_mat.Name_E = temp_mat.get("name_e", pmx_mat.Name)
+        pmx_mat.UseSystemToon = int(temp_mat.get("use_systemtoon", "1"))
+
+        if pmx_mat.UseSystemToon == 1:
+            pmx_mat.ToonIndex = int(temp_mat.get("toon", "0"))
+
+        else:
+            tex_path = temp_mat.get("toon", "toon01.bmp")
+
+            if tex_path == "" or tex_path == "-1":
+                pmx_mat.ToonIndex = -1
+
+            else:
+                pmx_mat.ToonIndex = tex_dic.setdefault(tex_path, len(tex_dic))
+
+        pmx_mat.Both = int(temp_mat.get("both", "0"))
+        pmx_mat.GroundShadow = int(temp_mat.get("ground_shadow", "0"))
+        pmx_mat.DropShadow = int(temp_mat.get("drop_shadow", "0"))
+        pmx_mat.OnShadow = int(temp_mat.get("on_shadow", "0"))
+
+        pmx_mat.OnEdge = int(temp_mat.get("on_edge", "0"))
+        pmx_mat.EdgeSize = float(temp_mat.get("edge_size", "1.0"))
+
+        edge_c = temp_mat.find("edge_color")
+        pmx_mat.EdgeColor = Math.Vector((float(edge_c.get("r", "0.0")),
+                                         float(edge_c.get("g", "0.0")),
+                                         float(edge_c.get("b", "0.0")),
+                                         float(edge_c.get("a", "1.0"))))
+
+    r, g, b, a = mat.diffuse_color
+    pmx_mat.Deffuse = Math.Vector((r, g, b, a))
+
+    r, g, b = mat.specular_color
+    pmx_mat.Specular = Math.Vector((r, g, b))
+    # pmx_mat.Power = mat.specular_hardness
+    pmx_mat.Power = 1
+
+    if "Ambient" in mat:
+        pmx_mat.Ambient = Math.Vector(mat["Ambient"].to_list())
+    else:
+        pmx_mat.Ambient = pmx_mat.Deffuse.xyz * 0.4
+
+    pmx_mat.FaceLength = 0
+        
+    tex_base_path = bpy.path.abspath("//")
+
+    if tex_base_path == "":
+        tex_base_path = os.path.dirname(filepath)
+
+    return pmx_mat
+
+
 def write_pmx_data(context, filepath="",
                    encode_type='OPT_Utf-16',
                    use_mesh_modifiers=False,
@@ -452,91 +514,8 @@ def write_pmx_data(context, filepath="",
             if not found:
                 continue
 
-            pmx_mat = pmx.PMMaterial()
-            pmx_mat.Name = mat.name
-            pmx_mat.Name_E = mat.name
-
-            # Load XML Status
-            if pmx_mat.Name in xml_mat_list.keys():
-                temp_mat = xml_mat_list[pmx_mat.Name]
-                pmx_mat.Name = temp_mat.get("name", mat.name)
-                pmx_mat.Name_E = temp_mat.get("name_e", pmx_mat.Name)
-                pmx_mat.UseSystemToon = int(temp_mat.get("use_systemtoon", "1"))
-
-                if pmx_mat.UseSystemToon == 1:
-                    pmx_mat.ToonIndex = int(temp_mat.get("toon", "0"))
-
-                else:
-                    tex_path = temp_mat.get("toon", "toon01.bmp")
-
-                    if tex_path == "" or tex_path == "-1":
-                        pmx_mat.ToonIndex = -1
-
-                    else:
-                        pmx_mat.ToonIndex = tex_dic.setdefault(tex_path, len(tex_dic))
-
-                pmx_mat.Both = int(temp_mat.get("both", "0"))
-                pmx_mat.GroundShadow = int(temp_mat.get("ground_shadow", "0"))
-                pmx_mat.DropShadow = int(temp_mat.get("drop_shadow", "0"))
-                pmx_mat.OnShadow = int(temp_mat.get("on_shadow", "0"))
-
-                pmx_mat.OnEdge = int(temp_mat.get("on_edge", "0"))
-                pmx_mat.EdgeSize = float(temp_mat.get("edge_size", "1.0"))
-
-                edge_c = temp_mat.find("edge_color")
-                pmx_mat.EdgeColor = Math.Vector((float(edge_c.get("r", "0.0")), float(edge_c.get("g", "0.0")),
-                                                 float(edge_c.get("b", "0.0")), float(edge_c.get("a", "1.0"))))
-
-            r, g, b, a = mat.diffuse_color
-            pmx_mat.Deffuse = Math.Vector((r, g, b, a))
-
-            r, g, b = mat.specular_color
-            pmx_mat.Specular = Math.Vector((r, g, b))
-            # pmx_mat.Power = mat.specular_hardness
-            pmx_mat.Power = 1
-
-            if "Ambient" in mat:
-                pmx_mat.Ambient = Math.Vector(mat["Ambient"].to_list())
-            else:
-                pmx_mat.Ambient = pmx_mat.Deffuse.xyz * 0.4
-
-            pmx_mat.FaceLength = 0
-
-            tex_base_path = bpy.path.abspath("//")
-
-            if tex_base_path == "":
-                tex_base_path = os.path.dirname(filepath)
-
-            '''
-            texture_0 = None if mat.texture_slots[0] is None else mat.texture_slots[0].texture
-
-            if texture_0 is not None and texture_0.type == "IMAGE" and texture_0.image is not None:
-                tex_abs_path = bpy.path.abspath(texture_0.image.filepath)
-                tex_path = bpy.path.relpath(tex_abs_path, tex_base_path)
-                tex_path = tex_path.replace("//", "", 1)
-
-                pmx_mat.TextureIndex = tex_dic.setdefault(tex_path, len(tex_dic))
-
-            texture_1 = None if mat.texture_slots[1] is None else mat.texture_slots[1].texture
-
-            if texture_1 is not None and texture_1.type == "IMAGE" and texture_1.image is not None:
-                tex_abs_path = bpy.path.abspath(texture_1.image.filepath)
-                tex_path = bpy.path.relpath(tex_abs_path, tex_base_path)
-                tex_path = tex_path.replace("//", "", 1)
-
-                pmx_mat.SphereIndex = tex_dic.setdefault(tex_path, len(tex_dic))
-
-                #[0:None 1:Multi 2:Add 3:SubTexture]
-                if mat.texture_slots[1].texture_coords == 'UV':
-                    pmx_mat.SphereType = 3
-
-                if mat.texture_slots[1].blend_type == 'ADD':
-                    pmx_mat.SphereType = 2
-
-                elif mat.texture_slots[1].blend_type == 'MULTIPLY':
-                    pmx_mat.SphereType = 1
-            '''
-
+            pmx_mat = create_PMMaterial(mat, xml_mat_list)
+            
             faceTemp[mat.name] = []
             mat_list[mat.name] = pmx_mat
 
