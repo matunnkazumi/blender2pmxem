@@ -10,6 +10,8 @@ import xml.etree.ElementTree as etree
 import re
 
 from . import add_function, global_variable
+from bpy_extras.node_shader_utils import PrincipledBSDFWrapper
+from bpy_extras.image_utils import load_image
 
 # global_variable
 GV = global_variable.Init()
@@ -580,9 +582,8 @@ def read_pmx_data(context, filepath="",
                 # image_dic[tex_index] = bpy.data.images[len(bpy.data.images)-1]
                 textures_dic[tex_index] = bpy.data.textures.new(os.path.basename(tex_path), type='IMAGE')
                 textures_dic[tex_index].image = bpy.data.images[os.path.basename(tex_path)]
-
+                
                 # Use Alpha
-                textures_dic[tex_index].image.use_alpha = True
                 textures_dic[tex_index].image.alpha_mode = 'PREMUL'
 
             except:
@@ -605,11 +606,10 @@ def read_pmx_data(context, filepath="",
             blender_mat_name = Get_JP_or_EN_Name(mat_data.Name, mat_data.Name_E, use_japanese_name)
 
             temp_mattrial = bpy.data.materials.new(blender_mat_name)
-            temp_mattrial.diffuse_color = mat_data.Deffuse.xyzw
-            temp_mattrial.specular_color = mat_data.Specular
-            # temp_mattrial.specular_hardness = mat_data.Power
-            temp_mattrial["Ambient"] = mat_data.Ambient
-            temp_mattrial.blend_method = 'BLEND'
+            temp_mattrial.use_nodes = True
+            temp_principled = PrincipledBSDFWrapper(temp_mattrial, is_readonly=False)
+            temp_principled.base_color = mat_data.Deffuse.xyz
+            temp_principled.alpha = mat_data.Deffuse.w
 
             mat_status.append((len(mat_status), mat_data.FaceLength))
 
@@ -628,20 +628,10 @@ def read_pmx_data(context, filepath="",
 
             # Texture
             if mat_data.TextureIndex != -1:
-                temp_tex = pmx_data.Textures[mat_data.TextureIndex]
-
-                if temp_mattrial.texture_slots[0] is None:
-                    temp_mattrial.texture_slots.add()
-
-                temp_mattrial.texture_slots[0].texture = textures_dic.get(mat_data.TextureIndex, None)
-                temp_mattrial.texture_slots[0].texture_coords = "UV"
-                temp_mattrial.texture_slots[0].uv_layer = "UV_Data"
-
-                # MMD Settings
-                temp_mattrial.texture_slots[0].use_map_color_diffuse = True
-                temp_mattrial.texture_slots[0].use_map_alpha = True
-                temp_mattrial.texture_slots[0].blend_type = 'MULTIPLY'
-                temp_mattrial.texture_slots[0]
+                temp_tex = textures_dic[mat_data.TextureIndex]
+                temp_principled.base_color_texture.image = temp_tex.image
+                temp_principled.base_color_texture.use_alpha = True
+                temp_principled.base_color_texture.texcoords = "UV"
 
             if mat_data.SphereIndex != -1:
                 temp_tex = pmx_data.Textures[mat_data.SphereIndex]
@@ -689,9 +679,9 @@ def read_pmx_data(context, filepath="",
                 mesh.polygons[index].material_index = dat[0]
 
                 # Set Texture
-                if pmx_data.Materials[dat[0]].TextureIndex < len(bpy.data.images) and pmx_data.Materials[dat[0]].TextureIndex >= 0:
-                    if textures_dic.get(pmx_data.Materials[dat[0]].TextureIndex, None) is not None:
-                        mesh.uv_textures[0].data[index].image = textures_dic[pmx_data.Materials[dat[0]].TextureIndex].image
+                #if pmx_data.Materials[dat[0]].TextureIndex < len(bpy.data.images) and pmx_data.Materials[dat[0]].TextureIndex >= 0:
+                #    if textures_dic.get(pmx_data.Materials[dat[0]].TextureIndex, None) is not None:
+                #        mesh.uv_layers[0].data[index].image = textures_dic[pmx_data.Materials[dat[0]].TextureIndex].image
 
                 # Set UV
                 poly_vert_index = mesh.polygons[index].loop_start
