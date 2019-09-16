@@ -3,6 +3,10 @@ import mathutils as Math
 import os
 from math import radians
 
+from bpy_extras.node_shader_utils import PrincipledBSDFWrapper
+from bpy.types import Object
+from bpy.types import Material
+from bpy.types import BlendDataObjects
 from . import pmx
 from . import object_applymodifier, global_variable
 
@@ -41,6 +45,30 @@ def GT_normal(vec, mat):  # GlobalTransformation
     w.resize_3d()
     w.normalize()
     return w
+
+
+# Find Object using Material
+def exist_object_using_material(material:Material, target_armature:Object, objects:BlendDataObjects) ->bool:
+
+    for mat_obj in objects:
+        if mat_obj.users == 0:
+            continue
+        if mat_obj.type != 'MESH':
+            continue
+
+        # Get Weight Bone
+        mesh_parent = mat_obj.find_armature()
+
+        if mesh_parent != target_armature:
+            continue
+
+        tmp_mat = mat_obj.data.materials.get(material.name)
+        if tmp_mat is not None:
+            # Find Material
+            return True
+
+    # Not Found
+    return False
 
 
 def write_pmx_data(context, filepath="",
@@ -420,24 +448,8 @@ def write_pmx_data(context, filepath="",
                 continue
 
             # Find Object using Material
-            for mat_obj in bpy.data.objects:
-                if mat_obj.users == 0:
-                    continue
-                if mat_obj.type != 'MESH':
-                    continue
-
-                # Get Weight Bone
-                mesh_parent = mat_obj.find_armature()
-
-                if mesh_parent != arm_obj:
-                    continue
-
-                tmp_mat = mat_obj.data.materials.get(mat.name)
-                if tmp_mat is not None:
-                    # Find Material
-                    break
-            # Not found
-            else:
+            found = exist_object_using_material(mat, arm_obj, bpy.data.objects)
+            if not found:
                 continue
 
             pmx_mat = pmx.PMMaterial()
