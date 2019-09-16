@@ -73,10 +73,15 @@ def exist_object_using_material(material:Material, target_armature:Object, objec
 
 def create_PMMaterial(mat:Material, xml_mat_list) -> pmx.PMMaterial:
 
+    principled = PrincipledBSDFWrapper(mat, is_readonly=True)
     pmx_mat = pmx.PMMaterial()
     pmx_mat.Name = mat.name
     pmx_mat.Name_E = mat.name
 
+    xml_deffuse = None
+    xml_specular = None
+    xml_ambient = None
+    
     # Load XML Status
     if pmx_mat.Name in xml_mat_list.keys():
         temp_mat = xml_mat_list[pmx_mat.Name]
@@ -110,18 +115,34 @@ def create_PMMaterial(mat:Material, xml_mat_list) -> pmx.PMMaterial:
                                          float(edge_c.get("b", "0.0")),
                                          float(edge_c.get("a", "1.0"))))
 
-    r, g, b, a = mat.diffuse_color
-    pmx_mat.Deffuse = Math.Vector((r, g, b, a))
+        deffuse_elm = temp_mat.find("deffuse")
+        if deffuse_elm != None:
+            c = (float(deffuse_elm.get("r", principled.base_color.r)),
+                 float(deffuse_elm.get("g", principled.base_color.g)),
+                 float(deffuse_elm.get("b", principled.base_color.b)),
+                 float(deffuse_elm.get("a", principled.alpha)))
+            xml_deffuse = Math.Vector(c)
 
-    r, g, b = mat.specular_color
-    pmx_mat.Specular = Math.Vector((r, g, b))
-    # pmx_mat.Power = mat.specular_hardness
-    pmx_mat.Power = 1
+        specular_elm = temp_mat.find("specular")
+        if specular_elm != None:
+            xml_specular = Math.Vector((float(specular_elm.get("r", "0.0")),
+                                        float(specular_elm.get("g", "0.0")),
+                                        float(specular_elm.get("b", "0.0"))))
 
-    if "Ambient" in mat:
-        pmx_mat.Ambient = Math.Vector(mat["Ambient"].to_list())
-    else:
-        pmx_mat.Ambient = pmx_mat.Deffuse.xyz * 0.4
+        ambient_elm = temp_mat.find("ambient")
+        if ambient_elm != None:
+            xml_ambient = Math.Vector((float(ambient_elm.get("r", "0.0")),
+                                       float(ambient_elm.get("g", "0.0")),
+                                       float(ambient_elm.get("b", "0.0"))))
+
+        pmx_mat.Power = int(temp_mat.get("power", "1"))
+
+    r, g, b = principled.base_color
+    a = principled.alpha
+    pmx_mat.Deffuse = xml_deffuse if xml_deffuse != None else Math.Vector((r, g, b, a))
+
+    pmx_mat.Specular = xml_specular if xml_specular != None else Math.Vector((1.0, 1.0, 1.0))
+    pmx_mat.Ambient = xml_ambient if xml_ambient != None else pmx_mat.Deffuse.xyz * 0.4
 
     pmx_mat.FaceLength = 0
         
