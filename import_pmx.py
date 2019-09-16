@@ -716,14 +716,14 @@ def read_pmx_data(context, filepath="",
         if len(pmx_data.Morphs) > 0:
             # Add Basis key
             if mesh.shape_keys is None:
-                obj_mesh.shape_key_add("Basis", False)
+                obj_mesh.shape_key_add(name="Basis", from_mix=False)
                 mesh.update()
 
             for data in pmx_data.Morphs:
                 # Vertex Morph
                 if data.Type == 1:
                     blender_morph_name = Get_JP_or_EN_Name(data.Name, data.Name_E, use_japanese_name)
-                    temp_key = obj_mesh.shape_key_add(blender_morph_name, False)
+                    temp_key = obj_mesh.shape_key_add(name=blender_morph_name, from_mix=False)
 
                     for v in data.Offsets:
                         temp_key.data[v.Index].co += GT(v.Move, GlobalMatrix)
