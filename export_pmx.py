@@ -9,6 +9,7 @@ from bpy.types import Material
 from bpy.types import BlendDataObjects
 from . import pmx
 from . import object_applymodifier, global_variable
+from typing import Tuple
 
 # global_variable
 GV = global_variable.Init()
@@ -71,7 +72,7 @@ def exist_object_using_material(material:Material, target_armature:Object, objec
     return False
 
 
-def create_PMMaterial(mat:Material, xml_mat_list) -> pmx.PMMaterial:
+def create_PMMaterial(mat:Material, xml_mat_list) -> Tuple[pmx.PMMaterial, str]:
 
     principled = PrincipledBSDFWrapper(mat, is_readonly=True)
     pmx_mat = pmx.PMMaterial()
@@ -151,7 +152,16 @@ def create_PMMaterial(mat:Material, xml_mat_list) -> pmx.PMMaterial:
     if tex_base_path == "":
         tex_base_path = os.path.dirname(filepath)
 
-    return pmx_mat
+    tex_path = None
+    texture = principled.base_color_texture
+    if texture and texture.image:
+        filepath = texture.image.filepath
+
+        tex_abs_path = bpy.path.abspath(filepath)
+        tex_path = bpy.path.relpath(tex_abs_path, tex_base_path)
+        tex_path = tex_path.replace("//", "", 1)
+
+    return pmx_mat, tex_path
 
 
 def write_pmx_data(context, filepath="",
@@ -535,7 +545,9 @@ def write_pmx_data(context, filepath="",
             if not found:
                 continue
 
-            pmx_mat = create_PMMaterial(mat, xml_mat_list)
+            pmx_mat, tex_path = create_PMMaterial(mat, xml_mat_list)
+            if tex_path != None:
+                pmx_mat.TextureIndex = tex_dic.setdefault(tex_path, len(tex_dic))
             
             faceTemp[mat.name] = []
             mat_list[mat.name] = pmx_mat
