@@ -49,7 +49,7 @@ def GT_normal(vec, mat):  # GlobalTransformation
 
 
 # Find Object using Material
-def exist_object_using_material(material:Material, target_armature:Object, objects:BlendDataObjects) ->bool:
+def exist_object_using_material(material: Material, target_armature: Object, objects: BlendDataObjects) -> bool:
 
     for mat_obj in objects:
         if mat_obj.users == 0:
@@ -72,7 +72,7 @@ def exist_object_using_material(material:Material, target_armature:Object, objec
     return False
 
 
-def create_PMMaterial(mat:Material, xml_mat_list) -> Tuple[pmx.PMMaterial, str]:
+def create_PMMaterial(mat: Material, xml_mat_list) -> Tuple[pmx.PMMaterial, str]:
 
     principled = PrincipledBSDFWrapper(mat, is_readonly=True)
     pmx_mat = pmx.PMMaterial()
@@ -82,7 +82,7 @@ def create_PMMaterial(mat:Material, xml_mat_list) -> Tuple[pmx.PMMaterial, str]:
     xml_deffuse = None
     xml_specular = None
     xml_ambient = None
-    
+
     # Load XML Status
     if pmx_mat.Name in xml_mat_list.keys():
         temp_mat = xml_mat_list[pmx_mat.Name]
@@ -146,7 +146,7 @@ def create_PMMaterial(mat:Material, xml_mat_list) -> Tuple[pmx.PMMaterial, str]:
     pmx_mat.Ambient = xml_ambient if xml_ambient != None else pmx_mat.Deffuse.xyz * 0.4
 
     pmx_mat.FaceLength = 0
-        
+
     tex_base_path = bpy.path.abspath("//")
 
     if tex_base_path == "":
@@ -548,7 +548,7 @@ def write_pmx_data(context, filepath="",
             pmx_mat, tex_path = create_PMMaterial(mat, xml_mat_list)
             if tex_path != None:
                 pmx_mat.TextureIndex = tex_dic.setdefault(tex_path, len(tex_dic))
-            
+
             faceTemp[mat.name] = []
             mat_list[mat.name] = pmx_mat
 
