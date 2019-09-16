@@ -945,11 +945,26 @@ def make_xml(pmx_data, filepath, use_japanese_name, xml_save_versions):
         material_node.set("on_shadow", str(pmx_mat.OnShadow))
         material_node.set("on_edge", str(pmx_mat.OnEdge))
         material_node.set("edge_size", str(pmx_mat.EdgeSize))
+        material_node.set("power", str(pmx_mat.Power))
         material_edge_color = etree.SubElement(material_node, "edge_color")
         material_edge_color.set("r", str(pmx_mat.EdgeColor.x))
         material_edge_color.set("g", str(pmx_mat.EdgeColor.y))
         material_edge_color.set("b", str(pmx_mat.EdgeColor.z))
         material_edge_color.set("a", str(pmx_mat.EdgeColor.w))
+        material_deffuse = etree.SubElement(material_node, "deffuse")
+        material_deffuse.set("r", str(pmx_mat.Deffuse.x))
+        material_deffuse.set("g", str(pmx_mat.Deffuse.y))
+        material_deffuse.set("b", str(pmx_mat.Deffuse.z))
+        material_deffuse.set("a", str(pmx_mat.Deffuse.w))
+        material_specular = etree.SubElement(material_node, "specular")
+        material_specular.set("r", str(pmx_mat.Specular.x))
+        material_specular.set("g", str(pmx_mat.Specular.y))
+        material_specular.set("b", str(pmx_mat.Specular.z))
+        material_ambient = etree.SubElement(material_node, "ambient")
+        material_ambient.set("r", str(pmx_mat.Ambient.x))
+        material_ambient.set("g", str(pmx_mat.Ambient.y))
+        material_ambient.set("b", str(pmx_mat.Ambient.z))
+
 
     #
     # Rigid
