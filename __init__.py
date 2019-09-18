@@ -455,24 +455,20 @@ class B2PmxeSaveAsXML(bpy.types.Operator):
             # Set active object
             def set_active(obj):
                 bpy.ops.object.select_all(action='DESELECT')
-                obj.select = True
-                context.scene.objects.active = obj
+                obj.select_set(True)
+                context.view_layer.objects.active = obj
 
             set_active(import_obj)
 
             # Select object
             def select_object(obj):
                 # Show object
-                obj.hide = False
+                obj.hide_viewport = False
                 obj.hide_select = False
 
-                # Show layers
-                for i, layer in enumerate(obj.layers):
-                    context.scene.layers[i] = layer if layer else context.scene.layers[i]
+                obj.select_set(True)
 
-                obj.select = True
-
-            for obj in context.scene.objects:
+            for obj in context.collection.objects:
                 if obj.find_armature() == arm:
                     select_object(obj)
 
@@ -486,8 +482,8 @@ class B2PmxeSaveAsXML(bpy.types.Operator):
                                                  mix_factor=1)
 
             # Unlink
-            context.scene.objects.unlink(import_obj)
-            context.scene.objects.unlink(import_arm)
+            context.collection.objects.unlink(import_obj)
+            context.collection.objects.unlink(import_arm)
 
             set_active(arm)
 
@@ -526,85 +522,6 @@ class B2PmxeSaveAsXML(bpy.types.Operator):
                     pb["IKLimit"] = data_bone.IK.Limit
 
             bpy.ops.object.mode_set(mode='OBJECT')
-
-        # --------------------
-        # Fix Materials
-        # --------------------
-
-        # Rename Images
-        for item in bpy.data.images:
-            item.name = bpy.path.basename(item.filepath)
-
-        # Add Textures
-        textures_dic = {}
-        for (tex_index, tex_data) in enumerate(pmx_data.Textures):
-            tex_path = os.path.join(directory, tex_data.Path)
-            try:
-                bpy.ops.image.open(filepath=tex_path)
-                textures_dic[tex_index] = bpy.data.textures.new(os.path.basename(tex_path), type='IMAGE')
-                textures_dic[tex_index].image = bpy.data.images[os.path.basename(tex_path)]
-
-                # Use Alpha
-                textures_dic[tex_index].image.use_alpha = True
-                textures_dic[tex_index].image.alpha_mode = 'PREMUL'
-
-            except:
-                pass
-
-        # Fix Material
-        for mat_data in pmx_data.Materials:
-            blender_mat_name = import_pmx.Get_JP_or_EN_Name(mat_data.Name, mat_data.Name_E, use_japanese_name)
-
-            temp_mattrial = bpy.data.materials.get(blender_mat_name)
-            if temp_mattrial is not None:
-                temp_mattrial.diffuse_color = mat_data.Deffuse.xyz
-                temp_mattrial.alpha = mat_data.Deffuse.w
-                temp_mattrial.specular_color = mat_data.Specular
-                temp_mattrial.specular_hardness = mat_data.Power
-                temp_mattrial["Ambient"] = mat_data.Ambient
-                temp_mattrial.use_transparency = True
-
-                # Texture
-                if mat_data.TextureIndex != -1:
-
-                    if temp_mattrial.texture_slots[0] is None:
-                        temp_mattrial.texture_slots.add()
-
-                    temp_mattrial.texture_slots[0].texture = textures_dic.get(mat_data.TextureIndex, None)
-                    temp_mattrial.texture_slots[0].texture_coords = "UV"
-
-                    # MMD Settings
-                    temp_mattrial.texture_slots[0].use_map_color_diffuse = True
-                    temp_mattrial.texture_slots[0].use_map_alpha = True
-                    temp_mattrial.texture_slots[0].blend_type = 'MULTIPLY'
-
-                if mat_data.SphereIndex != -1:
-
-                    if temp_mattrial.texture_slots[1] is None:
-                        temp_mattrial.texture_slots.add()
-
-                    if temp_mattrial.texture_slots[1] is None:
-                        temp_mattrial.texture_slots.add()
-
-                    temp_mattrial.texture_slots[1].texture = textures_dic.get(mat_data.SphereIndex, None)
-
-                    # [0:None 1:Multi 2:Add 3:SubTexture]
-                    if mat_data.SphereType == 1:
-                        temp_mattrial.texture_slots[1].texture_coords = 'NORMAL'
-                        temp_mattrial.texture_slots[1].blend_type = 'MULTIPLY'
-
-                    elif mat_data.SphereType == 2:
-                        temp_mattrial.texture_slots[1].texture_coords = 'NORMAL'
-                        temp_mattrial.texture_slots[1].blend_type = 'ADD'
-
-                    elif mat_data.SphereType == 3:
-                        temp_mattrial.texture_slots[1].texture_coords = "UV"
-                        temp_mattrial.texture_slots[1].blend_type = 'MIX'
-
-        # Remove Textures
-        for item in bpy.data.textures:
-            if item.users == 0:
-                bpy.data.textures.remove(item)
 
         return {'FINISHED'}
 

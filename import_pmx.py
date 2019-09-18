@@ -199,7 +199,8 @@ def Set_Bone_Position(pmx_data, arm_dat, blender_bone_list, fix=False):
         if eb.head == eb.tail:
             if data_bone.AdditionalBoneIndex >= 0 and pmx_data.Bones[data_bone.AdditionalBoneIndex].UseFixedAxis == 1:
                 if fixed_axis is None:
-                    eb.tail = GT(data_bone.Position + pmx_data.Bones[data_bone.AdditionalBoneIndex].FixedAxis, GlobalMatrix)
+                    eb.tail = GT(data_bone.Position +
+                                 pmx_data.Bones[data_bone.AdditionalBoneIndex].FixedAxis, GlobalMatrix)
                 else:
                     eb.tail = eb.head + fixed_axis
             else:
@@ -568,7 +569,7 @@ def read_pmx_data(context, filepath="",
         mesh.update()
 
         if bone_transfer:
-            scene.update()
+            context.view_layer.update()
             return arm_obj, obj_mesh
 
         # Add Textures
@@ -582,7 +583,7 @@ def read_pmx_data(context, filepath="",
                 # image_dic[tex_index] = bpy.data.images[len(bpy.data.images)-1]
                 textures_dic[tex_index] = bpy.data.textures.new(os.path.basename(tex_path), type='IMAGE')
                 textures_dic[tex_index].image = bpy.data.images[os.path.basename(tex_path)]
-                
+
                 # Use Alpha
                 textures_dic[tex_index].image.alpha_mode = 'PREMUL'
 
@@ -654,7 +655,7 @@ def read_pmx_data(context, filepath="",
                 mesh.polygons[index].material_index = dat[0]
 
                 # Set Texture
-                #if pmx_data.Materials[dat[0]].TextureIndex < len(bpy.data.images) and pmx_data.Materials[dat[0]].TextureIndex >= 0:
+                # if pmx_data.Materials[dat[0]].TextureIndex < len(bpy.data.images) and pmx_data.Materials[dat[0]].TextureIndex >= 0:
                 #    if textures_dic.get(pmx_data.Materials[dat[0]].TextureIndex, None) is not None:
                 #        mesh.uv_layers[0].data[index].image = textures_dic[pmx_data.Materials[dat[0]].TextureIndex].image
 
@@ -930,12 +931,11 @@ def make_xml(pmx_data, filepath, use_japanese_name, xml_save_versions):
         material_ambient.set("g", str(pmx_mat.Ambient.y))
         material_ambient.set("b", str(pmx_mat.Ambient.z))
 
-        if pmx_mat.SphereIndex != -1 and len(pmx_data.Textures) > pmx_mat.SphereIndex:      
+        if pmx_mat.SphereIndex != -1 and len(pmx_data.Textures) > pmx_mat.SphereIndex:
             material_sphere = etree.SubElement(material_node, "sphere")
             material_sphere.set("type", str(pmx_mat.SphereType))
             material_sphere.set("path", str(pmx_data.Textures[pmx_mat.SphereIndex].Path))
 
-            
     #
     # Rigid
     #
