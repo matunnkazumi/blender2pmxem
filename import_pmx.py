@@ -633,31 +633,6 @@ def read_pmx_data(context, filepath="",
                 temp_principled.base_color_texture.use_alpha = True
                 temp_principled.base_color_texture.texcoords = "UV"
 
-            if mat_data.SphereIndex != -1:
-                temp_tex = pmx_data.Textures[mat_data.SphereIndex]
-
-                if temp_mattrial.texture_slots[1] is None:
-                    temp_mattrial.texture_slots.add()
-
-                if temp_mattrial.texture_slots[1] is None:
-                    temp_mattrial.texture_slots.add()
-
-                temp_mattrial.texture_slots[1].texture = textures_dic.get(mat_data.SphereIndex, None)
-
-                # [0:None 1:Multi 2:Add 3:SubTexture]
-                if mat_data.SphereType == 1:
-                    temp_mattrial.texture_slots[1].texture_coords = 'NORMAL'
-                    temp_mattrial.texture_slots[1].blend_type = 'MULTIPLY'
-
-                elif mat_data.SphereType == 2:
-                    temp_mattrial.texture_slots[1].texture_coords = 'NORMAL'
-                    temp_mattrial.texture_slots[1].blend_type = 'ADD'
-
-                elif mat_data.SphereType == 3:
-                    temp_mattrial.texture_slots[1].texture_coords = "UV"
-                    temp_mattrial.texture_slots[1].uv_layer = "UV_Data"
-                    temp_mattrial.texture_slots[1].blend_type = 'MIX'
-
         mesh.update()
 
         # Set Material & UV
@@ -955,7 +930,12 @@ def make_xml(pmx_data, filepath, use_japanese_name, xml_save_versions):
         material_ambient.set("g", str(pmx_mat.Ambient.y))
         material_ambient.set("b", str(pmx_mat.Ambient.z))
 
+        if pmx_mat.SphereIndex != -1 and len(pmx_data.Textures) > pmx_mat.SphereIndex:      
+            material_sphere = etree.SubElement(material_node, "sphere")
+            material_sphere.set("type", str(pmx_mat.SphereType))
+            material_sphere.set("path", str(pmx_data.Textures[pmx_mat.SphereIndex].Path))
 
+            
     #
     # Rigid
     #
