@@ -9,7 +9,7 @@ from bpy.types import Material
 from bpy.types import BlendDataObjects
 from . import pmx
 from . import object_applymodifier, global_variable
-from typing import Tuple
+from typing import Dict
 
 # global_variable
 GV = global_variable.Init()
@@ -72,7 +72,7 @@ def exist_object_using_material(material: Material, target_armature: Object, obj
     return False
 
 
-def create_PMMaterial(mat: Material, xml_mat_list) -> Tuple[pmx.PMMaterial, str]:
+def create_PMMaterial(mat: Material, xml_mat_list, tex_dic: Dict[str, int]) -> pmx.PMMaterial:
 
     principled = PrincipledBSDFWrapper(mat, is_readonly=True)
     pmx_mat = pmx.PMMaterial()
@@ -138,6 +138,12 @@ def create_PMMaterial(mat: Material, xml_mat_list) -> Tuple[pmx.PMMaterial, str]
 
         pmx_mat.Power = float(temp_mat.get("power", "1"))
 
+        sphere_elm = temp_mat.find("sphere")
+        if sphere_elm != None:
+            path = sphere_elm.get("path")
+            pmx_mat.SphereIndex = tex_dic.setdefault(path, len(tex_dic))
+            pmx_mat.SphereType = int(sphere_elm.get("type", "0"))
+
     r, g, b = principled.base_color
     a = principled.alpha
     pmx_mat.Deffuse = xml_deffuse if xml_deffuse != None else Math.Vector((r, g, b, a))
@@ -152,7 +158,6 @@ def create_PMMaterial(mat: Material, xml_mat_list) -> Tuple[pmx.PMMaterial, str]
     if tex_base_path == "":
         tex_base_path = os.path.dirname(filepath)
 
-    tex_path = None
     texture = principled.base_color_texture
     if texture and texture.image:
         filepath = texture.image.filepath
@@ -161,7 +166,9 @@ def create_PMMaterial(mat: Material, xml_mat_list) -> Tuple[pmx.PMMaterial, str]
         tex_path = bpy.path.relpath(tex_abs_path, tex_base_path)
         tex_path = tex_path.replace("//", "", 1)
 
-    return pmx_mat, tex_path
+        pmx_mat.TextureIndex = tex_dic.setdefault(tex_path, len(tex_dic))
+
+    return pmx_mat
 
 
 def write_pmx_data(context, filepath="",
@@ -545,9 +552,7 @@ def write_pmx_data(context, filepath="",
             if not found:
                 continue
 
-            pmx_mat, tex_path = create_PMMaterial(mat, xml_mat_list)
-            if tex_path != None:
-                pmx_mat.TextureIndex = tex_dic.setdefault(tex_path, len(tex_dic))
+            pmx_mat = create_PMMaterial(mat, xml_mat_list, tex_dic)
 
             faceTemp[mat.name] = []
             mat_list[mat.name] = pmx_mat
