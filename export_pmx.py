@@ -142,7 +142,7 @@ def create_PMMaterial(mat: Material, xml_mat_list) -> Tuple[pmx.PMMaterial, str]
     a = principled.alpha
     pmx_mat.Deffuse = xml_deffuse if xml_deffuse != None else Math.Vector((r, g, b, a))
 
-    pmx_mat.Specular = xml_specular if xml_specular != None else Math.Vector((1.0, 1.0, 1.0))
+    pmx_mat.Specular = xml_specular if xml_specular != None else Math.Vector((0.0, 0.0, 0.0))
     pmx_mat.Ambient = xml_ambient if xml_ambient != None else pmx_mat.Deffuse.xyz * 0.4
 
     pmx_mat.FaceLength = 0
