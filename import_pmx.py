@@ -568,7 +568,7 @@ def read_pmx_data(context, filepath="",
         mesh.update()
 
         if bone_transfer:
-            scene.update()
+            context.view_layer.update()
             return arm_obj, obj_mesh
 
         # Add Textures

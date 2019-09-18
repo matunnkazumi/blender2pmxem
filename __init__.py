@@ -455,24 +455,20 @@ class B2PmxeSaveAsXML(bpy.types.Operator):
             # Set active object
             def set_active(obj):
                 bpy.ops.object.select_all(action='DESELECT')
-                obj.select = True
-                context.scene.objects.active = obj
+                obj.select_set(True)
+                context.view_layer.objects.active = obj
 
             set_active(import_obj)
 
             # Select object
             def select_object(obj):
                 # Show object
-                obj.hide = False
+                obj.hide_viewport = False
                 obj.hide_select = False
 
-                # Show layers
-                for i, layer in enumerate(obj.layers):
-                    context.scene.layers[i] = layer if layer else context.scene.layers[i]
+                obj.select_set(True)
 
-                obj.select = True
-
-            for obj in context.scene.objects:
+            for obj in context.collection.objects:
                 if obj.find_armature() == arm:
                     select_object(obj)
 
@@ -486,8 +482,8 @@ class B2PmxeSaveAsXML(bpy.types.Operator):
                                                  mix_factor=1)
 
             # Unlink
-            context.scene.objects.unlink(import_obj)
-            context.scene.objects.unlink(import_arm)
+            context.collection.objects.unlink(import_obj)
+            context.collection.objects.unlink(import_arm)
 
             set_active(arm)
 
