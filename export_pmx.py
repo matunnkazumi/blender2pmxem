@@ -136,7 +136,7 @@ def create_PMMaterial(mat: Material, xml_mat_list) -> Tuple[pmx.PMMaterial, str]
                                        float(ambient_elm.get("g", "0.0")),
                                        float(ambient_elm.get("b", "0.0"))))
 
-        pmx_mat.Power = int(temp_mat.get("power", "1"))
+        pmx_mat.Power = float(temp_mat.get("power", "1"))
 
     r, g, b = principled.base_color
     a = principled.alpha
