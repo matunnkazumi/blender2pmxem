@@ -671,65 +671,8 @@ class B2PMXEM_PT_ObjectPanel(bpy.types.Panel):
                     break
 
         # Tools
-        # Solidify Edge
-        box = layout.box()
-        row = box.split(factor=0.6)
-        row.label(text="Solidify Edge:", icon='MOD_SOLIDIFY')
-
-        row = row.row(align=True)
-        row.alignment = 'RIGHT'
-        row.scale_x = 1.33
-        row.operator(
-            "b2pmxe.toggle_solidify_render",
-            text="",
-            icon='RESTRICT_RENDER_OFF' if isRender else 'RESTRICT_RENDER_ON'
-        )
-        row.operator(
-            "b2pmxe.toggle_solidify_view",
-            text="",
-            icon='RESTRICT_VIEW_OFF' if isView else 'RESTRICT_VIEW_ON'
-        )
-        row.operator("b2pmxe.get_solidify_param", text="", icon='EYEDROPPER')
-
-        col = box.column()
-
-        row = col.row(align=True)
-        row.label(text="Color:")
-        row.prop(scn.b2pmxe_properties, "edge_color", text="")
-
-        if active_mat is None:
-            row.label(text="")
-            row.label(text="", icon='BLANK1')
-        else:
-            row.prop(active_mat, "diffuse_color", text="")
-            row.operator("b2pmxe.set_solidify_mat", text="", icon='STYLUS_PRESSURE')
-
-        row = col.row(align=True)
-        row.label(text="Thickness:")
-        row.prop(scn.b2pmxe_properties, "edge_thickness", text="", slider=True)
-
-        if active_mod is None:
-            row.label(text="")
-            row.label(text="", icon='BLANK1')
-        else:
-            row.prop(active_mod, "thickness", text="")
-            row.operator("b2pmxe.set_solidify_mod", text="", icon='STYLUS_PRESSURE')
-
-        # Solidify Edge UI Button
-        row = box.row(align=True)
-        row.operator("b2pmxe.delete_solidify", text="Delete", icon='X')
-        row.operator(
-            "b2pmxe.add_solidify",
-            text="Add" if active_mat is None else "Reload",
-            icon='ZOOM_IN' if active_mat is None else 'FILE_REFRESH'
-        )
 
         col = layout.column(align=True)
-
-        # Material to Texface
-        row = col.row(align=True)
-        row.operator("b2pmxe.texface_remove", text="Delete", icon="X")
-        row.operator("b2pmxe.material_to_texface", text="Mat to Tex", icon='MATERIAL')
 
         # WeightType Group
         row = col.row(align=True)
