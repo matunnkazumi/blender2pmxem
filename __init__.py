@@ -645,30 +645,12 @@ class B2PMXEM_PT_ObjectPanel(bpy.types.Panel):
 
         ao = context.active_object
         scn = context.scene
-        isRender = True
-        isView = True
-        active_mod = None
-        active_mat = None
         color_map = None
 
         # Get Solidify Edge Flag
         if ao and ao.type == 'MESH':
             # WeightType Group
             color_map = ao.data.vertex_colors.get(GV.WeightTypeName)
-
-            # Modifier
-            active_mod = ao.modifiers.get(GV.SolidfyName)
-            if active_mod is not None:
-                isRender = active_mod.show_render
-                isView = active_mod.show_viewport
-
-            # Material
-            for mat in ao.data.materials:
-                if mat is None:
-                    continue
-                if mat.name.startswith(GV.SolidfyName):
-                    active_mat = mat
-                    break
 
         # Tools
 
