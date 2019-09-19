@@ -680,7 +680,6 @@ class B2PMXEM_PT_ObjectPanel(bpy.types.Panel):
         # Shading
         row = layout.row()
         row.prop(scn.display.shading, 'show_backface_culling')
-        row.prop(scn.b2pmxe_properties, 'shadeless')
 
 
 # Registration
