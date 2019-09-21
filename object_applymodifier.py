@@ -45,7 +45,7 @@ def make_evaluated_object(target_obj):
         oiname = oi.object.name
         if oiname != target_obj.name:
             continue
-        tmp_mesh = bpy.data.meshes.new_from_object(oi.object)
+        tmp_mesh = bpy.data.meshes.new_from_object(oi.object, preserve_all_data_layers=True, depsgraph=depsgraph)
         return bpy.data.objects.new(tmp_mesh.name, tmp_mesh)
 
 
