@@ -1,5 +1,5 @@
 name: packaging and upload
-on: [pull_request,release]
+on: [pull_request, release]
 
 jobs:
   create_package:
