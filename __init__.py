@@ -27,8 +27,8 @@ bl_info = {
     "location": "File > Import-Export",
     "description": "Import-Export PMX model data",
     "warning": "",
-    "wiki_url": "",
-    "tracker_url": "",
+    "wiki_url": "https://github.com/matunnkazumi/blender2pmxem/wiki",
+    "tracker_url": "https://github.com/matunnkazumi/blender2pmxem/issues",
     "category": "Import-Export"
 }
 
