@@ -8,9 +8,5 @@ jobs:
     steps:
       - name: checkout
         uses: actions/checkout@master
-      - name: zip
-        run: zip -r blender2pmxem.zip . -x  '/*.git/*' '/*.github/*' '/*__pycache_/*' '/*.gitignore' '/*.pep8'
-      - uses: actions/upload-artifact@master
-        with:
-          name: package
-          path: blender2pmxem.zip
+      - name: ls
+        run: ls
