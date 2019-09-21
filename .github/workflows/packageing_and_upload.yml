@@ -1,0 +1,26 @@
+name: packaging and upload
+on: [pull_request,release]
+
+jobs:
+  create_package:
+    name: Create Package
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout
+        uses: actions/checkout@master
+        with:
+          fetch-depth: 1
+      - name: zip
+        run: zip -r blender2pmxem.zip . -x  '/*.git/*' '/*.github/*' '/*__pycache_/*' '/*.gitignore' '/*.pep8'
+      - name: upload artifact
+        uses: actions/upload-artifact@master
+        with:
+          name: package
+          path: blender2pmxem.zip
+      - name: upload to release
+        if: github.event_name == 'release'
+        uses: JasonEtco/upload-to-release@master
+        with:
+          args: blender2pmxem.zip
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
