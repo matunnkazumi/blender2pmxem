@@ -21,6 +21,6 @@ jobs:
         if: github.event_name == 'release'
         uses: JasonEtco/upload-to-release@master
         with:
-          args: blender2pmxem.zip
+          args: blender2pmxem.zip application/zip
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
