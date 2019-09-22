@@ -3,8 +3,13 @@ import mathutils as Math
 import os
 from math import radians
 
-from blender2pmxe import pmx
-from blender2pmxe import object_applymodifier, global_variable
+from bpy_extras.node_shader_utils import PrincipledBSDFWrapper
+from bpy.types import Object
+from bpy.types import Material
+from bpy.types import BlendDataObjects
+from . import pmx
+from . import object_applymodifier, global_variable
+from typing import Dict
 
 # global_variable
 GV = global_variable.Init()
@@ -27,7 +32,7 @@ def GT(vec, mat):  # GlobalTransformation
     v = vec.copy()
     v.resize_4d()
 
-    w = GlobalMatrix * mat * v
+    w = GlobalMatrix @ mat @ v
     w = w / w.w
     w.resize_3d()
     return w
@@ -37,10 +42,133 @@ def GT_normal(vec, mat):  # GlobalTransformation
     v = vec.copy()
     v.resize_4d()
 
-    w = GlobalMatrix * mat.to_3x3().to_4x4() * v
+    w = GlobalMatrix @ mat.to_3x3().to_4x4() @ v
     w.resize_3d()
     w.normalize()
     return w
+
+
+# Find Object using Material
+def exist_object_using_material(material: Material, target_armature: Object, objects: BlendDataObjects) -> bool:
+
+    for mat_obj in objects:
+        if mat_obj.users == 0:
+            continue
+        if mat_obj.type != 'MESH':
+            continue
+
+        # Get Weight Bone
+        mesh_parent = mat_obj.find_armature()
+
+        if mesh_parent != target_armature:
+            continue
+
+        tmp_mat = mat_obj.data.materials.get(material.name)
+        if tmp_mat is not None:
+            # Find Material
+            return True
+
+    # Not Found
+    return False
+
+
+def create_PMMaterial(mat: Material, xml_mat_list, tex_dic: Dict[str, int]) -> pmx.PMMaterial:
+
+    principled = PrincipledBSDFWrapper(mat, is_readonly=True)
+    pmx_mat = pmx.PMMaterial()
+    pmx_mat.Name = mat.name
+    pmx_mat.Name_E = mat.name
+
+    xml_deffuse = None
+    xml_specular = None
+    xml_ambient = None
+
+    # Load XML Status
+    if pmx_mat.Name in xml_mat_list.keys():
+        temp_mat = xml_mat_list[pmx_mat.Name]
+        pmx_mat.Name = temp_mat.get("name", mat.name)
+        pmx_mat.Name_E = temp_mat.get("name_e", pmx_mat.Name)
+        pmx_mat.UseSystemToon = int(temp_mat.get("use_systemtoon", "1"))
+
+        if pmx_mat.UseSystemToon == 1:
+            pmx_mat.ToonIndex = int(temp_mat.get("toon", "0"))
+
+        else:
+            tex_path = temp_mat.get("toon", "toon01.bmp")
+
+            if tex_path == "" or tex_path == "-1":
+                pmx_mat.ToonIndex = -1
+
+            else:
+                pmx_mat.ToonIndex = tex_dic.setdefault(tex_path, len(tex_dic))
+
+        pmx_mat.Both = int(temp_mat.get("both", "0"))
+        pmx_mat.GroundShadow = int(temp_mat.get("ground_shadow", "0"))
+        pmx_mat.DropShadow = int(temp_mat.get("drop_shadow", "0"))
+        pmx_mat.OnShadow = int(temp_mat.get("on_shadow", "0"))
+
+        pmx_mat.OnEdge = int(temp_mat.get("on_edge", "0"))
+        pmx_mat.EdgeSize = float(temp_mat.get("edge_size", "1.0"))
+
+        edge_c = temp_mat.find("edge_color")
+        pmx_mat.EdgeColor = Math.Vector((float(edge_c.get("r", "0.0")),
+                                         float(edge_c.get("g", "0.0")),
+                                         float(edge_c.get("b", "0.0")),
+                                         float(edge_c.get("a", "1.0"))))
+
+        deffuse_elm = temp_mat.find("deffuse")
+        if deffuse_elm != None:
+            c = (float(deffuse_elm.get("r", principled.base_color.r)),
+                 float(deffuse_elm.get("g", principled.base_color.g)),
+                 float(deffuse_elm.get("b", principled.base_color.b)),
+                 float(deffuse_elm.get("a", principled.alpha)))
+            xml_deffuse = Math.Vector(c)
+
+        specular_elm = temp_mat.find("specular")
+        if specular_elm != None:
+            xml_specular = Math.Vector((float(specular_elm.get("r", "0.0")),
+                                        float(specular_elm.get("g", "0.0")),
+                                        float(specular_elm.get("b", "0.0"))))
+
+        ambient_elm = temp_mat.find("ambient")
+        if ambient_elm != None:
+            xml_ambient = Math.Vector((float(ambient_elm.get("r", "0.0")),
+                                       float(ambient_elm.get("g", "0.0")),
+                                       float(ambient_elm.get("b", "0.0"))))
+
+        pmx_mat.Power = float(temp_mat.get("power", "1"))
+
+        sphere_elm = temp_mat.find("sphere")
+        if sphere_elm != None:
+            path = sphere_elm.get("path")
+            pmx_mat.SphereIndex = tex_dic.setdefault(path, len(tex_dic))
+            pmx_mat.SphereType = int(sphere_elm.get("type", "0"))
+
+    r, g, b = principled.base_color
+    a = principled.alpha
+    pmx_mat.Deffuse = xml_deffuse if xml_deffuse != None else Math.Vector((r, g, b, a))
+
+    pmx_mat.Specular = xml_specular if xml_specular != None else Math.Vector((0.0, 0.0, 0.0))
+    pmx_mat.Ambient = xml_ambient if xml_ambient != None else pmx_mat.Deffuse.xyz * 0.4
+
+    pmx_mat.FaceLength = 0
+
+    tex_base_path = bpy.path.abspath("//")
+
+    if tex_base_path == "":
+        tex_base_path = os.path.dirname(filepath)
+
+    texture = principled.base_color_texture
+    if texture and texture.image:
+        filepath = texture.image.filepath
+
+        tex_abs_path = bpy.path.abspath(filepath)
+        tex_path = bpy.path.relpath(tex_abs_path, tex_base_path)
+        tex_path = tex_path.replace("//", "", 1)
+
+        pmx_mat.TextureIndex = tex_dic.setdefault(tex_path, len(tex_dic))
+
+    return pmx_mat
 
 
 def write_pmx_data(context, filepath="",
@@ -49,7 +177,7 @@ def write_pmx_data(context, filepath="",
                    use_custom_normals=False,
                    ):
 
-    prefs = context.user_preferences.addons[GV.FolderName].preferences
+    prefs = context.preferences.addons[GV.FolderName].preferences
     use_japanese_name = prefs.use_japanese_name
 
     GV.SetStartTime()
@@ -68,7 +196,7 @@ def write_pmx_data(context, filepath="",
         xml_path = os.path.splitext(filepath)[0] + ".xml"
         has_xml_file = os.path.isfile(xml_path)
 
-        default_xml = "default_jp.xml" if use_japanese_name == True else "default_en.xml"
+        default_xml = "default_jp.xml" if use_japanese_name else "default_en.xml"
         def_path = os.path.join(os.path.dirname(__file__), default_xml)
         has_def_file = os.path.isfile(def_path)
 
@@ -420,107 +548,11 @@ def write_pmx_data(context, filepath="",
                 continue
 
             # Find Object using Material
-            for mat_obj in bpy.data.objects:
-                if mat_obj.users == 0:
-                    continue
-                if mat_obj.type != 'MESH':
-                    continue
-
-                # Get Weight Bone
-                mesh_parent = mat_obj.find_armature()
-
-                if mesh_parent != arm_obj:
-                    continue
-
-                tmp_mat = mat_obj.data.materials.get(mat.name)
-                if tmp_mat is not None:
-                    # Find Material
-                    break
-            # Not found
-            else:
+            found = exist_object_using_material(mat, arm_obj, bpy.data.objects)
+            if not found:
                 continue
 
-            pmx_mat = pmx.PMMaterial()
-            pmx_mat.Name = mat.name
-            pmx_mat.Name_E = mat.name
-
-            # Load XML Status
-            if pmx_mat.Name in xml_mat_list.keys():
-                temp_mat = xml_mat_list[pmx_mat.Name]
-                pmx_mat.Name = temp_mat.get("name", mat.name)
-                pmx_mat.Name_E = temp_mat.get("name_e", pmx_mat.Name)
-                pmx_mat.UseSystemToon = int(temp_mat.get("use_systemtoon", "1"))
-
-                if pmx_mat.UseSystemToon == 1:
-                    pmx_mat.ToonIndex = int(temp_mat.get("toon", "0"))
-
-                else:
-                    tex_path = temp_mat.get("toon", "toon01.bmp")
-
-                    if tex_path == "" or tex_path == "-1":
-                        pmx_mat.ToonIndex = -1
-
-                    else:
-                        pmx_mat.ToonIndex = tex_dic.setdefault(tex_path, len(tex_dic))
-
-                pmx_mat.Both = int(temp_mat.get("both", "0"))
-                pmx_mat.GroundShadow = int(temp_mat.get("ground_shadow", "0"))
-                pmx_mat.DropShadow = int(temp_mat.get("drop_shadow", "0"))
-                pmx_mat.OnShadow = int(temp_mat.get("on_shadow", "0"))
-
-                pmx_mat.OnEdge = int(temp_mat.get("on_edge", "0"))
-                pmx_mat.EdgeSize = float(temp_mat.get("edge_size", "1.0"))
-
-                edge_c = temp_mat.find("edge_color")
-                pmx_mat.EdgeColor = Math.Vector((float(edge_c.get("r", "0.0")), float(edge_c.get("g", "0.0")),
-                                                 float(edge_c.get("b", "0.0")), float(edge_c.get("a", "1.0"))))
-
-            r, g, b = mat.diffuse_color
-            pmx_mat.Deffuse = Math.Vector((r, g, b, mat.alpha))
-
-            r, g, b = mat.specular_color
-            pmx_mat.Specular = Math.Vector((r, g, b))
-            pmx_mat.Power = mat.specular_hardness
-
-            if "Ambient" in mat:
-                pmx_mat.Ambient = Math.Vector(mat["Ambient"].to_list())
-            else:
-                pmx_mat.Ambient = pmx_mat.Deffuse.xyz * 0.4
-
-            pmx_mat.FaceLength = 0
-
-            tex_base_path = bpy.path.abspath("//")
-
-            if tex_base_path == "":
-                tex_base_path = os.path.dirname(filepath)
-
-            texture_0 = None if mat.texture_slots[0] is None else mat.texture_slots[0].texture
-
-            if texture_0 is not None and texture_0.type == "IMAGE" and texture_0.image is not None:
-                tex_abs_path = bpy.path.abspath(texture_0.image.filepath)
-                tex_path = bpy.path.relpath(tex_abs_path, tex_base_path)
-                tex_path = tex_path.replace("//", "", 1)
-
-                pmx_mat.TextureIndex = tex_dic.setdefault(tex_path, len(tex_dic))
-
-            texture_1 = None if mat.texture_slots[1] is None else mat.texture_slots[1].texture
-
-            if texture_1 is not None and texture_1.type == "IMAGE" and texture_1.image is not None:
-                tex_abs_path = bpy.path.abspath(texture_1.image.filepath)
-                tex_path = bpy.path.relpath(tex_abs_path, tex_base_path)
-                tex_path = tex_path.replace("//", "", 1)
-
-                pmx_mat.SphereIndex = tex_dic.setdefault(tex_path, len(tex_dic))
-
-                #[0:None 1:Multi 2:Add 3:SubTexture]
-                if mat.texture_slots[1].texture_coords == 'UV':
-                    pmx_mat.SphereType = 3
-
-                if mat.texture_slots[1].blend_type == 'ADD':
-                    pmx_mat.SphereType = 2
-
-                elif mat.texture_slots[1].blend_type == 'MULTIPLY':
-                    pmx_mat.SphereType = 1
+            pmx_mat = create_PMMaterial(mat, xml_mat_list, tex_dic)
 
             faceTemp[mat.name] = []
             mat_list[mat.name] = pmx_mat
@@ -540,7 +572,7 @@ def write_pmx_data(context, filepath="",
         t_key.sort()
 
         for mat_name in t_key:
-            if not mat_name in xml_mat_list.keys():
+            if mat_name not in xml_mat_list.keys():
                 pmx_data.Materials.append(mat_list[mat_name])
                 mat_name_List.append(mat_name)
 
@@ -610,7 +642,7 @@ def write_pmx_data(context, filepath="",
                 continue
 
             # Apply Modifiers
-            if use_mesh_modifiers == True:
+            if use_mesh_modifiers:
                 try:
                     mesh = apply_mod.Get_Apply_Mesh(mesh_obj)
                 except object_applymodifier.ShapeVertexError as e:
@@ -625,7 +657,7 @@ def write_pmx_data(context, filepath="",
 
             # Custom Normals
             normals = {}
-            if use_custom_normals == True and hasattr(mesh, "has_custom_normals"):
+            if use_custom_normals and hasattr(mesh, "has_custom_normals"):
                 if mesh.has_custom_normals and mesh.use_auto_smooth:
                     OK_normal_list.append(mesh_obj.name)
 
@@ -703,7 +735,7 @@ def write_pmx_data(context, filepath="",
             # Get Face & UV
             uv_data = None
             add_vertex_count = 0
-            if len(mesh.uv_textures) > 0:
+            if len(mesh.uv_layers) > 0:
                 # mesh.uv_textures.active_index = 0
                 uv_data = mesh.uv_layers.active.data[:]
 
@@ -728,7 +760,6 @@ def write_pmx_data(context, filepath="",
                 else:
                     for loop in loops:
                         temp_index = loop.vertex_index + base_vert_index
-                        target_vert = mesh.vertices[loop.vertex_index]
                         target_uv = uv_data[loop.index].uv
                         vert_key = (temp_index, target_uv[0], target_uv[1])
 
@@ -824,7 +855,7 @@ def write_pmx_data(context, filepath="",
             base_vert_index += (len(mesh.vertices) + add_vertex_count)
 
             # remove modifier applied mesh
-            if use_mesh_modifiers == True:
+            if use_mesh_modifiers:
                 apply_mod.Remove()
 
         # print NG_object_list
@@ -949,7 +980,7 @@ def write_pmx_data(context, filepath="",
                 pmx_rigid.Name = rigid.get("name")
                 pmx_rigid.Name_E = rigid.get("name_e")
                 attach = rigid.get("attach")
-                #print (attach,end="  ")
+                # print (attach,end="  ")
 
                 if attach == "World":
                     pmx_rigid.Bone = -1
@@ -963,7 +994,9 @@ def write_pmx_data(context, filepath="",
                 pmx_rigid.BoundType = int(rigid.get("shape"))
 
                 rigid_size = rigid.find("size")
-                pmx_rigid.Size = Math.Vector((float(rigid_size.get("a")), float(rigid_size.get("b")), float(rigid_size.get("c"))))
+                pmx_rigid.Size = Math.Vector((float(rigid_size.get("a")),
+                                              float(rigid_size.get("b")),
+                                              float(rigid_size.get("c"))))
 
                 pmx_rigid.Position = get_Vector(rigid.find("pos"))
                 pmx_rigid.Rotate = get_Vector_Rad(rigid.find("rot"))

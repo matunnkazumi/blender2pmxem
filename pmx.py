@@ -1,5 +1,5 @@
 #!/bin/python
-#-*- coding utf_8 -*-
+# -*- coding utf_8 -*-
 
 #
 # pmx.py : 20140104 v 1.1
@@ -132,8 +132,8 @@ class ModelStatus(object):
                 pass
             elif self.Version == 2.1:
                 pass
-                #self.HasError = 1
-                #self.ErrorMessage = "PMX 2.1 Not Supported"
+                # self.HasError = 1
+                # self.ErrorMessage = "PMX 2.1 Not Supported"
                 # break
             else:
                 self.HasError = 1
@@ -843,7 +843,7 @@ class PMBone(object):
         self.FixedAxis = mathutils.Vector((0, 0, 0))
 
         self.LocalAxisX = mathutils.Vector((0, 0, 0))
-        #self.LocalAxisY = mathutils.Vector((0,0,0))
+        # self.LocalAxisY = mathutils.Vector((0,0,0))
         self.LocalAxisZ = mathutils.Vector((0, 0, 0))
 
         self.ExternalBoneIndex = -1
@@ -896,7 +896,7 @@ class PMBone(object):
 
         if self.UseLocalAxis == 1:
             self.LocalAxisX = mathutils.Vector(ReadStruct(f, "3f"))
-            #self.LocalAxisY = mathutils.Vector(ReadStruct(f,"3f"))
+            # self.LocalAxisY = mathutils.Vector(ReadStruct(f,"3f"))
             self.LocalAxisZ = mathutils.Vector(ReadStruct(f, "3f"))
 
         # External Model Bone Control
@@ -1024,7 +1024,7 @@ class PMMorphOffset(object):
         self.MatToon = mathutils.Vector((0, 0, 0, 0))
 
     def Load(self, f, mode, type):
-        #[0:Group 1:Vertex 2:Bone 3:UV 4:ExUV1 5:ExUV2 6:ExUV3 7:ExUV4 8:Material]
+        # [0:Group 1:Vertex 2:Bone 3:UV 4:ExUV1 5:ExUV2 6:ExUV3 7:ExUV4 8:Material]
         if type in (0, 9):  # 0:Group 9:Flip
             self.Index = ReadStruct(f, mode.MorphIndexSize)
             self.Power = ReadStruct(f, "f")
@@ -1064,7 +1064,7 @@ class PMMorphOffset(object):
         return
 
     def Save(self, f, mode, type):
-        #[0:Group 1:Vertex 2:Bone 3:UV 4:ExUV1 5:ExUV2 6:ExUV3 7:ExUV4 8:Material]
+        # [0:Group 1:Vertex 2:Bone 3:UV 4:ExUV1 5:ExUV2 6:ExUV3 7:ExUV4 8:Material]
         if type in (0, 9):   # 0:Group 9:Flip
             WriteStruct(f, mode.MorphIndexSize, self.Index)
             WriteStruct(f, "f", self.Power)

@@ -35,7 +35,6 @@ This script has several functions and operators, grouped for convenience:
 
 
 import bpy
-from bpy.props import StringProperty, BoolProperty, EnumProperty
 
 
 def mat_to_texface():

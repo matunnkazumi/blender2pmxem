@@ -1,5 +1,5 @@
 import bpy
-from blender2pmxe import global_variable
+from . import global_variable
 
 # global_variable
 GV = global_variable.Init()
@@ -43,7 +43,7 @@ class B2PmxeSolidifyAdd(bpy.types.Operator):
             bpy.context.scene.render.engine = 'BLENDER_RENDER'
 
             # Add Solidfy Material
-            if mat_reload == False:
+            if not mat_reload:
                 if len(obj.material_slots) == 0:
                     obj.data.materials.append(bpy.data.materials.new("Material"))
 

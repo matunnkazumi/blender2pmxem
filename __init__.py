@@ -1,25 +1,37 @@
+from . import space_view3d_materials_utils
+from . import add_function
+from . import solidify_edge
+from . import global_variable
+from . import object_applymodifier
+from . import import_pmx
+from . import export_pmx
+from bpy.props import StringProperty
+from bpy.props import BoolProperty
+from bpy.props import EnumProperty
+from bpy.props import FloatProperty
+from bpy.props import FloatVectorProperty
+from bpy.props import PointerProperty
+from bpy.props import IntProperty
+from bpy_extras.io_utils import ExportHelper
+from bpy_extras.io_utils import ImportHelper
+from bpy.app.translations import pgettext_iface as iface_
+from glob import glob
+import os
+import bpy
+
 bl_info = {
     "name": "MMD PMX Format (Extend)",
-    "author": "NaNashi",
-    "version": (1, 0, 6),
-    "blender": (2, 76, 0),
+    "author": "matunnkazumi",
+    "version": (0, 1, 0),
+    "blender": (2, 80, 0),
     "location": "File > Import-Export",
     "description": "Import-Export PMX model data",
     "warning": "",
-    "wiki_url": "",
-    "tracker_url": "",
+    "wiki_url": "https://github.com/matunnkazumi/blender2pmxem/wiki",
+    "tracker_url": "https://github.com/matunnkazumi/blender2pmxem/issues",
     "category": "Import-Export"
 }
 
-import bpy
-import os
-from glob import glob
-from bpy.app.translations import pgettext_iface as iface_
-from bpy_extras.io_utils import ExportHelper, ImportHelper
-from bpy.props import StringProperty, BoolProperty, EnumProperty, FloatProperty, FloatVectorProperty, PointerProperty, IntProperty
-from blender2pmxe import import_pmx, export_pmx
-from blender2pmxe import add_function, solidify_edge, global_variable
-from blender2pmxe import space_view3d_materials_utils
 
 # global_variable
 GV = global_variable.Init()
@@ -149,30 +161,30 @@ class Blender2PmxeProperties(bpy.types.PropertyGroup):
 class Blender2PmxeAddonPreferences(bpy.types.AddonPreferences):
     bl_idname = __name__
 
-    use_T_stance = BoolProperty(
+    use_T_stance: BoolProperty(
         name="Append with T stance",
         description="Append template armature with T stance",
         default=False
     )
-    use_custom_shape = BoolProperty(
+    use_custom_shape: BoolProperty(
         name="Use Custom Shape",
         description="Use Custom Shape when creating bones",
         default=False
     )
-    use_japanese_name = BoolProperty(
+    use_japanese_name: BoolProperty(
         name="Use Japanese Bone name",
         description="Append template armature with Japanese bone name",
         default=False
     )
 
-    saveVersions = IntProperty(name="Save Versions", default=0, min=0, max=32)
+    saveVersions: IntProperty(name="Save Versions", default=0, min=0, max=32)
 
-    rotShoulder = FloatProperty(name="Shoulder", default=0.261799, min=-1.5708, max=1.5708, unit='ROTATION')
-    rotArm = FloatProperty(name="Arm", default=0.401426, min=-1.5708, max=1.5708, unit='ROTATION')
+    rotShoulder: FloatProperty(name="Shoulder", default=0.261799, min=-1.5708, max=1.5708, unit='ROTATION')
+    rotArm: FloatProperty(name="Arm", default=0.401426, min=-1.5708, max=1.5708, unit='ROTATION')
 
-    twistBones = IntProperty(name="Number", default=3, min=0, max=3)
-    autoInfluence = FloatProperty(name="Influence", default=0.5, min=-1.0, max=1.0, step=1)
-    threshold = FloatProperty(name="Threshold", default=0.01, min=0.0, max=1.0, step=0.001, precision=5)
+    twistBones: IntProperty(name="Number", default=3, min=0, max=3)
+    autoInfluence: FloatProperty(name="Influence", default=0.5, min=-1.0, max=1.0, step=1)
+    threshold: FloatProperty(name="Threshold", default=0.01, min=0.0, max=1.0, step=0.001, precision=5)
 
     def draw(self, context):
         layout = self.layout
@@ -183,11 +195,11 @@ class Blender2PmxeAddonPreferences(bpy.types.AddonPreferences):
         row.prop(self, "use_T_stance")
 
         col = layout.column_flow(columns=2)
-        col.label("Number of .xml old versions:")
-        col.label("Angle of T stance and A stance:")
-        col.label("Number of Twist link bones:")
-        col.label("Auto Bone influence:")
-        col.label("Rename Chain threshold:")
+        col.label(text="Number of .xml old versions:")
+        col.label(text="Angle of T stance and A stance:")
+        col.label(text="Number of Twist link bones:")
+        col.label(text="Auto Bone influence:")
+        col.label(text="Rename Chain threshold:")
 
         col.prop(self, "saveVersions")
         row = col.row(align=True)
@@ -205,9 +217,9 @@ class ImportBlender2Pmx(bpy.types.Operator, ImportHelper):
     # bl_options = {'PRESET'}
 
     filename_ext = ".pmx"
-    filter_glob = StringProperty(default="*.pm[dx]", options={'HIDDEN'})
+    filter_glob: StringProperty(default="*.pm[dx]", options={'HIDDEN'})
 
-    adjust_bone_position = BoolProperty(
+    adjust_bone_position: BoolProperty(
         name="Adjust bone position",
         description="Automatically adjust bone position",
         default=False
@@ -233,22 +245,22 @@ class ExportBlender2Pmx(bpy.types.Operator, ExportHelper):
 
     # ExportHelper mixin class uses this
     filename_ext = ".pmx"
-    filter_glob = StringProperty(default="*.pmx", options={'HIDDEN'})
+    filter_glob: StringProperty(default="*.pmx", options={'HIDDEN'})
 
-    encode_type = EnumProperty(items=(('OPT_Utf-8', "UTF-8", "To use UTF-8 encoding."),
-                                      ('OPT_Utf-16', "UTF-16", "To use UTF-16 encoding."),
-                                      ),
-                               name="Encode",
-                               description="Select the encoding to use",
-                               default='OPT_Utf-16'
-                               )
+    encode_type: EnumProperty(items=(('OPT_Utf-8', "UTF-8", "To use UTF-8 encoding."),
+                                     ('OPT_Utf-16', "UTF-16", "To use UTF-16 encoding."),
+                                     ),
+                              name="Encode",
+                              description="Select the encoding to use",
+                              default='OPT_Utf-16'
+                              )
 
-    use_mesh_modifiers = BoolProperty(
+    use_mesh_modifiers: BoolProperty(
         name="Apply Modifiers",
         description="Apply modifiers (Warning, may be slow)",
         default=False,
     )
-    use_custom_normals = BoolProperty(
+    use_custom_normals: BoolProperty(
         name="Custom Normals",
         description="Use custom normals",
         default=False,
@@ -298,7 +310,7 @@ class ExportBlender2Pmx(bpy.types.Operator, ExportHelper):
         layout = self.layout
 
         box = layout.box()
-        row = box.split(percentage=0.3)
+        row = box.split(factor=0.3)
         row.label(text="Encode:")
         row.prop(self, "encode_type", text="")
 
@@ -314,15 +326,15 @@ class B2PmxeMessageOperator(bpy.types.Operator):
     bl_idname = "b2pmxe.message"
     bl_label = "B2Pmxe Message"
 
-    type = EnumProperty(
+    type: EnumProperty(
         items=(
             ('ERROR', "Error", ""),
             ('INFO', "Info", ""),
         ), default='ERROR')
-    line1 = StringProperty(default="")
-    line2 = StringProperty(default="")
-    line3 = StringProperty(default="")
-    use_console = BoolProperty(default=False)
+    line1: StringProperty(default="")
+    line2: StringProperty(default="")
+    line3: StringProperty(default="")
+    use_console: BoolProperty(default=False)
 
     def execute(self, context):
         return {'FINISHED'}
@@ -335,26 +347,26 @@ class B2PmxeMessageOperator(bpy.types.Operator):
         layout = self.layout
 
         if self.type == 'ERROR':
-            layout.label(iface_("Error") + ":", icon='ERROR')
+            layout.label(text=iface_("Error") + ":", icon='ERROR')
         elif self.type == 'INFO':
-            layout.label(iface_("Info") + ":", icon='INFO')
+            layout.label(text=iface_("Info") + ":", icon='INFO')
 
-        row = layout.split(0.05)
-        row.label("")
+        row = layout.split(factor=0.05)
+        row.label(text="")
         col = row.column(align=True)
-        col.label(self.line1)
+        col.label(text=self.line1)
 
         type_text = "[{0:s}]".format(self.type)
         print("{0:s} {1:s}".format(type_text, self.line1))
 
         if self.line2:
-            col.label(self.line2)
+            col.label(text=self.line2)
             print("{0:s} {1:s}".format(" " * (len(type_text)), self.line2))
         if self.line3:
-            col.label(self.line3)
+            col.label(text=self.line3)
             print("{0:s} {1:s}".format(" " * (len(type_text)), self.line3))
         if self.use_console:
-            col.label("See the console log for more information.")
+            col.label(text="See the console log for more information.")
 
         layout.separator()
 
@@ -386,19 +398,19 @@ class B2PmxeMakeXML(bpy.types.Operator):
         files = [os.path.relpath(x, directory) for x in glob(os.path.join(directory, '*.pmx'))]
 
         layout = self.layout
-        row = layout.split(0.01)
-        row.label("")
+        row = layout.split(factor=0.01)
+        row.label(text="")
 
-        split = row.split(0.968)
+        split = row.split(factor=0.968)
         col = split.column(align=True)
 
-        col.label("Fix Bones:")
+        col.label(text="Fix Bones:")
         props = context.scene.b2pmxe_properties
         row = col.row(align=True)
         row.prop(props, "make_xml_option", expand=True)
         col.separator()
 
-        col.label("File Select:")
+        col.label(text="File Select:")
         for file in files:
             col.operator("b2pmxe.save_as_xml", text=file).filename = file
 
@@ -411,7 +423,7 @@ class B2PmxeSaveAsXML(bpy.types.Operator):
     bl_label = "Save As XML File"
     bl_options = {'UNDO'}
 
-    filename = StringProperty(name="Filename", default="")
+    filename: StringProperty(name="Filename", default="")
 
     @classmethod
     def poll(cls, context):
@@ -419,7 +431,7 @@ class B2PmxeSaveAsXML(bpy.types.Operator):
         return (bpy.data.is_saved) and (obj and obj.type == 'ARMATURE')
 
     def execute(self, context):
-        prefs = context.user_preferences.addons[GV.FolderName].preferences
+        prefs = context.preferences.addons[GV.FolderName].preferences
         use_japanese_name = prefs.use_japanese_name
         xml_save_versions = prefs.saveVersions
         props = context.scene.b2pmxe_properties
@@ -428,11 +440,11 @@ class B2PmxeSaveAsXML(bpy.types.Operator):
         directory = bpy.path.abspath("//")
         filepath = os.path.join(directory, self.filename)
 
-        if os.path.isfile(filepath) != True:
+        if not os.path.isfile(filepath):
             return {'CANCELLED'}
 
         with open(filepath, "rb") as f:
-            from blender2pmxe import pmx
+            from . import pmx
             pmx_data = pmx.Model()
             pmx_data.Load(f)
 
@@ -443,34 +455,35 @@ class B2PmxeSaveAsXML(bpy.types.Operator):
             # Set active object
             def set_active(obj):
                 bpy.ops.object.select_all(action='DESELECT')
-                obj.select = True
-                context.scene.objects.active = obj
+                obj.select_set(True)
+                context.view_layer.objects.active = obj
 
             set_active(import_obj)
 
             # Select object
             def select_object(obj):
                 # Show object
-                obj.hide = False
+                obj.hide_viewport = False
                 obj.hide_select = False
 
-                # Show layers
-                for i, layer in enumerate(obj.layers):
-                    context.scene.layers[i] = layer if layer else context.scene.layers[i]
+                obj.select_set(True)
 
-                obj.select = True
-
-            for obj in context.scene.objects:
+            for obj in context.collection.objects:
                 if obj.find_armature() == arm:
                     select_object(obj)
 
                     # Data Transfer
-                    bpy.ops.object.data_transfer(data_type='VGROUP_WEIGHTS', vert_mapping='NEAREST', ray_radius=0,
-                                                 layers_select_src='ALL', layers_select_dst='NAME', mix_mode='REPLACE', mix_factor=1)
+                    bpy.ops.object.data_transfer(data_type='VGROUP_WEIGHTS',
+                                                 vert_mapping='NEAREST',
+                                                 ray_radius=0,
+                                                 layers_select_src='ALL',
+                                                 layers_select_dst='NAME',
+                                                 mix_mode='REPLACE',
+                                                 mix_factor=1)
 
             # Unlink
-            context.scene.objects.unlink(import_obj)
-            context.scene.objects.unlink(import_arm)
+            context.collection.objects.unlink(import_obj)
+            context.collection.objects.unlink(import_arm)
 
             set_active(arm)
 
@@ -478,15 +491,14 @@ class B2PmxeSaveAsXML(bpy.types.Operator):
             # Make XML
             blender_bone_list = import_pmx.make_xml(pmx_data, filepath, use_japanese_name, xml_save_versions)
 
-            #--------------------
+            # --------------------
             # Fix Armature
-            #--------------------
+            # --------------------
             arm_obj = context.active_object
-            bone_id = {}
 
             if props.make_xml_option == 'POSITION':
                 # Set Bone Position
-                bone_id = import_pmx.Set_Bone_Position(pmx_data, arm_obj.data, blender_bone_list, fix=True)
+                import_pmx.Set_Bone_Position(pmx_data, arm_obj.data, blender_bone_list, fix=True)
 
                 # BoneItem Direction
                 bpy.ops.object.mode_set(mode="EDIT", toggle=False)
@@ -511,92 +523,13 @@ class B2PmxeSaveAsXML(bpy.types.Operator):
 
             bpy.ops.object.mode_set(mode='OBJECT')
 
-        #--------------------
-        # Fix Materials
-        #--------------------
-
-        # Rename Images
-        for item in bpy.data.images:
-            item.name = bpy.path.basename(item.filepath)
-
-        # Add Textures
-        textures_dic = {}
-        for (tex_index, tex_data) in enumerate(pmx_data.Textures):
-            tex_path = os.path.join(directory, tex_data.Path)
-            try:
-                bpy.ops.image.open(filepath=tex_path)
-                textures_dic[tex_index] = bpy.data.textures.new(os.path.basename(tex_path), type='IMAGE')
-                textures_dic[tex_index].image = bpy.data.images[os.path.basename(tex_path)]
-
-                # Use Alpha
-                textures_dic[tex_index].image.use_alpha = True
-                textures_dic[tex_index].image.alpha_mode = 'PREMUL'
-
-            except:
-                pass
-
-        # Fix Material
-        for mat_data in pmx_data.Materials:
-            blender_mat_name = import_pmx.Get_JP_or_EN_Name(mat_data.Name, mat_data.Name_E, use_japanese_name)
-
-            temp_mattrial = bpy.data.materials.get(blender_mat_name)
-            if temp_mattrial is not None:
-                temp_mattrial.diffuse_color = mat_data.Deffuse.xyz
-                temp_mattrial.alpha = mat_data.Deffuse.w
-                temp_mattrial.specular_color = mat_data.Specular
-                temp_mattrial.specular_hardness = mat_data.Power
-                temp_mattrial["Ambient"] = mat_data.Ambient
-                temp_mattrial.use_transparency = True
-
-                # Texture
-                if mat_data.TextureIndex != -1:
-
-                    if temp_mattrial.texture_slots[0] is None:
-                        temp_mattrial.texture_slots.add()
-
-                    temp_mattrial.texture_slots[0].texture = textures_dic.get(mat_data.TextureIndex, None)
-                    temp_mattrial.texture_slots[0].texture_coords = "UV"
-
-                    # MMD Settings
-                    temp_mattrial.texture_slots[0].use_map_color_diffuse = True
-                    temp_mattrial.texture_slots[0].use_map_alpha = True
-                    temp_mattrial.texture_slots[0].blend_type = 'MULTIPLY'
-
-                if mat_data.SphereIndex != -1:
-
-                    if temp_mattrial.texture_slots[1] is None:
-                        temp_mattrial.texture_slots.add()
-
-                    if temp_mattrial.texture_slots[1] is None:
-                        temp_mattrial.texture_slots.add()
-
-                    temp_mattrial.texture_slots[1].texture = textures_dic.get(mat_data.SphereIndex, None)
-
-                    #[0:None 1:Multi 2:Add 3:SubTexture]
-                    if mat_data.SphereType == 1:
-                        temp_mattrial.texture_slots[1].texture_coords = 'NORMAL'
-                        temp_mattrial.texture_slots[1].blend_type = 'MULTIPLY'
-
-                    elif mat_data.SphereType == 2:
-                        temp_mattrial.texture_slots[1].texture_coords = 'NORMAL'
-                        temp_mattrial.texture_slots[1].blend_type = 'ADD'
-
-                    elif mat_data.SphereType == 3:
-                        temp_mattrial.texture_slots[1].texture_coords = "UV"
-                        temp_mattrial.texture_slots[1].blend_type = 'MIX'
-
-        # Remove Textures
-        for item in bpy.data.textures:
-            if item.users == 0:
-                bpy.data.textures.remove(item)
-
         return {'FINISHED'}
 
 
-class Blender2PmxeEditPanel(bpy.types.Panel):
-    bl_label = "Blender2Pmxe Tools"
+class B2PMXEM_PT_EditPanel(bpy.types.Panel):
+    bl_label = "Blender2Pmxem Tools"
     bl_space_type = "VIEW_3D"
-    bl_region_type = "TOOLS"
+    bl_region_type = "UI"
     bl_context = "armature_edit"
 
     def draw(self, context):
@@ -608,13 +541,13 @@ class Blender2PmxeEditPanel(bpy.types.Panel):
 
         row = col.row(align=True)
         row.operator("b2pmxe.delete_right", text="Delete _R", icon="X")
-        row.operator("b2pmxe.select_left", text="Select _L", icon="BORDER_RECT")
+        row.operator("b2pmxe.select_left", text="Select _L", icon="UV_SYNC_SELECT")
 
-        col.operator("b2pmxe.calculate_roll", icon="MANIPUL")
+        col.operator("b2pmxe.calculate_roll", icon="EMPTY_DATA")
         col.separator()
-        col.operator("b2pmxe.sleeve_bones", icon="CONSTRAINT_DATA")
-        col.operator("b2pmxe.twist_bones", icon="CONSTRAINT_DATA")
-        col.operator("b2pmxe.auto_bone", icon="CONSTRAINT_DATA")
+        col.operator("b2pmxe.sleeve_bones", icon="LIBRARY_DATA_DIRECT")
+        col.operator("b2pmxe.twist_bones", icon="LIBRARY_DATA_DIRECT")
+        col.operator("b2pmxe.auto_bone", icon="LIBRARY_DATA_DIRECT")
         col.separator()
         col.operator("b2pmxe.mirror_bones", icon="MOD_MIRROR")
 
@@ -637,14 +570,14 @@ class Blender2PmxeEditPanel(bpy.types.Panel):
         col = col.column_flow(columns=2)
         col.prop(obj.data, "show_names", text="Name")
         col.prop(obj.data, "show_axes", text="Axis")
-        col.prop(obj, "show_x_ray")
+        col.prop(obj, "show_in_front")
         col.prop(obj.data, "use_mirror_x", text="X Mirror")
 
 
-class Blender2PmxePosePanel(bpy.types.Panel):
-    bl_label = "Blender2Pmxe Tools"
+class B2PMXEM_PT_PosePanel(bpy.types.Panel):
+    bl_label = "Blender2Pmxem Tools"
     bl_space_type = "VIEW_3D"
-    bl_region_type = "TOOLS"
+    bl_region_type = "UI"
     bl_context = "posemode"
 
     def draw(self, context):
@@ -668,25 +601,25 @@ class Blender2PmxePosePanel(bpy.types.Panel):
         col = layout.column(align=True)
         col.label(text="Constraints:")
 
-        col.operator("b2pmxe.add_location", icon="CONSTRAINT_DATA")
-        col.operator("b2pmxe.add_rotation", icon="CONSTRAINT_DATA")
-        col.operator("b2pmxe.limit_rotation", icon="CONSTRAINT_DATA")
+        col.operator("b2pmxe.add_location", icon="LIBRARY_DATA_DIRECT")
+        col.operator("b2pmxe.add_rotation", icon="LIBRARY_DATA_DIRECT")
+        col.operator("b2pmxe.limit_rotation", icon="LIBRARY_DATA_DIRECT")
 
         row = col.row(align=True)
-        row.operator_menu_enum("b2pmxe.add_ik", 'type', icon="CONSTRAINT_DATA")
+        row.operator_menu_enum("b2pmxe.add_ik", 'type', icon="LIBRARY_DATA_DIRECT")
 
         mute_type = True
         for bone in context.active_object.pose.bones:
             for const in bone.constraints:
                 if const.type == 'IK':
-                    if const.mute == True:
+                    if const.mute:
                         mute_type = False
                         break
 
         row.operator(
             "b2pmxe.mute_ik",
             text="",
-            icon="VISIBLE_IPO_ON" if mute_type == True else "VISIBLE_IPO_OFF"
+            icon="HIDE_OFF" if mute_type else "HIDE_ON"
         ).flag = mute_type
 
         # Display
@@ -697,14 +630,14 @@ class Blender2PmxePosePanel(bpy.types.Panel):
         col = col.column_flow(columns=2)
         col.prop(obj.data, "show_names", text="Name")
         col.prop(obj.data, "show_axes", text="Axis")
-        col.prop(obj, "show_x_ray")
-        col.prop(obj.data, "use_auto_ik")
+        col.prop(obj, "show_in_front")
+        col.prop(obj.pose, "use_auto_ik")
 
 
-class Blender2PmxeObjectPanel(bpy.types.Panel):
-    bl_label = "Blender2Pmxe Tools"
+class B2PMXEM_PT_ObjectPanel(bpy.types.Panel):
+    bl_label = "Blender2Pmxem Tools"
     bl_space_type = "VIEW_3D"
-    bl_region_type = "TOOLS"
+    bl_region_type = "UI"
     bl_context = "objectmode"
 
     def draw(self, context):
@@ -712,10 +645,6 @@ class Blender2PmxeObjectPanel(bpy.types.Panel):
 
         ao = context.active_object
         scn = context.scene
-        isRender = True
-        isView = True
-        active_mod = None
-        active_mat = None
         color_map = None
 
         # Get Solidify Edge Flag
@@ -723,80 +652,9 @@ class Blender2PmxeObjectPanel(bpy.types.Panel):
             # WeightType Group
             color_map = ao.data.vertex_colors.get(GV.WeightTypeName)
 
-            # Modifier
-            active_mod = ao.modifiers.get(GV.SolidfyName)
-            if active_mod is not None:
-                isRender = active_mod.show_render
-                isView = active_mod.show_viewport
-
-            # Material
-            for mat in ao.data.materials:
-                if mat is None:
-                    continue
-                if mat.name.startswith(GV.SolidfyName):
-                    active_mat = mat
-                    break
-
         # Tools
-        # Solidify Edge
-        box = layout.box()
-        row = box.split(percentage=0.6)
-        row.label("Solidify Edge:", icon='MOD_SOLIDIFY')
-
-        row = row.row(align=True)
-        row.alignment = 'RIGHT'
-        row.scale_x = 1.33
-        row.operator(
-            "b2pmxe.toggle_solidify_render",
-            text="",
-            icon='RESTRICT_RENDER_OFF' if isRender == True else 'RESTRICT_RENDER_ON'
-        )
-        row.operator(
-            "b2pmxe.toggle_solidify_view",
-            text="",
-            icon='RESTRICT_VIEW_OFF' if isView == True else 'RESTRICT_VIEW_ON'
-        )
-        row.operator("b2pmxe.get_solidify_param", text="", icon='EYEDROPPER')
-
-        col = box.column()
-
-        row = col.row(align=True)
-        row.label("Color:")
-        row.prop(scn.b2pmxe_properties, "edge_color", text="")
-
-        if active_mat is None:
-            row.label("")
-            row.label("", icon='BLANK1')
-        else:
-            row.prop(active_mat, "diffuse_color", text="")
-            row.operator("b2pmxe.set_solidify_mat", text="", icon='STYLUS_PRESSURE')
-
-        row = col.row(align=True)
-        row.label("Thickness:")
-        row.prop(scn.b2pmxe_properties, "edge_thickness", text="", slider=True)
-
-        if active_mod is None:
-            row.label("")
-            row.label("", icon='BLANK1')
-        else:
-            row.prop(active_mod, "thickness", text="")
-            row.operator("b2pmxe.set_solidify_mod", text="", icon='STYLUS_PRESSURE')
-
-        # Solidify Edge UI Button
-        row = box.row(align=True)
-        row.operator("b2pmxe.delete_solidify", text="Delete", icon='X')
-        row.operator(
-            "b2pmxe.add_solidify",
-            text="Add" if active_mat is None else "Reload",
-            icon='ZOOMIN' if active_mat is None else 'FILE_REFRESH'
-        )
 
         col = layout.column(align=True)
-
-        # Material to Texface
-        row = col.row(align=True)
-        row.operator("b2pmxe.texface_remove", text="Delete", icon="X")
-        row.operator("b2pmxe.material_to_texface", text="Mat to Tex", icon='POTATO')
 
         # WeightType Group
         row = col.row(align=True)
@@ -810,7 +668,7 @@ class Blender2PmxeObjectPanel(bpy.types.Panel):
         # Add Driver
         row = col.row(align=True)
         row.operator("b2pmxe.add_driver", text="Delete", icon="X").delete = True
-        row.operator("b2pmxe.add_driver", text="Add Driver", icon="LOGIC")
+        row.operator("b2pmxe.add_driver", text="Add Driver", icon="DRIVER")
 
         col.operator("b2pmxe.make_xml", icon="FILE_TEXT")
         col.operator("b2pmxe.apply_modifier", icon="FILE_TICK")
@@ -821,8 +679,7 @@ class Blender2PmxeObjectPanel(bpy.types.Panel):
 
         # Shading
         row = layout.row()
-        row.prop(context.space_data, 'show_backface_culling')
-        row.prop(scn.b2pmxe_properties, 'shadeless')
+        row.prop(scn.display.shading, 'show_backface_culling')
 
 
 # Registration
@@ -836,22 +693,72 @@ def menu_func_export(self, context):
 
 def menu_func_vg(self, context):
     self.layout.separator()
-    self.layout.operator("b2pmxe.mirror_vertexgroup", text=iface_("Mirror active vertex group (L/R)"), icon='ZOOMIN')
+    self.layout.operator("b2pmxe.mirror_vertexgroup", text=iface_("Mirror active vertex group (L/R)"), icon='ZOOM_IN')
+
+
+classes = [
+    ExportBlender2Pmx,
+    ImportBlender2Pmx,
+    B2PmxeMakeXML,
+    add_function.B2PmxeMirrorVertexGroup,
+    add_function.B2PmxeRecalculateRoll,
+    add_function.B2PmxeAddDriver,
+    add_function.B2PmxeCreateWeightType,
+    add_function.B2PmxeDeleteWeightType,
+    add_function.B2PmxeAppendTemplate,
+    add_function.B2PmxeToStance,
+    add_function.B2PmxeDeleteRight,
+    add_function.B2PmxeSelectLeft,
+    add_function.B2PmxeReplacePeriod,
+    add_function.B2PmxeRenameChain,
+    add_function.B2PmxeRenameChainToLR,
+    add_function.B2PmxeRenameChainToNum,
+    add_function.B2PmxeMirrorBones,
+    add_function.B2PmxeAutoBone,
+    add_function.B2PmxeSleeveBones,
+    add_function.B2PmxeTwistBones,
+    add_function.B2PmxeClearPose,
+    add_function.B2PmxeRebindArmature,
+    add_function.B2PmxeLockRot,
+    add_function.B2PmxeLockLoc,
+    add_function.B2PmxeAddCopyLoc,
+    add_function.B2PmxeAddCopyRot,
+    add_function.B2PmxeAddLimit,
+    add_function.B2PmxeAddIK,
+    add_function.B2PmxeMuteIK,
+    solidify_edge.B2PmxeSolidifyRender,
+    solidify_edge.B2PmxeSolidifyView,
+    solidify_edge.B2PmxeSolidifyGetParam,
+    solidify_edge.B2PmxeSolidifyAdd,
+    solidify_edge.B2PmxeSolidifyDelete,
+    space_view3d_materials_utils.VIEW3D_OT_material_to_texface,
+    space_view3d_materials_utils.VIEW3D_OT_texface_remove,
+    object_applymodifier.B2PmxeApplyModifier,
+    Blender2PmxeAddonPreferences,
+    B2PmxeMessageOperator,
+    B2PmxeSaveAsXML,
+    Blender2PmxeProperties,
+    B2PMXEM_PT_EditPanel,
+    B2PMXEM_PT_PosePanel,
+    B2PMXEM_PT_ObjectPanel,
+]
 
 
 def register():
-    bpy.utils.register_module(__name__)
-    bpy.types.MESH_MT_vertex_group_specials.append(menu_func_vg)
-    bpy.types.INFO_MT_file_export.append(menu_func_export)
-    bpy.types.INFO_MT_file_import.append(menu_func_import)
+    for cls in classes:
+        bpy.utils.register_class(cls)
+    bpy.types.MESH_MT_vertex_group_context_menu.append(menu_func_vg)
+    bpy.types.TOPBAR_MT_file_export.append(menu_func_export)
+    bpy.types.TOPBAR_MT_file_import.append(menu_func_import)
     bpy.app.translations.register(__name__, translation_dict)
 
 
 def unregister():
-    bpy.utils.unregister_module(__name__)
-    bpy.types.MESH_MT_vertex_group_specials.remove(menu_func_vg)
-    bpy.types.INFO_MT_file_export.remove(menu_func_export)
-    bpy.types.INFO_MT_file_import.remove(menu_func_import)
+    for cls in classes:
+        bpy.utils.unregister_class(cls)
+    bpy.types.MESH_MT_vertex_group_context_menu.remove(menu_func_vg)
+    bpy.types.TOPBAR_MT_file_export.remove(menu_func_export)
+    bpy.types.TOPBAR_MT_file_import.remove(menu_func_import)
     bpy.app.translations.unregister(__name__)
 
 
