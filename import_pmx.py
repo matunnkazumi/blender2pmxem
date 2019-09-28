@@ -593,9 +593,9 @@ def read_pmx_data(context, filepath="",
         # print NG_tex_list
         if len(NG_tex_list):
             bpy.ops.b2pmxem.message('INVOKE_DEFAULT',
-                                   type='INFO',
-                                   line1="Some Texture file not found.",
-                                   use_console=True)
+                                    type='INFO',
+                                    line1="Some Texture file not found.",
+                                    use_console=True)
             for data in NG_tex_list:
                 print("   --> %s" % data)
 
