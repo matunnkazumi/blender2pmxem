@@ -673,7 +673,7 @@ class B2PMXEM_PT_ObjectPanel(bpy.types.Panel):
         row.operator(add_function.B2PmxeAddDriver.bl_idname, text="Add Driver", icon="DRIVER")
 
         col.operator(B2PMXEM_OT_MakeXML.bl_idname, icon="FILE_TEXT")
-        col.operator(object_applymodifier.B2PmxeApplyModifier.bl_idname, icon="FILE_TICK")
+        col.operator(object_applymodifier.B2PMXEM_OT_ApplyModifier.bl_idname, icon="FILE_TICK")
         col.separator()
 
         # Append Template
@@ -733,7 +733,7 @@ classes = [
     solidify_edge.B2PmxeSolidifyDelete,
     space_view3d_materials_utils.VIEW3D_OT_material_to_texface,
     space_view3d_materials_utils.VIEW3D_OT_texface_remove,
-    object_applymodifier.B2PmxeApplyModifier,
+    object_applymodifier.B2PMXEM_OT_ApplyModifier,
     Blender2PmxemAddonPreferences,
     Blender2PmxemProperties,
     B2PMXEM_OT_ExportBlender2Pmx,
