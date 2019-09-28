@@ -412,7 +412,7 @@ class B2PmxeMakeXML(bpy.types.Operator):
 
         col.label(text="File Select:")
         for file in files:
-            col.operator("b2pmxe.save_as_xml", text=file).filename = file
+            col.operator(B2PmxeSaveAsXML.bl_idname, text=file).filename = file
 
         layout.separator()
 
@@ -540,27 +540,27 @@ class B2PMXEM_PT_EditPanel(bpy.types.Panel):
         col.label(text="Tools:")
 
         row = col.row(align=True)
-        row.operator("b2pmxe.delete_right", text="Delete _R", icon="X")
-        row.operator("b2pmxe.select_left", text="Select _L", icon="UV_SYNC_SELECT")
+        row.operator(add_function.B2PmxeDeleteRight.bl_idname, text="Delete _R", icon="X")
+        row.operator(add_function.B2PmxeSelectLeft.bl_idname, text="Select _L", icon="UV_SYNC_SELECT")
 
-        col.operator("b2pmxe.calculate_roll", icon="EMPTY_DATA")
+        col.operator(add_function.B2PmxeRecalculateRoll.bl_idname, icon="EMPTY_DATA")
         col.separator()
-        col.operator("b2pmxe.sleeve_bones", icon="LIBRARY_DATA_DIRECT")
-        col.operator("b2pmxe.twist_bones", icon="LIBRARY_DATA_DIRECT")
-        col.operator("b2pmxe.auto_bone", icon="LIBRARY_DATA_DIRECT")
+        col.operator(add_function.B2PmxeSleeveBones.bl_idname, icon="LIBRARY_DATA_DIRECT")
+        col.operator(add_function.B2PmxeTwistBones.bl_idname, icon="LIBRARY_DATA_DIRECT")
+        col.operator(add_function.B2PmxeAutoBone.bl_idname, icon="LIBRARY_DATA_DIRECT")
         col.separator()
-        col.operator("b2pmxe.mirror_bones", icon="MOD_MIRROR")
+        col.operator(add_function.B2PmxeMirrorBones.bl_idname, icon="MOD_MIRROR")
 
         # Rename
         col = layout.column(align=True)
         col.label(text="Name:")
-        col.operator("b2pmxe.rename_chain", icon="LINKED")
+        col.operator(add_function.B2PmxeRenameChain.bl_idname, icon="LINKED")
 
         row = col.row(align=True)
-        row.operator("b2pmxe.rename_chain_lr", text="to L/R", icon="LINKED")
-        row.operator("b2pmxe.rename_chain_num", text="to Number", icon="LINKED")
+        row.operator(add_function.B2PmxeRenameChainToLR.bl_idname, text="to L/R", icon="LINKED")
+        row.operator(add_function.B2PmxeRenameChainToNum.bl_idname, text="to Number", icon="LINKED")
         col.separator()
-        col.operator("b2pmxe.replace_period", text="Replace . to _", icon="DOT")
+        col.operator(add_function.B2PmxeReplacePeriod.bl_idname, text="Replace . to _", icon="DOT")
 
         # Display
         obj = context.object
@@ -588,25 +588,25 @@ class B2PMXEM_PT_PosePanel(bpy.types.Panel):
         col.label(text="Tools:")
 
         row = col.row(align=True)
-        row.operator("b2pmxe.to_stance", text="to T pose", icon="OUTLINER_DATA_ARMATURE").to_A_stance = False
-        row.operator("b2pmxe.to_stance", text="to A pose", icon="OUTLINER_DATA_ARMATURE").to_A_stance = True
+        row.operator(add_function.B2PmxeToStance.bl_idname, text="to T pose", icon="OUTLINER_DATA_ARMATURE").to_A_stance = False
+        row.operator(add_function.B2PmxeToStance.bl_idname, text="to A pose", icon="OUTLINER_DATA_ARMATURE").to_A_stance = True
 
         row = col.row(align=True)
-        row.operator("b2pmxe.clear_pose", text="Clear", icon="LOOP_BACK")
-        row.operator("b2pmxe.rebind_armature", text="Rebind", icon="POSE_HLT")
+        row.operator(add_function.B2PmxeClearPose.bl_idname, text="Clear", icon="LOOP_BACK")
+        row.operator(add_function.B2PmxeRebindArmature.bl_idname, text="Rebind", icon="POSE_HLT")
         col.separator()
-        col.operator("b2pmxe.lock_location", icon="LOCKED").flag = True
-        col.operator("b2pmxe.lock_rotation", icon="LOCKED").flag = True
+        col.operator(add_function.B2PmxeLockLoc.bl_idname, icon="LOCKED").flag = True
+        col.operator(add_function.B2PmxeLockRot.bl_idname, icon="LOCKED").flag = True
 
         col = layout.column(align=True)
         col.label(text="Constraints:")
 
-        col.operator("b2pmxe.add_location", icon="LIBRARY_DATA_DIRECT")
-        col.operator("b2pmxe.add_rotation", icon="LIBRARY_DATA_DIRECT")
-        col.operator("b2pmxe.limit_rotation", icon="LIBRARY_DATA_DIRECT")
+        col.operator(add_function.B2PmxeAddCopyLoc.bl_idname, icon="LIBRARY_DATA_DIRECT")
+        col.operator(add_function.B2PmxeAddCopyRot.bl_idname, icon="LIBRARY_DATA_DIRECT")
+        col.operator(add_function.B2PmxeAddLimit.bl_idname, icon="LIBRARY_DATA_DIRECT")
 
         row = col.row(align=True)
-        row.operator_menu_enum("b2pmxe.add_ik", 'type', icon="LIBRARY_DATA_DIRECT")
+        row.operator_menu_enum(add_function.B2PmxeAddIK.bl_idname, 'type', icon="LIBRARY_DATA_DIRECT")
 
         mute_type = True
         for bone in context.active_object.pose.bones:
@@ -617,7 +617,7 @@ class B2PMXEM_PT_PosePanel(bpy.types.Panel):
                         break
 
         row.operator(
-            "b2pmxe.mute_ik",
+            add_function.B2PmxeMuteIK.bl_idname,
             text="",
             icon="HIDE_OFF" if mute_type else "HIDE_ON"
         ).flag = mute_type
@@ -658,24 +658,24 @@ class B2PMXEM_PT_ObjectPanel(bpy.types.Panel):
 
         # WeightType Group
         row = col.row(align=True)
-        row.operator("b2pmxe.delete_weight_type", text="Delete", icon="X")
+        row.operator(add_function.B2PmxeDeleteWeightType.bl_idname, text="Delete", icon="X")
         row.operator(
-            "b2pmxe.create_weight_type",
+            add_function.B2PmxeCreateWeightType.bl_idname,
             text="WeightType" if color_map is None else "Reload",
             icon='COLOR'
         )
 
         # Add Driver
         row = col.row(align=True)
-        row.operator("b2pmxe.add_driver", text="Delete", icon="X").delete = True
-        row.operator("b2pmxe.add_driver", text="Add Driver", icon="DRIVER")
+        row.operator(add_function.B2PmxeAddDriver.bl_idname, text="Delete", icon="X").delete = True
+        row.operator(add_function.B2PmxeAddDriver.bl_idname, text="Add Driver", icon="DRIVER")
 
-        col.operator("b2pmxe.make_xml", icon="FILE_TEXT")
-        col.operator("b2pmxe.apply_modifier", icon="FILE_TICK")
+        col.operator(B2PmxeMakeXML.bl_idname, icon="FILE_TEXT")
+        col.operator(object_applymodifier.B2PmxeApplyModifier.bl_idname, icon="FILE_TICK")
         col.separator()
 
         # Append Template
-        col.operator_menu_enum("b2pmxe.append_template", 'type', icon="ARMATURE_DATA")
+        col.operator_menu_enum(add_function.B2PmxeAppendTemplate.bl_idname, 'type', icon="ARMATURE_DATA")
 
         # Shading
         row = layout.row()
@@ -693,7 +693,7 @@ def menu_func_export(self, context):
 
 def menu_func_vg(self, context):
     self.layout.separator()
-    self.layout.operator("b2pmxe.mirror_vertexgroup", text=iface_("Mirror active vertex group (L/R)"), icon='ZOOM_IN')
+    self.layout.operator(add_function.B2PmxeMirrorVertexGroup.bl_idname, text=iface_("Mirror active vertex group (L/R)"), icon='ZOOM_IN')
 
 
 classes = [
