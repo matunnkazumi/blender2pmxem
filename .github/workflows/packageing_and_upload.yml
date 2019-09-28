@@ -3,8 +3,7 @@ on:
   pull_request:
     types: [opened, synchronize]
   release:
-    types: [created]
-
+    types: [published]
 
 jobs:
   create_package:
