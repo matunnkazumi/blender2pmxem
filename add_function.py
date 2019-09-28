@@ -1431,7 +1431,6 @@ class B2PMXEM_OT_AddDriver(bpy.types.Operator):
         # driver setting
         drv = fcurve.driver
         drv.type = 'AVERAGE'
-        drv.show_debug_info = True
 
         # variable setting
         var = drv.variables.new()
