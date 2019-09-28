@@ -1,9 +1,10 @@
 name: packaging and upload
 on:
-  - pull_request:
-      types: [opened, synchronize]
-  - release:
-      types: [created]
+  pull_request:
+    types: [opened, synchronize]
+  release:
+    types: [created]
+
 
 jobs:
   create_package:
