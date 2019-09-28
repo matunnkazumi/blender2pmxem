@@ -205,7 +205,7 @@ class Init(object):
             bpy.data.meshes.remove(tmp_mesh)
 
 
-class B2PmxeApplyModifier(bpy.types.Operator):
+class B2PMXEM_OT_ApplyModifier(bpy.types.Operator):
 
     '''Apply Modifier to selected mesh object'''
     bl_idname = "b2pmxem.apply_modifier"

@@ -49,7 +49,7 @@ class B2PmxeSolidifyAdd(bpy.types.Operator):
 
                 # Create Solidfy Material
                 mtl = bpy.data.materials.new(GV.SolidfyName)
-                mtl.diffuse_color = scn.b2pmxe_properties.edge_color
+                mtl.diffuse_color = scn.b2pmxem_properties.edge_color
                 mtl.use_shadeless = True
                 mtl.use_transparency = True
                 mtl.use_nodes = True
@@ -79,7 +79,7 @@ class B2PmxeSolidifyAdd(bpy.types.Operator):
             if mod is None:
                 mod = obj.modifiers.new(name=GV.SolidfyName, type='SOLIDIFY')
                 mod.show_render = False
-                mod.thickness = scn.b2pmxe_properties.edge_thickness
+                mod.thickness = scn.b2pmxem_properties.edge_thickness
                 mod.offset = 1.0
                 mod.use_flip_normals = True
                 mod.use_rim = False
@@ -175,9 +175,9 @@ def solidify_copy(scn, obj, mode, type):
                 continue
             if mat.name.startswith(GV.SolidfyName):
                 if mode == 'get':
-                    scn.b2pmxe_properties.edge_color = mat.diffuse_color
+                    scn.b2pmxem_properties.edge_color = mat.diffuse_color
                 else:  # mode == 'set'
-                    mat.diffuse_color = scn.b2pmxe_properties.edge_color
+                    mat.diffuse_color = scn.b2pmxem_properties.edge_color
                 break
 
     else:  # type == 'mod'
@@ -185,9 +185,9 @@ def solidify_copy(scn, obj, mode, type):
         mod = obj.modifiers.get(GV.SolidfyName)
         if mod is not None:
             if mode == 'get':
-                scn.b2pmxe_properties.edge_thickness = mod.thickness
+                scn.b2pmxem_properties.edge_thickness = mod.thickness
             else:  # mode == 'set'
-                mod.thickness = scn.b2pmxe_properties.edge_thickness
+                mod.thickness = scn.b2pmxem_properties.edge_thickness
 
 
 class B2PmxeSolidifyGetParam(bpy.types.Operator):
