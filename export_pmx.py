@@ -646,7 +646,7 @@ def write_pmx_data(context, filepath="",
                 try:
                     mesh = apply_mod.Get_Apply_Mesh(mesh_obj)
                 except object_applymodifier.ShapeVertexError as e:
-                    bpy.ops.b2pmxe.message(
+                    bpy.ops.b2pmxem.message(
                         'INVOKE_DEFAULT',
                         type='ERROR',
                         line1="Failed to create some shape keys.",
@@ -870,7 +870,7 @@ def write_pmx_data(context, filepath="",
             for data in OK_normal_list:
                 print("   --> %s" % data)
         elif use_custom_normals:
-            bpy.ops.b2pmxe.message(
+            bpy.ops.b2pmxem.message(
                 'INVOKE_DEFAULT',
                 type='ERROR',
                 line1="Could not use custom split normals data.",

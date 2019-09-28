@@ -119,7 +119,7 @@ def remove_texface():
 class VIEW3D_OT_material_to_texface(bpy.types.Operator):
 
     """Transfer material assignments to UV editor"""
-    bl_idname = "b2pmxe.material_to_texface"
+    bl_idname = "b2pmxem.material_to_texface"
     bl_label = "Material Images to Texface"
     bl_options = {'REGISTER', 'UNDO'}
 
@@ -131,7 +131,7 @@ class VIEW3D_OT_material_to_texface(bpy.types.Operator):
 class VIEW3D_OT_texface_remove(bpy.types.Operator):
 
     """Remove all texface from all objects"""
-    bl_idname = "b2pmxe.texface_remove"
+    bl_idname = "b2pmxem.texface_remove"
     bl_label = "Remove All Texface"
     bl_options = {'REGISTER', 'UNDO'}
 

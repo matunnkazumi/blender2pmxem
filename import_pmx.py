@@ -483,7 +483,7 @@ def read_pmx_data(context, filepath="",
 
         # BoneItem Direction
         bpy.ops.armature.select_all(action='SELECT')
-        bpy.ops.b2pmxe.calculate_roll()
+        bpy.ops.b2pmxem.calculate_roll()
         bpy.ops.armature.select_all(action='DESELECT')
 
         bpy.ops.object.mode_set(mode='OBJECT')
@@ -592,10 +592,10 @@ def read_pmx_data(context, filepath="",
 
         # print NG_tex_list
         if len(NG_tex_list):
-            bpy.ops.b2pmxe.message('INVOKE_DEFAULT',
-                                   type='INFO',
-                                   line1="Some Texture file not found.",
-                                   use_console=True)
+            bpy.ops.b2pmxem.message('INVOKE_DEFAULT',
+                                    type='INFO',
+                                    line1="Some Texture file not found.",
+                                    use_console=True)
             for data in NG_tex_list:
                 print("   --> %s" % data)
 
@@ -733,7 +733,7 @@ def make_xml(pmx_data, filepath, use_japanese_name, xml_save_versions):
         xml_path = root + str(index) + ".xml"
 
     save_message = 'Save As "%s"' % bpy.path.basename(xml_path)
-    bpy.ops.b2pmxe.message('INVOKE_DEFAULT', type='INFO', line1=save_message)
+    bpy.ops.b2pmxem.message('INVOKE_DEFAULT', type='INFO', line1=save_message)
 
     # print xml_exist_list
     if len(xml_exist_list):

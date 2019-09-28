@@ -208,7 +208,7 @@ class Init(object):
 class B2PmxeApplyModifier(bpy.types.Operator):
 
     '''Apply Modifier to selected mesh object'''
-    bl_idname = "b2pmxe.apply_modifier"
+    bl_idname = "b2pmxem.apply_modifier"
     bl_label = "Apply Modifier"
     bl_options = {'REGISTER', 'UNDO'}
 
