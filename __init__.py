@@ -111,11 +111,11 @@ translation_dict = {
 # ------------------------------------------------------------------------
 #    store properties in the active scene
 # ------------------------------------------------------------------------
-class Blender2PmxeProperties(bpy.types.PropertyGroup):
+class Blender2PmxemProperties(bpy.types.PropertyGroup):
 
     @classmethod
     def register(cls):
-        bpy.types.Scene.b2pmxe_properties = PointerProperty(type=cls)
+        bpy.types.Scene.b2pmxem_properties = PointerProperty(type=cls)
 
         def toggle_shadeless(self, context):
             context.space_data.show_textured_shadeless = self.shadeless
@@ -152,13 +152,13 @@ class Blender2PmxeProperties(bpy.types.PropertyGroup):
 
     @classmethod
     def unregister(cls):
-        del bpy.types.Scene.b2pmxe_properties
+        del bpy.types.Scene.b2pmxem_properties
 
 
 # ------------------------------------------------------------------------
 
 
-class Blender2PmxeAddonPreferences(bpy.types.AddonPreferences):
+class Blender2PmxemAddonPreferences(bpy.types.AddonPreferences):
     bl_idname = __name__
 
     use_T_stance: BoolProperty(
@@ -210,7 +210,7 @@ class Blender2PmxeAddonPreferences(bpy.types.AddonPreferences):
         col.prop(self, "threshold")
 
 
-class ImportBlender2Pmx(bpy.types.Operator, ImportHelper):
+class B2PMXEM_OT_ImportBlender2Pmx(bpy.types.Operator, ImportHelper):
     '''Load a MMD PMX File'''
     bl_idname = "import.pmx_data_em"
     bl_label = "Import PMX Data (Extend)"
@@ -237,7 +237,7 @@ class ImportBlender2Pmx(bpy.types.Operator, ImportHelper):
         box.prop(self, "adjust_bone_position")
 
 
-class ExportBlender2Pmx(bpy.types.Operator, ExportHelper):
+class B2PMXEM_OT_ExportBlender2Pmx(bpy.types.Operator, ExportHelper):
     '''Save a MMD PMX File'''
     bl_idname = "export.pmx_data_em"
     bl_label = "Export PMX Data (Extend)"
@@ -322,7 +322,7 @@ class ExportBlender2Pmx(bpy.types.Operator, ExportHelper):
 #   The error message operator. When invoked, pops up a dialog
 #   window with the given message.
 #
-class B2PmxeMessageOperator(bpy.types.Operator):
+class B2PMXEM_OT_MessageOperator(bpy.types.Operator):
     bl_idname = "b2pmxem.message"
     bl_label = "B2Pmxem Message"
 
@@ -371,7 +371,7 @@ class B2PmxeMessageOperator(bpy.types.Operator):
         layout.separator()
 
 
-class B2PmxeMakeXML(bpy.types.Operator):
+class B2PMXEM_OT_MakeXML(bpy.types.Operator):
     '''Make a MMD xml file, and update materials'''
     bl_idname = "b2pmxem.make_xml"
     bl_label = "Make XML File"
@@ -405,19 +405,19 @@ class B2PmxeMakeXML(bpy.types.Operator):
         col = split.column(align=True)
 
         col.label(text="Fix Bones:")
-        props = context.scene.b2pmxe_properties
+        props = context.scene.b2pmxem_properties
         row = col.row(align=True)
         row.prop(props, "make_xml_option", expand=True)
         col.separator()
 
         col.label(text="File Select:")
         for file in files:
-            col.operator(B2PmxeSaveAsXML.bl_idname, text=file).filename = file
+            col.operator(B2PMXEM_OT_SaveAsXML.bl_idname, text=file).filename = file
 
         layout.separator()
 
 
-class B2PmxeSaveAsXML(bpy.types.Operator):
+class B2PMXEM_OT_SaveAsXML(bpy.types.Operator):
     '''Save As a MMD XML File.'''
     bl_idname = "b2pmxem.save_as_xml"
     bl_label = "Save As XML File"
@@ -434,7 +434,7 @@ class B2PmxeSaveAsXML(bpy.types.Operator):
         prefs = context.preferences.addons[GV.FolderName].preferences
         use_japanese_name = prefs.use_japanese_name
         xml_save_versions = prefs.saveVersions
-        props = context.scene.b2pmxe_properties
+        props = context.scene.b2pmxem_properties
         arm = context.active_object
 
         directory = bpy.path.abspath("//")
@@ -672,7 +672,7 @@ class B2PMXEM_PT_ObjectPanel(bpy.types.Panel):
         row.operator(add_function.B2PmxeAddDriver.bl_idname, text="Delete", icon="X").delete = True
         row.operator(add_function.B2PmxeAddDriver.bl_idname, text="Add Driver", icon="DRIVER")
 
-        col.operator(B2PmxeMakeXML.bl_idname, icon="FILE_TEXT")
+        col.operator(B2PMXEM_OT_MakeXML.bl_idname, icon="FILE_TEXT")
         col.operator(object_applymodifier.B2PmxeApplyModifier.bl_idname, icon="FILE_TICK")
         col.separator()
 
@@ -686,11 +686,11 @@ class B2PMXEM_PT_ObjectPanel(bpy.types.Panel):
 
 # Registration
 def menu_func_import(self, context):
-    self.layout.operator(ImportBlender2Pmx.bl_idname, text="PMX File for MMD (Extend) (.pmx)", icon='PLUGIN')
+    self.layout.operator(B2PMXEM_OT_ImportBlender2Pmx.bl_idname, text="PMX File for MMD (Extend) (.pmx)", icon='PLUGIN')
 
 
 def menu_func_export(self, context):
-    self.layout.operator(ExportBlender2Pmx.bl_idname, text="PMX File for MMD (Extend) (.pmx)", icon='PLUGIN')
+    self.layout.operator(B2PMXEM_OT_ExportBlender2Pmx.bl_idname, text="PMX File for MMD (Extend) (.pmx)", icon='PLUGIN')
 
 
 def menu_func_vg(self, context):
@@ -700,9 +700,6 @@ def menu_func_vg(self, context):
 
 
 classes = [
-    ExportBlender2Pmx,
-    ImportBlender2Pmx,
-    B2PmxeMakeXML,
     add_function.B2PmxeMirrorVertexGroup,
     add_function.B2PmxeRecalculateRoll,
     add_function.B2PmxeAddDriver,
@@ -737,10 +734,13 @@ classes = [
     space_view3d_materials_utils.VIEW3D_OT_material_to_texface,
     space_view3d_materials_utils.VIEW3D_OT_texface_remove,
     object_applymodifier.B2PmxeApplyModifier,
-    Blender2PmxeAddonPreferences,
-    B2PmxeMessageOperator,
-    B2PmxeSaveAsXML,
-    Blender2PmxeProperties,
+    Blender2PmxemAddonPreferences,
+    Blender2PmxemProperties,
+    B2PMXEM_OT_ExportBlender2Pmx,
+    B2PMXEM_OT_ImportBlender2Pmx,
+    B2PMXEM_OT_MakeXML,
+    B2PMXEM_OT_SaveAsXML,
+    B2PMXEM_OT_MessageOperator,
     B2PMXEM_PT_EditPanel,
     B2PMXEM_PT_PosePanel,
     B2PMXEM_PT_ObjectPanel,
