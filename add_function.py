@@ -283,11 +283,11 @@ class B2PmxeMirrorBones(bpy.types.Operator):
 
         replace_period(context)
 
-        bpy.ops.b2pmxe.calculate_roll()
+        bpy.ops.b2pmxem.calculate_roll()
         bpy.ops.armature.duplicate_move()
         bpy.ops.transform.mirror(constraint_axis=(True, False, False))
         bpy.ops.armature.flip_names()
-        bpy.ops.b2pmxe.calculate_roll()
+        bpy.ops.b2pmxem.calculate_roll()
 
         # replace period to underscore
         replace_period(context)
@@ -404,7 +404,7 @@ class B2PmxeAddIK(bpy.types.Operator):
 
         # recalculate roll
         bpy.ops.object.mode_set(mode='EDIT')
-        bpy.ops.b2pmxe.calculate_roll()
+        bpy.ops.b2pmxem.calculate_roll()
         bpy.ops.object.mode_set(mode='POSE')
 
         # add constraint
@@ -908,7 +908,7 @@ class B2PmxeTwistBones(bpy.types.Operator):
             self.add_twist(context, bone)
 
         # recalculate roll
-        bpy.ops.b2pmxe.calculate_roll()
+        bpy.ops.b2pmxem.calculate_roll()
 
         return {'FINISHED'}
 
@@ -962,7 +962,7 @@ class B2PmxeAutoBone(bpy.types.Operator):
         pos = active_bone.head
 
         # recalculate roll
-        bpy.ops.b2pmxe.calculate_roll()
+        bpy.ops.b2pmxem.calculate_roll()
 
         # deselect bone
         bpy.ops.armature.select_all(action='DESELECT')
@@ -980,7 +980,7 @@ class B2PmxeAutoBone(bpy.types.Operator):
         bone_name = eb.name
 
         # recalculate roll
-        bpy.ops.b2pmxe.calculate_roll()
+        bpy.ops.b2pmxem.calculate_roll()
 
         bpy.ops.object.mode_set(mode='POSE')
 
@@ -1119,7 +1119,7 @@ class B2PmxeSleeveBones(bpy.types.Operator):
                 self.add_sleeve(context, bone, parent_name)
 
         # recalculate roll
-        bpy.ops.b2pmxe.calculate_roll()
+        bpy.ops.b2pmxem.calculate_roll()
 
         return {'FINISHED'}
 
@@ -1191,7 +1191,7 @@ class B2PmxeAppendTemplate(bpy.types.Operator):
 
             # want to A pose? then
             if prefs.use_T_stance:
-                bpy.ops.b2pmxe.to_stance(to_A_stance=True)
+                bpy.ops.b2pmxem.to_stance(to_A_stance=True)
                 bpy.ops.pose.armature_apply()
 
             bpy.ops.object.mode_set(mode='OBJECT')

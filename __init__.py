@@ -275,7 +275,7 @@ class ExportBlender2Pmx(bpy.types.Operator, ExportHelper):
         file_name = bpy.path.basename(self.filepath)
 
         if file_name == "":
-            bpy.ops.b2pmxe.message('INVOKE_DEFAULT', type='ERROR', line1="Filename is empty.")
+            bpy.ops.b2pmxem.message('INVOKE_DEFAULT', type='ERROR', line1="Filename is empty.")
             return {'CANCELLED'}
 
         arm_obj = context.active_object
@@ -503,7 +503,7 @@ class B2PmxeSaveAsXML(bpy.types.Operator):
                 # BoneItem Direction
                 bpy.ops.object.mode_set(mode="EDIT", toggle=False)
                 bpy.ops.armature.select_all(action='SELECT')
-                bpy.ops.b2pmxe.calculate_roll()
+                bpy.ops.b2pmxem.calculate_roll()
                 bpy.ops.armature.select_all(action='DESELECT')
                 bpy.ops.object.mode_set(mode='OBJECT')
 
