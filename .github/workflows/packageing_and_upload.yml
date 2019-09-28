@@ -1,5 +1,8 @@
 name: packaging and upload
-on: [pull_request, release]
+on:
+  - pull_request:
+  - release:
+      types: [created]
 
 jobs:
   create_package:
