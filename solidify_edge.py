@@ -8,7 +8,7 @@ GV = global_variable.Init()
 class B2PmxeSolidifyAdd(bpy.types.Operator):
 
     '''Add Solidify Edge to selected objects'''
-    bl_idname = "b2pmxe.add_solidify"
+    bl_idname = "b2pmxem.add_solidify"
     bl_label = "Add Solidify Edge"
     bl_options = {'REGISTER', 'UNDO'}
 
@@ -95,7 +95,7 @@ class B2PmxeSolidifyAdd(bpy.types.Operator):
 class B2PmxeSolidifyView(bpy.types.Operator):
 
     '''Toggle Solidify Edge show_viewport of all objects'''
-    bl_idname = "b2pmxe.toggle_solidify_view"
+    bl_idname = "b2pmxem.toggle_solidify_view"
     bl_label = "Toggle Solidify Edge viewport"
 
     def execute(self, context):
@@ -115,7 +115,7 @@ class B2PmxeSolidifyView(bpy.types.Operator):
 class B2PmxeSolidifyRender(bpy.types.Operator):
 
     '''Toggle Solidify Edge show_render of all objects'''
-    bl_idname = "b2pmxe.toggle_solidify_render"
+    bl_idname = "b2pmxem.toggle_solidify_render"
     bl_label = "Toggle Solidify Edge render"
 
     def execute(self, context):
@@ -135,7 +135,7 @@ class B2PmxeSolidifyRender(bpy.types.Operator):
 class B2PmxeSolidifyDelete(bpy.types.Operator):
 
     '''Delete Solidify Edge of selected objects'''
-    bl_idname = "b2pmxe.delete_solidify"
+    bl_idname = "b2pmxem.delete_solidify"
     bl_label = "Delete Solidify Edge"
     bl_options = {'REGISTER', 'UNDO'}
 
@@ -193,7 +193,7 @@ def solidify_copy(scn, obj, mode, type):
 class B2PmxeSolidifyGetParam(bpy.types.Operator):
 
     '''Get Solidify Edge parameter of active object'''
-    bl_idname = "b2pmxe.get_solidify_param"
+    bl_idname = "b2pmxem.get_solidify_param"
     bl_label = "Get Solidify Edge parameter"
     bl_options = {'REGISTER', 'UNDO'}
 
@@ -218,7 +218,7 @@ class B2PmxeSolidifyGetParam(bpy.types.Operator):
 class B2PmxeSolidifySetMat(bpy.types.Operator):
 
     '''Set Solidify Edge diffuse_color of selected objects'''
-    bl_idname = "b2pmxe.set_solidify_mat"
+    bl_idname = "b2pmxem.set_solidify_mat"
     bl_label = "Set Solidify Edge diffuse_color"
     bl_options = {'REGISTER', 'UNDO'}
 
@@ -243,7 +243,7 @@ class B2PmxeSolidifySetMat(bpy.types.Operator):
 class B2PmxeSolidifySetMod(bpy.types.Operator):
 
     '''Set Solidify Edge thickness of selected objects'''
-    bl_idname = "b2pmxe.set_solidify_mod"
+    bl_idname = "b2pmxem.set_solidify_mod"
     bl_label = "Set Solidify Edge thickness"
     bl_options = {'REGISTER', 'UNDO'}
 

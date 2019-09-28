@@ -212,7 +212,7 @@ class Blender2PmxeAddonPreferences(bpy.types.AddonPreferences):
 
 class ImportBlender2Pmx(bpy.types.Operator, ImportHelper):
     '''Load a MMD PMX File'''
-    bl_idname = "import.pmx_data_e"
+    bl_idname = "import.pmx_data_em"
     bl_label = "Import PMX Data (Extend)"
     # bl_options = {'PRESET'}
 
@@ -239,7 +239,7 @@ class ImportBlender2Pmx(bpy.types.Operator, ImportHelper):
 
 class ExportBlender2Pmx(bpy.types.Operator, ExportHelper):
     '''Save a MMD PMX File'''
-    bl_idname = "export.pmx_data_e"
+    bl_idname = "export.pmx_data_em"
     bl_label = "Export PMX Data (Extend)"
     bl_options = {'PRESET'}
 
@@ -323,8 +323,8 @@ class ExportBlender2Pmx(bpy.types.Operator, ExportHelper):
 #   window with the given message.
 #
 class B2PmxeMessageOperator(bpy.types.Operator):
-    bl_idname = "b2pmxe.message"
-    bl_label = "B2Pmxe Message"
+    bl_idname = "b2pmxem.message"
+    bl_label = "B2Pmxem Message"
 
     type: EnumProperty(
         items=(
@@ -373,7 +373,7 @@ class B2PmxeMessageOperator(bpy.types.Operator):
 
 class B2PmxeMakeXML(bpy.types.Operator):
     '''Make a MMD xml file, and update materials'''
-    bl_idname = "b2pmxe.make_xml"
+    bl_idname = "b2pmxem.make_xml"
     bl_label = "Make XML File"
 
     @classmethod
@@ -419,7 +419,7 @@ class B2PmxeMakeXML(bpy.types.Operator):
 
 class B2PmxeSaveAsXML(bpy.types.Operator):
     '''Save As a MMD XML File.'''
-    bl_idname = "b2pmxe.save_as_xml"
+    bl_idname = "b2pmxem.save_as_xml"
     bl_label = "Save As XML File"
     bl_options = {'UNDO'}
 
@@ -588,8 +588,10 @@ class B2PMXEM_PT_PosePanel(bpy.types.Panel):
         col.label(text="Tools:")
 
         row = col.row(align=True)
-        row.operator(add_function.B2PmxeToStance.bl_idname, text="to T pose", icon="OUTLINER_DATA_ARMATURE").to_A_stance = False
-        row.operator(add_function.B2PmxeToStance.bl_idname, text="to A pose", icon="OUTLINER_DATA_ARMATURE").to_A_stance = True
+        row.operator(add_function.B2PmxeToStance.bl_idname, text="to T pose",
+                     icon="OUTLINER_DATA_ARMATURE").to_A_stance = False
+        row.operator(add_function.B2PmxeToStance.bl_idname, text="to A pose",
+                     icon="OUTLINER_DATA_ARMATURE").to_A_stance = True
 
         row = col.row(align=True)
         row.operator(add_function.B2PmxeClearPose.bl_idname, text="Clear", icon="LOOP_BACK")
@@ -693,7 +695,8 @@ def menu_func_export(self, context):
 
 def menu_func_vg(self, context):
     self.layout.separator()
-    self.layout.operator(add_function.B2PmxeMirrorVertexGroup.bl_idname, text=iface_("Mirror active vertex group (L/R)"), icon='ZOOM_IN')
+    self.layout.operator(add_function.B2PmxeMirrorVertexGroup.bl_idname,
+                         text=iface_("Mirror active vertex group (L/R)"), icon='ZOOM_IN')
 
 
 classes = [
