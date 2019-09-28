@@ -26,7 +26,7 @@ def Get_Edit_Bone(edit_bones, jp_name, en_name):
     return eb
 
 
-class B2PmxeRenameChain(bpy.types.Operator):
+class B2PMXEM_OT_RenameChain(bpy.types.Operator):
     '''Rename chain bone names'''
     bl_idname = "b2pmxem.rename_chain"
     bl_label = "Rename Chain"
@@ -58,7 +58,7 @@ class B2PmxeRenameChain(bpy.types.Operator):
         return {'FINISHED'}
 
 
-class B2PmxeRenameChainToLR(bpy.types.Operator):
+class B2PMXEM_OT_RenameChainToLR(bpy.types.Operator):
     '''Rename chain bone names to L/R'''
     bl_idname = "b2pmxem.rename_chain_lr"
     bl_label = "Rename Chain to L/R"
@@ -150,7 +150,7 @@ class B2PmxeRenameChainToLR(bpy.types.Operator):
         return {'FINISHED'}
 
 
-class B2PmxeRenameChainToNum(bpy.types.Operator):
+class B2PMXEM_OT_RenameChainToNum(bpy.types.Operator):
 
     '''Rename chain bone names to Number'''
     bl_idname = "b2pmxem.rename_chain_num"
@@ -234,7 +234,7 @@ def replace_period(context):
         bone.name = bone.name.replace('.', '_')
 
 
-class B2PmxeReplacePeriod(bpy.types.Operator):
+class B2PMXEM_OT_ReplacePeriod(bpy.types.Operator):
 
     '''Replace period to underscore'''
     bl_idname = "b2pmxem.replace_period"
@@ -251,7 +251,7 @@ class B2PmxeReplacePeriod(bpy.types.Operator):
         return {'FINISHED'}
 
 
-class B2PmxeMirrorBones(bpy.types.Operator):
+class B2PMXEM_OT_MirrorBones(bpy.types.Operator):
 
     '''Create X axis mirror in selected bones'''
     bl_idname = "b2pmxem.mirror_bones"
@@ -327,7 +327,7 @@ def get_active_bone(self, context):
 
 
 # BoneItem Direction
-class B2PmxeRecalculateRoll(bpy.types.Operator):
+class B2PMXEM_OT_RecalculateRoll(bpy.types.Operator):
 
     '''Recalculate Roll for MMD'''
     bl_idname = "b2pmxem.calculate_roll"
@@ -376,7 +376,7 @@ class B2PmxeRecalculateRoll(bpy.types.Operator):
         return {'FINISHED'}
 
 
-class B2PmxeAddIK(bpy.types.Operator):
+class B2PMXEM_OT_AddIK(bpy.types.Operator):
     '''Add IK Constraint to the active Bone for MMD'''
     bl_idname = "b2pmxem.add_ik"
     bl_label = "Add IK"
@@ -440,7 +440,7 @@ class B2PmxeAddIK(bpy.types.Operator):
         return {'FINISHED'}
 
 
-class B2PmxeMuteIK(bpy.types.Operator):
+class B2PMXEM_OT_MuteIK(bpy.types.Operator):
     '''Toggle Mute IK Constraint'''
     bl_idname = "b2pmxem.mute_ik"
     bl_label = "Toggle Mute IK"
@@ -480,7 +480,7 @@ def add_copy_rotation(context, active, target_name, influence=1.0):
         const.invert_z = True
 
 
-class B2PmxeAddCopyRot(bpy.types.Operator):
+class B2PMXEM_OT_AddCopyRot(bpy.types.Operator):
     '''Add Copy Rotation Constraint to the active Bone for MMD'''
     bl_idname = "b2pmxem.add_rotation"
     bl_label = "Add Copy Rotation"
@@ -513,7 +513,7 @@ def add_copy_location(context, active, target_name, influence=1.0):
     const.influence = influence
 
 
-class B2PmxeAddCopyLoc(bpy.types.Operator):
+class B2PMXEM_OT_AddCopyLoc(bpy.types.Operator):
     '''Add Copy Location Constraint to the active Bone for MMD'''
     bl_idname = "b2pmxem.add_location"
     bl_label = "Add Copy Location"
@@ -545,7 +545,7 @@ def add_limit_rotation(context, active):
     active.lock_rotation = [True, False, True]
 
 
-class B2PmxeAddLimit(bpy.types.Operator):
+class B2PMXEM_OT_AddLimit(bpy.types.Operator):
     '''Add Limit Rotation Constraint to the active Bone for MMD'''
     bl_idname = "b2pmxem.limit_rotation"
     bl_label = "Add Limit Rotation"
@@ -569,7 +569,7 @@ class B2PmxeAddLimit(bpy.types.Operator):
 
 
 # vertex_groups
-class B2PmxeCreateWeightType(bpy.types.Operator):
+class B2PMXEM_OT_CreateWeightType(bpy.types.Operator):
 
     '''Create WeightType vertex group'''
     bl_idname = "b2pmxem.create_weight_type"
@@ -641,7 +641,7 @@ class B2PmxeCreateWeightType(bpy.types.Operator):
 
 
 # delete_groups
-class B2PmxeDeleteWeightType(bpy.types.Operator):
+class B2PMXEM_OT_DeleteWeightType(bpy.types.Operator):
 
     '''Delete WeightType vertex group'''
     bl_idname = "b2pmxem.delete_weight_type"
@@ -664,7 +664,7 @@ class B2PmxeDeleteWeightType(bpy.types.Operator):
         return {'FINISHED'}
 
 
-class B2PmxeClearPose(bpy.types.Operator):
+class B2PMXEM_OT_ClearPose(bpy.types.Operator):
 
     '''Reset Transform of all bones'''
     bl_idname = "b2pmxem.clear_pose"
@@ -684,7 +684,7 @@ class B2PmxeClearPose(bpy.types.Operator):
 
 
 # apply and skin
-class B2PmxeRebindArmature(bpy.types.Operator):
+class B2PMXEM_OT_RebindArmature(bpy.types.Operator):
 
     '''Rebind Armature'''
     bl_idname = "b2pmxem.rebind_armature"
@@ -761,7 +761,7 @@ def set_custom_shape(context, pose_bone, shape):
 
 
 # Twist Bones
-class B2PmxeTwistBones(bpy.types.Operator):
+class B2PMXEM_OT_TwistBones(bpy.types.Operator):
 
     '''Add twist bones'''
     bl_idname = "b2pmxem.twist_bones"
@@ -914,7 +914,7 @@ class B2PmxeTwistBones(bpy.types.Operator):
 
 
 # Auto Bone
-class B2PmxeAutoBone(bpy.types.Operator):
+class B2PMXEM_OT_AutoBone(bpy.types.Operator):
     '''Add bone automatically rotate'''
     bl_idname = "b2pmxem.auto_bone"
     bl_label = "Add Auto Bone"
@@ -1000,7 +1000,7 @@ class B2PmxeAutoBone(bpy.types.Operator):
         return {'FINISHED'}
 
 
-class B2PmxeSleeveBones(bpy.types.Operator):
+class B2PMXEM_OT_SleeveBones(bpy.types.Operator):
     '''Add sleeve IK bones'''
     bl_idname = "b2pmxem.sleeve_bones"
     bl_label = "Add Sleeve IK Bones"
@@ -1142,7 +1142,7 @@ def append_object(objname, activeflag=True):
         active_collection=activeflag)
 
 
-class B2PmxeAppendTemplate(bpy.types.Operator):
+class B2PMXEM_OT_AppendTemplate(bpy.types.Operator):
     '''Append basic template armature'''
     bl_idname = "b2pmxem.append_template"
     bl_label = "Append Template Armature"
@@ -1199,7 +1199,7 @@ class B2PmxeAppendTemplate(bpy.types.Operator):
         return {'FINISHED'}
 
 
-class B2PmxeDeleteRight(bpy.types.Operator):
+class B2PMXEM_OT_DeleteRight(bpy.types.Operator):
 
     '''Delete right side bones'''
     bl_idname = "b2pmxem.delete_right"
@@ -1229,7 +1229,7 @@ class B2PmxeDeleteRight(bpy.types.Operator):
         return {'FINISHED'}
 
 
-class B2PmxeSelectLeft(bpy.types.Operator):
+class B2PMXEM_OT_SelectLeft(bpy.types.Operator):
 
     '''Select left side bones'''
     bl_idname = "b2pmxem.select_left"
@@ -1247,7 +1247,7 @@ class B2PmxeSelectLeft(bpy.types.Operator):
         return {'FINISHED'}
 
 
-class B2PmxeMirrorVertexGroup(bpy.types.Operator):
+class B2PMXEM_OT_MirrorVertexGroup(bpy.types.Operator):
     '''Mirror active vertex group (L/R)'''
     bl_idname = "b2pmxem.mirror_vertexgroup"
     bl_label = "Mirror active group"
@@ -1339,7 +1339,7 @@ def rotate_pose(context, to_A_stance):
     bpy.ops.pose.select_all(action='DESELECT')
 
 
-class B2PmxeToStance(bpy.types.Operator):
+class B2PMXEM_OT_ToStance(bpy.types.Operator):
 
     '''Rotate bones to A or T stance'''
     bl_idname = "b2pmxem.to_stance"
@@ -1361,7 +1361,7 @@ class B2PmxeToStance(bpy.types.Operator):
         return {'FINISHED'}
 
 
-class B2PmxeLockLoc(bpy.types.Operator):
+class B2PMXEM_OT_LockLoc(bpy.types.Operator):
     '''Toggle Lock XYZ location of selected bones'''
     bl_idname = "b2pmxem.lock_location"
     bl_label = "Lock Location"
@@ -1384,7 +1384,7 @@ class B2PmxeLockLoc(bpy.types.Operator):
         return {'FINISHED'}
 
 
-class B2PmxeLockRot(bpy.types.Operator):
+class B2PMXEM_OT_LockRot(bpy.types.Operator):
     '''Toggle Lock XYZ rotation of selected bones'''
     bl_idname = "b2pmxem.lock_rotation"
     bl_label = "Lock Rotation"
@@ -1407,7 +1407,7 @@ class B2PmxeLockRot(bpy.types.Operator):
         return {'FINISHED'}
 
 
-class B2PmxeAddDriver(bpy.types.Operator):
+class B2PMXEM_OT_AddDriver(bpy.types.Operator):
 
     '''Add driver to the same shape_key name of all objects'''
     bl_idname = "b2pmxem.add_driver"
