@@ -1,6 +1,7 @@
 name: packaging and upload
 on:
   - pull_request:
+      types: [opened, synchronize]
   - release:
       types: [created]
 
