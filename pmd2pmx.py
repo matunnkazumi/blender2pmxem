@@ -6,7 +6,6 @@
 #
 import mathutils
 import os
-from struct import *
 
 DEBUG = False
 

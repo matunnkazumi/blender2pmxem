@@ -5,7 +5,9 @@
 # pmx.py : 20140104 v 1.1
 #
 import mathutils
-from struct import *
+from struct import calcsize
+from struct import unpack
+from struct import pack
 
 DEBUG = False
 
