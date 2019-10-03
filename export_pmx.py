@@ -438,7 +438,13 @@ def write_pmx_data(context, filepath="",
                             ik_member = pmx.PMIKLink()
                             ik_member.Index = bone_index.get(cursor.name, -1)
 
-                            if cursor.lock_ik_x or cursor.lock_ik_y or cursor.lock_ik_z or cursor.use_ik_limit_x or cursor.use_ik_limit_y or cursor.use_ik_limit_z:
+                            if cursor.lock_ik_x \
+                               or cursor.lock_ik_y \
+                               or cursor.lock_ik_z \
+                               or cursor.use_ik_limit_x \
+                               or cursor.use_ik_limit_y \
+                               or cursor.use_ik_limit_z:
+
                                 ik_member.UseLimit = 1
                                 ik_member.UpperLimit = Math.Vector((0, 0, 0))
                                 ik_member.LowerLimit = Math.Vector((0, 0, 0))
