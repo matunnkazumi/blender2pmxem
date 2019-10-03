@@ -1,0 +1,30 @@
+name: lint
+on:
+  pull_request:
+    types: [opened, synchronize]
+
+jobs:
+  lint:
+    name: Source Code Check
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout
+        uses: actions/checkout@master
+        with:
+          fetch-depth: 1
+      - name: setup python
+        uses: actions/setup-python@v1
+        with:
+          python-version: '3.7.4'
+          architecture: 'x64'
+      - name: change parent directory
+        run: cd ../
+      - name: install lint tools
+        run: pip install flake8 mypy
+      - name: logging installed packages
+        run: pip freeze
+      - name: flake8
+        run: flake8 --config=blender2pmxem/.pep8 blender2pmxem 
+      - name: mypy
+        run: mypy --no-incremental --ignore-missing-imports blender2pmxem
+
