@@ -28,8 +28,10 @@ jobs:
       - name: flake8
         run: |
           cd ../
-          flake8 --config=blender2pmxem/.pep8 blender2pmxem 
+          flake8 --config=blender2pmxem/.pep8 blender2pmxem
+          pwd
       - name: mypy
         run: |
           cd ../
           mypy --no-incremental --ignore-missing-imports blender2pmxem
+          pwd
