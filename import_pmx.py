@@ -11,7 +11,6 @@ import re
 
 from . import add_function, global_variable
 from bpy_extras.node_shader_utils import PrincipledBSDFWrapper
-from bpy_extras.image_utils import load_image
 
 # global_variable
 GV = global_variable.Init()

@@ -4,7 +4,6 @@
 #
 # pmx.py : 20140104 v 1.1
 #
-import bpy
 import mathutils
 from struct import *
 

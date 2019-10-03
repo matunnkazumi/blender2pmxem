@@ -4,7 +4,6 @@
 #
 # pmd.py : 20111203 v 5.0
 #
-import bpy
 import mathutils
 from struct import *
 
