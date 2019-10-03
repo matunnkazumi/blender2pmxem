@@ -26,7 +26,10 @@ jobs:
       - name: logging installed packages
         run: pip freeze
       - name: flake8
-        run: flake8 --config=blender2pmxem/.pep8 blender2pmxem 
+        run: |
+          cd ../
+          flake8 --config=blender2pmxem/.pep8 blender2pmxem 
       - name: mypy
-        run: mypy --no-incremental --ignore-missing-imports blender2pmxem
-
+        run: |
+          cd ../
+          mypy --no-incremental --ignore-missing-imports blender2pmxem
