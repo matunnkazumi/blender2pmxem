@@ -117,7 +117,7 @@ def create_PMMaterial(mat: Material, xml_mat_list, tex_dic: Dict[str, int]) -> p
                                          float(edge_c.get("a", "1.0"))))
 
         deffuse_elm = temp_mat.find("deffuse")
-        if deffuse_elm != None:
+        if deffuse_elm is not None:
             c = (float(deffuse_elm.get("r", principled.base_color.r)),
                  float(deffuse_elm.get("g", principled.base_color.g)),
                  float(deffuse_elm.get("b", principled.base_color.b)),
@@ -125,13 +125,13 @@ def create_PMMaterial(mat: Material, xml_mat_list, tex_dic: Dict[str, int]) -> p
             xml_deffuse = Math.Vector(c)
 
         specular_elm = temp_mat.find("specular")
-        if specular_elm != None:
+        if specular_elm is not None:
             xml_specular = Math.Vector((float(specular_elm.get("r", "0.0")),
                                         float(specular_elm.get("g", "0.0")),
                                         float(specular_elm.get("b", "0.0"))))
 
         ambient_elm = temp_mat.find("ambient")
-        if ambient_elm != None:
+        if ambient_elm is not None:
             xml_ambient = Math.Vector((float(ambient_elm.get("r", "0.0")),
                                        float(ambient_elm.get("g", "0.0")),
                                        float(ambient_elm.get("b", "0.0"))))
@@ -139,17 +139,17 @@ def create_PMMaterial(mat: Material, xml_mat_list, tex_dic: Dict[str, int]) -> p
         pmx_mat.Power = float(temp_mat.get("power", "1"))
 
         sphere_elm = temp_mat.find("sphere")
-        if sphere_elm != None:
+        if sphere_elm is not None:
             path = sphere_elm.get("path")
             pmx_mat.SphereIndex = tex_dic.setdefault(path, len(tex_dic))
             pmx_mat.SphereType = int(sphere_elm.get("type", "0"))
 
     r, g, b = principled.base_color
     a = principled.alpha
-    pmx_mat.Deffuse = xml_deffuse if xml_deffuse != None else Math.Vector((r, g, b, a))
+    pmx_mat.Deffuse = xml_deffuse if xml_deffuse is not None else Math.Vector((r, g, b, a))
 
-    pmx_mat.Specular = xml_specular if xml_specular != None else Math.Vector((0.0, 0.0, 0.0))
-    pmx_mat.Ambient = xml_ambient if xml_ambient != None else pmx_mat.Deffuse.xyz * 0.4
+    pmx_mat.Specular = xml_specular if xml_specular is not None else Math.Vector((0.0, 0.0, 0.0))
+    pmx_mat.Ambient = xml_ambient if xml_ambient is not None else pmx_mat.Deffuse.xyz * 0.4
 
     pmx_mat.FaceLength = 0
 
