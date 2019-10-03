@@ -19,6 +19,7 @@ jobs:
           architecture: 'x64'
       - name: change parent directory
         run: cd ../
+        run: pwd
       - name: install lint tools
         run: pip install flake8 mypy
       - name: logging installed packages
