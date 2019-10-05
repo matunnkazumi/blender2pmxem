@@ -72,7 +72,7 @@ def exist_object_using_material(material: Material, target_armature: Object, obj
     return False
 
 
-def create_PMMaterial(mat: Material, xml_mat_list, tex_dic: Dict[str, int]) -> pmx.PMMaterial:
+def create_PMMaterial(mat: Material, xml_mat_list, tex_dic: Dict[str, int], filepath: str) -> pmx.PMMaterial:
 
     principled = PrincipledBSDFWrapper(mat, is_readonly=True)
     pmx_mat = pmx.PMMaterial()
@@ -160,9 +160,9 @@ def create_PMMaterial(mat: Material, xml_mat_list, tex_dic: Dict[str, int]) -> p
 
     texture = principled.base_color_texture
     if texture and texture.image:
-        filepath = texture.image.filepath
+        image_filepath = texture.image.filepath
 
-        tex_abs_path = bpy.path.abspath(filepath)
+        tex_abs_path = bpy.path.abspath(image_filepath)
         tex_path = bpy.path.relpath(tex_abs_path, tex_base_path)
         tex_path = tex_path.replace("//", "", 1)
 
@@ -558,7 +558,7 @@ def write_pmx_data(context, filepath="",
             if not found:
                 continue
 
-            pmx_mat = create_PMMaterial(mat, xml_mat_list, tex_dic)
+            pmx_mat = create_PMMaterial(mat, xml_mat_list, tex_dic, filepath)
 
             faceTemp[mat.name] = []
             mat_list[mat.name] = pmx_mat
