@@ -4,9 +4,10 @@
 #
 # pmd.py : 20111203 v 5.0
 #
-import bpy
 import mathutils
-from struct import *
+from struct import calcsize
+from struct import unpack
+from struct import pack
 
 DEBUG = False
 
@@ -30,7 +31,7 @@ def ReadStruct(f, format):  # Read Struct
             return q
         else:
             return p
-    except:
+    except OSError:
         return 0
 
 

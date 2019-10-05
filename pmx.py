@@ -4,9 +4,11 @@
 #
 # pmx.py : 20140104 v 1.1
 #
-import bpy
 import mathutils
-from struct import *
+from struct import calcsize
+from struct import unpack
+from struct import pack
+from struct import error as StructError
 
 DEBUG = False
 
@@ -30,7 +32,7 @@ def ReadStruct(f, format):  # Read Struct
             return q
         else:
             return p
-    except:
+    except (OSError, StructError):
         return 0
 
 
@@ -127,6 +129,7 @@ class ModelStatus(object):
 
         elif hdr_string[0:3] == b"PMX":
             temp = ReadStruct(f, "s")
+            assert temp == b" ", 'invalid header'
             self.Version = ReadStruct(f, "f")
             if self.Version == 2.0:
                 pass
@@ -141,6 +144,7 @@ class ModelStatus(object):
                 return
             # PMX Status
             pmx_param_size = ReadStruct(f, "B")  # Fixed 8
+            assert pmx_param_size == 8, 'param_size is not 8, {0}'.format(pmx_param_size)
             pmx_params = ReadStruct(f, "8B")
             self.Magic = 1
             self.Encode = pmx_params[0]
@@ -517,7 +521,7 @@ class PMVertex(object):
 
         self.AppendUV = [mathutils.Vector((0, 0, 0, 0))] * mode.AppendUVCount
         for tempUV in self.AppendUV:
-            tempUV = ReadStruct(f, "4f")
+            ReadStruct(f, "4f")
 
         self.Type = ReadStruct(f, "b")
 

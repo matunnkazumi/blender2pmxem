@@ -1,6 +1,4 @@
-from . import space_view3d_materials_utils
 from . import add_function
-from . import solidify_edge
 from . import global_variable
 from . import object_applymodifier
 from . import import_pmx

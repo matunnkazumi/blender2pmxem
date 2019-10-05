@@ -358,7 +358,7 @@ class B2PMXEM_OT_RecalculateRoll(bpy.types.Operator):
                 tmp = target_z.dot(local_z) / (local_z.length * target_z.length)
                 rot_y = math.acos(tmp)
 
-            except:
+            except (ZeroDivisionError, ValueError):
                 if tmp > 1.0:
                     tmp = 1.0
 
@@ -949,7 +949,7 @@ class B2PMXEM_OT_AutoBone(bpy.types.Operator):
                 if ord(c) > 255:
                     auto = "自動"
                     break
-            except:
+            except TypeError:
                 pass
 
         LR = active_name[-2:] if active_name[-2:] in GV.TextLR else ""
@@ -1021,12 +1021,16 @@ class B2PMXEM_OT_SleeveBones(bpy.types.Operator):
         eb = arm_obj.data.edit_bones.new(sleeve_name)
         eb.select = True
         eb.use_connect = False
-        eb.parent = arm_obj.data.edit_bones[active_name].parent if parent_name is None else arm_obj.data.edit_bones[parent_name]
+        eb.parent = (arm_obj.data.edit_bones[active_name].parent if parent_name is None
+                     else arm_obj.data.edit_bones[parent_name])
         eb.head = pos_head
         eb.tail = pos_tail
-        eb.layers = [False, False, True, False, False, False, False, False, False, False, False, False,
-                     False, False, False, False, False, False, False, False, False, False, False, False,
-                     False, False, False, False, False, False, False, False]
+        eb.layers = [False, False, True, False, False, False,
+                     False, False, False, False, False, False,
+                     False, False, False, False, False, False,
+                     False, False, False, False, False, False,
+                     False, False, False, False, False, False,
+                     False, False]
         sleeve_name = eb.name
 
         # add ik_bone(edit_bone)
@@ -1036,9 +1040,12 @@ class B2PMXEM_OT_SleeveBones(bpy.types.Operator):
         eb.parent = arm_obj.data.edit_bones[active_name].children[0]
         eb.head = pos_tail
         eb.tail = pos_tail + Vector((0.0, 0.2, 0.0))
-        eb.layers = [False, False, True, False, False, False, False, False, False, False, False, False,
-                     False, False, False, False, False, False, False, False, False, False, False, False,
-                     False, False, False, False, False, False, False, False]
+        eb.layers = [False, False, True, False, False, False,
+                     False, False, False, False, False, False,
+                     False, False, False, False, False, False,
+                     False, False, False, False, False, False,
+                     False, False, False, False, False, False,
+                     False, False]
         ik_name = eb.name
 
         bpy.ops.object.mode_set(mode='POSE')
