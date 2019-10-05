@@ -753,8 +753,8 @@ def set_custom_shape(context, pose_bone, shape):
             shape_obj = bpy.data.objects[shape]
 
             # Delete shape object
-            context.scene.objects.unlink(shape_obj)
-            arm_obj.select = True
+            context.collection.objects.unlink(shape_obj)
+            arm_obj.select_set(True)
 
         pose_bone.custom_shape = shape_obj
         arm_obj.data.bones[pose_bone.name].show_wire = True
