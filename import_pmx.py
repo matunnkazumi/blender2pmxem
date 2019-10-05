@@ -586,7 +586,7 @@ def read_pmx_data(context, filepath="",
                 # Use Alpha
                 textures_dic[tex_index].image.alpha_mode = 'PREMUL'
 
-            except:
+            except RuntimeError:
                 NG_tex_list.append(tex_data.Path)
 
         # print NG_tex_list

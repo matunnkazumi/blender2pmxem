@@ -31,7 +31,7 @@ def ReadStruct(f, format):  # Read Struct
             return q
         else:
             return p
-    except:
+    except OSError:
         return 0
 
 

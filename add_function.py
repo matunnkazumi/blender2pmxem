@@ -358,7 +358,7 @@ class B2PMXEM_OT_RecalculateRoll(bpy.types.Operator):
                 tmp = target_z.dot(local_z) / (local_z.length * target_z.length)
                 rot_y = math.acos(tmp)
 
-            except:
+            except (ZeroDivisionError, ValueError):
                 if tmp > 1.0:
                     tmp = 1.0
 
@@ -949,7 +949,7 @@ class B2PMXEM_OT_AutoBone(bpy.types.Operator):
                 if ord(c) > 255:
                     auto = "自動"
                     break
-            except:
+            except TypeError:
                 pass
 
         LR = active_name[-2:] if active_name[-2:] in GV.TextLR else ""

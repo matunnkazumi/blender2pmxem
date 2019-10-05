@@ -8,6 +8,7 @@ import mathutils
 from struct import calcsize
 from struct import unpack
 from struct import pack
+from struct import error as StructError
 
 DEBUG = False
 
@@ -31,7 +32,7 @@ def ReadStruct(f, format):  # Read Struct
             return q
         else:
             return p
-    except:
+    except (OSError, StructError):
         return 0
 
 
