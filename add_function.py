@@ -1197,7 +1197,7 @@ class B2PMXEM_OT_AppendTemplate(bpy.types.Operator):
                     set_custom_shape(context, pb, GV.ShapeEyes)
 
             # want to A pose? then
-            if prefs.use_T_stance:
+            if not prefs.use_T_stance:
                 bpy.ops.b2pmxem.to_stance(to_A_stance=True)
                 bpy.ops.pose.armature_apply()
 
