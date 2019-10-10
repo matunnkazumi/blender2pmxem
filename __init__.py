@@ -644,7 +644,6 @@ class B2PMXEM_PT_ObjectPanel(bpy.types.Panel):
         layout = self.layout
 
         ao = context.active_object
-        scn = context.scene
         color_map = None
 
         # Get Solidify Edge Flag
@@ -676,10 +675,6 @@ class B2PMXEM_PT_ObjectPanel(bpy.types.Panel):
 
         # Append Template
         col.operator_menu_enum(add_function.B2PMXEM_OT_AppendTemplate.bl_idname, 'type', icon="ARMATURE_DATA")
-
-        # Shading
-        row = layout.row()
-        row.prop(scn.display.shading, 'show_backface_culling')
 
 
 # Registration
