@@ -109,10 +109,7 @@ def create_bone_stack(arm_obj) -> List[BoneStackEntry]:
 
 
 def create_bone_index(bone_stack: List[BoneStackEntry]) -> Dict[str, int]:
-    bone_index = {}  # type: Dict[str, int]
-    for index, bone_name in enumerate(bone_stack):
-        bone_index[bone_name[1]] = index
-    return bone_index
+    return {bone_name[1]: index for index, bone_name in enumerate(bone_stack)}
 
 
 def create_PMMaterial(mat: Material, xml_mat_list, tex_dic: Dict[str, int], filepath: str) -> pmx.PMMaterial:
