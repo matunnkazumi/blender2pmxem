@@ -226,14 +226,17 @@ def create_PMMaterial(mat: Material, xml_mat_list, tex_dic: Dict[str, int], file
     return pmx_mat
 
 
-def create_PMJoint(joint) -> pmx.PMJoint:
+def create_PMJoint(joint, rigid_index: Dict[str, int]) -> pmx.PMJoint:
 
     pmx_joint = pmx.PMJoint()
 
     pmx_joint.Name = joint.get("name")
     pmx_joint.Name_E = joint.get("name_e")
-    pmx_joint.Parent = int(joint.get("body_A"))
-    pmx_joint.Child = int(joint.get("body_B"))
+
+    body_A = joint.get("body_A")
+    pmx_joint.Parent = rigid_index.get(body_A, -1) if body_A else -1
+    body_B = joint.get("body_B")
+    pmx_joint.Child = rigid_index.get(body_B, -1) if body_B else -1
     pmx_joint.Position = get_Vector(joint.find("pos"))
     pmx_joint.Rotate = get_Vector_Rad(joint.find("rot"))
 
@@ -1031,11 +1034,14 @@ def write_pmx_data(context, filepath="",
 
         # Rigid
         # print("Get Rigid")
+        rigid_index = {}  # type: Dict[str, int]
         if has_xml_file and xml_root is not None:
             rigid_root = xml_root.find("rigid_bodies")
             rigid_list = rigid_root.findall("rigid")
 
-            for rigid in rigid_list:
+            for index, rigid in enumerate(rigid_list):
+                rigid_index[rigid.get("name")] = index
+
                 pmx_rigid = pmx.PMRigid()
                 pmx_rigid.Name = rigid.get("name")
                 pmx_rigid.Name_E = rigid.get("name_e")
@@ -1076,7 +1082,7 @@ def write_pmx_data(context, filepath="",
             joint_list = joint_root.findall("constraint")
 
             for joint in joint_list:
-                pmx_joint = create_PMJoint(joint)
+                pmx_joint = create_PMJoint(joint, rigid_index)
                 pmx_data.Joints.append(pmx_joint)
 
         pmx_data.Save(f)
