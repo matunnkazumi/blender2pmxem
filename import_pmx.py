@@ -985,8 +985,10 @@ def make_xml(pmx_data, filepath, use_japanese_name, xml_save_versions):
         # joint_node.set("index",str(joint_index))
         joint_node.set("name", pmx_joint.Name)
         joint_node.set("name_e", pmx_joint.Name_E)
-        joint_node.set("body_A", str(pmx_joint.Parent))
-        joint_node.set("body_B", str(pmx_joint.Child))
+        if pmx_joint.Parent >= 0:
+            joint_node.set("body_A", pmx_data.Rigids[pmx_joint.Parent].Name)
+        if pmx_joint.Child >= 0:
+            joint_node.set("body_B", pmx_data.Rigids[pmx_joint.Child].Name)
 
         set_Vector(joint_node, pmx_joint.Position, "pos")
         set_Vector_Deg(joint_node, pmx_joint.Rotate, "rot")
