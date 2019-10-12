@@ -10,6 +10,10 @@ from bpy.types import BlendDataObjects
 from . import pmx
 from . import object_applymodifier, global_variable
 from typing import Dict
+from typing import List
+from typing import Tuple
+from typing import Optional
+from typing import Union
 
 # global_variable
 GV = global_variable.Init()
@@ -70,6 +74,45 @@ def exist_object_using_material(material: Material, target_armature: Object, obj
 
     # Not Found
     return False
+
+
+BoneStackEntry = Union[Tuple[str, str], Tuple[str, str, Optional[str]]]
+
+
+def create_bone_stack(arm_obj) -> List[BoneStackEntry]:
+    bone_stack = []  # type: List[BoneStackEntry]
+
+    for bone in arm_obj.data.edit_bones:
+        if (arm_obj.name, bone.name) in bone_stack:
+            continue
+
+        bone_stack.append((arm_obj.name, bone.name))
+
+        for const in arm_obj.pose.bones[bone.name].constraints:
+            if const.type == 'IK':
+                has_child = False
+
+                for child_bone in bone.children:
+                    if child_bone.use_connect:
+                        has_child = True
+                        break
+
+                if not has_child:
+                    bone_stack.append((arm_obj.name, bone.name + "_", bone.name))
+
+                if (const.target.name, const.subtarget) in bone_stack:
+                    bone_stack.remove((const.target.name, const.subtarget))
+
+                bone_stack.append((const.target.name, const.subtarget))
+
+    return bone_stack
+
+
+def create_bone_index(bone_stack: List[BoneStackEntry]) -> Dict[str, int]:
+    bone_index = {}  # type: Dict[str, int]
+    for index, bone_name in enumerate(bone_stack):
+        bone_index[bone_name[1]] = index
+    return bone_index
 
 
 def create_PMMaterial(mat: Material, xml_mat_list, tex_dic: Dict[str, int], filepath: str) -> pmx.PMMaterial:
@@ -249,35 +292,9 @@ def write_pmx_data(context, filepath="",
                 xml_bone_list[bone.get("b_name")] = bone
 
         # make index
-        bone_stack = []
         arm_obj = bpy.context.active_object
-
-        for bone in arm_obj.data.edit_bones:
-            if (arm_obj.name, bone.name) in bone_stack:
-                continue
-
-            bone_stack.append((arm_obj.name, bone.name))
-
-            for const in arm_obj.pose.bones[bone.name].constraints:
-                if const.type == 'IK':
-                    has_child = False
-
-                    for child_bone in bone.children:
-                        if child_bone.use_connect:
-                            has_child = True
-                            break
-
-                    if not has_child:
-                        bone_stack.append((arm_obj.name, bone.name + "_", bone.name))
-
-                    if (const.target.name, const.subtarget) in bone_stack:
-                        bone_stack.remove((const.target.name, const.subtarget))
-
-                    bone_stack.append((const.target.name, const.subtarget))
-
-        bone_index = {}
-        for index, bone_name in enumerate(bone_stack):
-            bone_index[bone_name[1]] = index
+        bone_stack = create_bone_stack(arm_obj)
+        bone_index = create_bone_index(bone_stack)
 
         # output bone
         ik_stack = []
