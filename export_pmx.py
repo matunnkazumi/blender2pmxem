@@ -83,6 +83,9 @@ def create_PMMaterial(mat: Material, xml_mat_list, tex_dic: Dict[str, int], file
     xml_specular = None
     xml_ambient = None
 
+    r, g, b, *rem = principled.base_color
+    a = principled.alpha if not rem else rem[0]
+
     # Load XML Status
     if pmx_mat.Name in xml_mat_list.keys():
         temp_mat = xml_mat_list[pmx_mat.Name]
@@ -118,10 +121,10 @@ def create_PMMaterial(mat: Material, xml_mat_list, tex_dic: Dict[str, int], file
 
         deffuse_elm = temp_mat.find("deffuse")
         if deffuse_elm is not None:
-            c = (float(deffuse_elm.get("r", principled.base_color.r)),
-                 float(deffuse_elm.get("g", principled.base_color.g)),
-                 float(deffuse_elm.get("b", principled.base_color.b)),
-                 float(deffuse_elm.get("a", principled.alpha)))
+            c = (float(deffuse_elm.get("r", r)),
+                 float(deffuse_elm.get("g", g)),
+                 float(deffuse_elm.get("b", b)),
+                 float(deffuse_elm.get("a", a)))
             xml_deffuse = Math.Vector(c)
 
         specular_elm = temp_mat.find("specular")
@@ -144,8 +147,6 @@ def create_PMMaterial(mat: Material, xml_mat_list, tex_dic: Dict[str, int], file
             pmx_mat.SphereIndex = tex_dic.setdefault(path, len(tex_dic))
             pmx_mat.SphereType = int(sphere_elm.get("type", "0"))
 
-    r, g, b = principled.base_color
-    a = principled.alpha
     pmx_mat.Deffuse = xml_deffuse if xml_deffuse is not None else Math.Vector((r, g, b, a))
 
     pmx_mat.Specular = xml_specular if xml_specular is not None else Math.Vector((0.0, 0.0, 0.0))
