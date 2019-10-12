@@ -226,6 +226,31 @@ def create_PMMaterial(mat: Material, xml_mat_list, tex_dic: Dict[str, int], file
     return pmx_mat
 
 
+def create_PMJoint(joint) -> pmx.PMJoint:
+
+    pmx_joint = pmx.PMJoint()
+
+    pmx_joint.Name = joint.get("name")
+    pmx_joint.Name_E = joint.get("name_e")
+    pmx_joint.Parent = int(joint.get("body_A"))
+    pmx_joint.Child = int(joint.get("body_B"))
+    pmx_joint.Position = get_Vector(joint.find("pos"))
+    pmx_joint.Rotate = get_Vector_Rad(joint.find("rot"))
+
+    joint_pos_limit = joint.find("pos_limit")
+    pmx_joint.PosLowerLimit = get_Vector(joint_pos_limit.find("from"))
+    pmx_joint.PosUpperLimit = get_Vector(joint_pos_limit.find("to"))
+
+    joint_rot_limit = joint.find("rot_limit")
+    pmx_joint.RotLowerLimit = get_Vector_Rad(joint_rot_limit.find("from"))
+    pmx_joint.RotUpperLimit = get_Vector_Rad(joint_rot_limit.find("to"))
+
+    pmx_joint.PosSpring = get_Vector(joint.find("pos_spring"))
+    pmx_joint.RotSpring = get_Vector(joint.find("rot_spring"))
+
+    return pmx_joint
+
+
 def write_pmx_data(context, filepath="",
                    encode_type='OPT_Utf-16',
                    use_mesh_modifiers=False,
@@ -1051,26 +1076,7 @@ def write_pmx_data(context, filepath="",
             joint_list = joint_root.findall("constraint")
 
             for joint in joint_list:
-                pmx_joint = pmx.PMJoint()
-                # joint_node.set("index",str(index))
-                pmx_joint.Name = joint.get("name")
-                pmx_joint.Name_E = joint.get("name_e")
-                pmx_joint.Parent = int(joint.get("body_A"))
-                pmx_joint.Child = int(joint.get("body_B"))
-                pmx_joint.Position = get_Vector(joint.find("pos"))
-                pmx_joint.Rotate = get_Vector_Rad(joint.find("rot"))
-
-                joint_pos_limit = joint.find("pos_limit")
-                pmx_joint.PosLowerLimit = get_Vector(joint_pos_limit.find("from"))
-                pmx_joint.PosUpperLimit = get_Vector(joint_pos_limit.find("to"))
-
-                joint_rot_limit = joint.find("rot_limit")
-                pmx_joint.RotLowerLimit = get_Vector_Rad(joint_rot_limit.find("from"))
-                pmx_joint.RotUpperLimit = get_Vector_Rad(joint_rot_limit.find("to"))
-
-                pmx_joint.PosSpring = get_Vector(joint.find("pos_spring"))
-                pmx_joint.RotSpring = get_Vector(joint.find("rot_spring"))
-
+                pmx_joint = create_PMJoint(joint)
                 pmx_data.Joints.append(pmx_joint)
 
         pmx_data.Save(f)
