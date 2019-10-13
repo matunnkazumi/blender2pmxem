@@ -8,11 +8,11 @@
 
 > 改変は自由にしてください。改良点は共有していただけると幸いです。
 
-> ・Blender2Pmxのimporter 1.26 exporter 1.25をベースにして作成
-> ・space_view3d_materials_utils.pyはmichaelwさんのソースコードを流用
-> ・object_applymodifier.pyは@mato_sus304さんのソースコードを流用
-> ・solidify_edge.pyは@che_tekuさんと@saidenkaさんのソースコードを流用
-> ・アペンド処理は@che_tekuさんのソースコードを流用
+> ・Blender2Pmxのimporter 1.26 exporter 1.25をベースにして作成  
+> ・space_view3d_materials_utils.pyはmichaelwさんのソースコードを流用  
+> ・object_applymodifier.pyは@mato_sus304さんのソースコードを流用  
+> ・solidify_edge.pyは@che_tekuさんと@saidenkaさんのソースコードを流用  
+> ・アペンド処理は@che_tekuさんのソースコードを流用  
 
 # blender2pmxem
 
