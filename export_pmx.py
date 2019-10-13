@@ -8,7 +8,9 @@ from bpy.types import Object
 from bpy.types import Material
 from bpy.types import BlendDataObjects
 from . import pmx
-from . import object_applymodifier, global_variable
+from . import object_applymodifier
+from . import global_variable
+from . import validator
 from typing import Dict
 from typing import List
 from typing import Tuple
@@ -292,6 +294,20 @@ def write_pmx_data(context, filepath="",
         if xml_root is None:
             xml_root = def_root
             has_xml_file = has_def_file
+
+        if has_xml_file and xml_root is not None:
+            validate_result = validator.validate_xml(xml_root)
+            if validate_result:
+                l1 = validate_result[0]
+                l2 = validate_result[1] if len(validate_result) > 1 else None
+                l3 = validate_result[2] if len(validate_result) > 2 else None
+                bpy.ops.b2pmxem.message('INVOKE_DEFAULT',
+                                        type='ERROR',
+                                        line1=l1,
+                                        line2=l2,
+                                        line3=l3
+                                        )
+                return {'CANCELLED'}
 
         #
         # Header
