@@ -1,3 +1,10 @@
+#
+# packageing_and_upload.yml
+#
+# These codes are licensed under CC0.
+# http://creativecommons.org/publicdomain/zero/1.0/deed.ja
+#
+
 name: packaging and upload
 on:
   pull_request:
