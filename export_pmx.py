@@ -8,7 +8,9 @@ from bpy.types import Object
 from bpy.types import Material
 from bpy.types import BlendDataObjects
 from . import pmx
-from . import object_applymodifier, global_variable
+from . import object_applymodifier
+from . import global_variable
+from . import validator
 from typing import Dict
 from typing import List
 from typing import Tuple
@@ -226,6 +228,34 @@ def create_PMMaterial(mat: Material, xml_mat_list, tex_dic: Dict[str, int], file
     return pmx_mat
 
 
+def create_PMJoint(joint, rigid_index: Dict[str, int]) -> pmx.PMJoint:
+
+    pmx_joint = pmx.PMJoint()
+
+    pmx_joint.Name = joint.get("name")
+    pmx_joint.Name_E = joint.get("name_e")
+
+    body_A = joint.get("body_A")
+    pmx_joint.Parent = rigid_index.get(body_A, -1) if body_A else -1
+    body_B = joint.get("body_B")
+    pmx_joint.Child = rigid_index.get(body_B, -1) if body_B else -1
+    pmx_joint.Position = get_Vector(joint.find("pos"))
+    pmx_joint.Rotate = get_Vector_Rad(joint.find("rot"))
+
+    joint_pos_limit = joint.find("pos_limit")
+    pmx_joint.PosLowerLimit = get_Vector(joint_pos_limit.find("from"))
+    pmx_joint.PosUpperLimit = get_Vector(joint_pos_limit.find("to"))
+
+    joint_rot_limit = joint.find("rot_limit")
+    pmx_joint.RotLowerLimit = get_Vector_Rad(joint_rot_limit.find("from"))
+    pmx_joint.RotUpperLimit = get_Vector_Rad(joint_rot_limit.find("to"))
+
+    pmx_joint.PosSpring = get_Vector(joint.find("pos_spring"))
+    pmx_joint.RotSpring = get_Vector(joint.find("rot_spring"))
+
+    return pmx_joint
+
+
 def write_pmx_data(context, filepath="",
                    encode_type='OPT_Utf-16',
                    use_mesh_modifiers=False,
@@ -264,6 +294,20 @@ def write_pmx_data(context, filepath="",
         if xml_root is None:
             xml_root = def_root
             has_xml_file = has_def_file
+
+        if has_xml_file and xml_root is not None:
+            validate_result = validator.validate_xml(xml_root)
+            if validate_result:
+                l1 = validate_result[0]
+                l2 = validate_result[1] if len(validate_result) > 1 else ""
+                l3 = validate_result[2] if len(validate_result) > 2 else ""
+                bpy.ops.b2pmxem.message('INVOKE_DEFAULT',
+                                        type='ERROR',
+                                        line1=l1,
+                                        line2=l2,
+                                        line3=l3
+                                        )
+                return {'CANCELLED'}
 
         #
         # Header
@@ -1006,11 +1050,14 @@ def write_pmx_data(context, filepath="",
 
         # Rigid
         # print("Get Rigid")
+        rigid_index = {}  # type: Dict[str, int]
         if has_xml_file and xml_root is not None:
             rigid_root = xml_root.find("rigid_bodies")
             rigid_list = rigid_root.findall("rigid")
 
-            for rigid in rigid_list:
+            for index, rigid in enumerate(rigid_list):
+                rigid_index[rigid.get("name")] = index
+
                 pmx_rigid = pmx.PMRigid()
                 pmx_rigid.Name = rigid.get("name")
                 pmx_rigid.Name_E = rigid.get("name_e")
@@ -1051,26 +1098,7 @@ def write_pmx_data(context, filepath="",
             joint_list = joint_root.findall("constraint")
 
             for joint in joint_list:
-                pmx_joint = pmx.PMJoint()
-                # joint_node.set("index",str(index))
-                pmx_joint.Name = joint.get("name")
-                pmx_joint.Name_E = joint.get("name_e")
-                pmx_joint.Parent = int(joint.get("body_A"))
-                pmx_joint.Child = int(joint.get("body_B"))
-                pmx_joint.Position = get_Vector(joint.find("pos"))
-                pmx_joint.Rotate = get_Vector_Rad(joint.find("rot"))
-
-                joint_pos_limit = joint.find("pos_limit")
-                pmx_joint.PosLowerLimit = get_Vector(joint_pos_limit.find("from"))
-                pmx_joint.PosUpperLimit = get_Vector(joint_pos_limit.find("to"))
-
-                joint_rot_limit = joint.find("rot_limit")
-                pmx_joint.RotLowerLimit = get_Vector_Rad(joint_rot_limit.find("from"))
-                pmx_joint.RotUpperLimit = get_Vector_Rad(joint_rot_limit.find("to"))
-
-                pmx_joint.PosSpring = get_Vector(joint.find("pos_spring"))
-                pmx_joint.RotSpring = get_Vector(joint.find("rot_spring"))
-
+                pmx_joint = create_PMJoint(joint, rigid_index)
                 pmx_data.Joints.append(pmx_joint)
 
         pmx_data.Save(f)

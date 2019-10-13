@@ -3,6 +3,7 @@ from . import global_variable
 from . import object_applymodifier
 from . import import_pmx
 from . import export_pmx
+from . import validator
 from bpy.props import StringProperty
 from bpy.props import BoolProperty
 from bpy.props import EnumProperty
@@ -45,6 +46,12 @@ translation_dict = {
         ("*", "Select %d bones"): "ボーンを%dつ選択してください",
         ("*", "'%s' No parent bone found"): "'%s' 親ボーンが見つかりませんでした",
         ("*", "'%s' No parent bone and child bone found"): "'%s' 親ボーンと子ボーンが見つかりませんでした",
+        ("*", "Bone name must be unique in PMX."): "PMXのボーンの名前が重複しています",
+        ("*", "Rigid name must be unique in PMX."): "PMXの剛体の名前が重複しています",
+        ("*", "Joint name must be unique in PMX."): "PMXのジョイントの名前が重複しています",
+        ("*", "Bone name must be unique in XML."): "XMLのボーンの名前が重複しています",
+        ("*", "Rigid name must be unique in XML."): "XMLの剛体の名前が重複しています",
+        ("*", "Joint name must be unique in XML."): "XMLのジョイントの名前が重複しています",
         ("*", "MMD PMX Format (Extend)"): "MMD PMXフォーマット (機能拡張版)",
         ("*", "Import-Export PMX model data"): "PMXモデルをインポート・エクスポートできます",
         ("*", "File > Import-Export"): "ファイル > インポート・エクスポート",
@@ -225,6 +232,25 @@ class B2PMXEM_OT_ImportBlender2Pmx(bpy.types.Operator, ImportHelper):
 
     def execute(self, context):
         keywords = self.as_keywords(ignore=("filter_glob", ))
+
+        with open(keywords['filepath'], "rb") as f:
+            from . import pmx
+            pmx_data = pmx.Model()
+            pmx_data.Load(f)
+
+        validate_result = validator.validate_pmx(pmx_data)
+        if validate_result:
+            l1 = validate_result[0]
+            l2 = validate_result[1] if len(validate_result) > 1 else ""
+            l3 = validate_result[2] if len(validate_result) > 2 else ""
+            bpy.ops.b2pmxem.message('INVOKE_DEFAULT',
+                                    type='ERROR',
+                                    line1=l1,
+                                    line2=l2,
+                                    line3=l3
+                                    )
+            return {'CANCELLED'}
+
         import_pmx.read_pmx_data(context, **keywords)
         return {'FINISHED'}
 
@@ -445,6 +471,19 @@ class B2PMXEM_OT_SaveAsXML(bpy.types.Operator):
             from . import pmx
             pmx_data = pmx.Model()
             pmx_data.Load(f)
+
+        validate_result = validator.validate_pmx(pmx_data)
+        if validate_result:
+            l1 = validate_result[0]
+            l2 = validate_result[1] if len(validate_result) > 1 else ""
+            l3 = validate_result[2] if len(validate_result) > 2 else ""
+            bpy.ops.b2pmxem.message('INVOKE_DEFAULT',
+                                    type='ERROR',
+                                    line1=l1,
+                                    line2=l2,
+                                    line3=l3
+                                    )
+            return {'CANCELLED'}
 
         if props.make_xml_option == 'TRANSFER':
             import_arm, import_obj = import_pmx.read_pmx_data(context, filepath, bone_transfer=True)
