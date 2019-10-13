@@ -25,3 +25,21 @@ def validate_pmx(pmx_data: pmx.Model) -> List[str]:
         result.append('Joint name must be unique.')
 
     return result
+
+
+def validate_xml(xml_root) -> List[str]:
+    result = []
+
+    bone_name_list = [e.get("name") for e in xml_root.findall("bones/bone")]
+    if len(bone_name_list) != len(set(bone_name_list)):
+        result.append('Bone name must be unique.')
+
+    rigid_name_list = [e.get("name") for e in xml_root.findall("rigid_bodies/rigid")]
+    if len(rigid_name_list) != len(set(rigid_name_list)):
+        result.append('Rigid name must be unique.')
+
+    joint_name_list = [e.get("name") for e in xml_root.findall("constraints/constraint")]
+    if len(joint_name_list) != len(set(joint_name_list)):
+        result.append('Joint name must be unique.')
+
+    return result
