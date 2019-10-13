@@ -17,16 +17,11 @@ jobs:
         with:
           python-version: '3.7.4'
           architecture: 'x64'
-      - name: change parent directory
-        run: cd ../
-      - name: directory info
-        run: pwd
       - name: install lint tools
         run: pip install flake8 mypy
       - name: logging installed packages
         run: pip freeze
       - name: flake8
-        continue-on-error: true
         run: |
           cd ../
           flake8 --config=blender2pmxem/.pep8 blender2pmxem
