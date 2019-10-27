@@ -8,7 +8,7 @@ GV = global_variable.Init()
 class B2PmxeSolidifyAdd(bpy.types.Operator):
 
     '''Add Solidify Edge to selected objects'''
-    bl_idname = "b2pmxe.add_solidify"
+    bl_idname = "b2pmxem.add_solidify"
     bl_label = "Add Solidify Edge"
     bl_options = {'REGISTER', 'UNDO'}
 
@@ -49,7 +49,7 @@ class B2PmxeSolidifyAdd(bpy.types.Operator):
 
                 # Create Solidfy Material
                 mtl = bpy.data.materials.new(GV.SolidfyName)
-                mtl.diffuse_color = scn.b2pmxe_properties.edge_color
+                mtl.diffuse_color = scn.b2pmxem_properties.edge_color
                 mtl.use_shadeless = True
                 mtl.use_transparency = True
                 mtl.use_nodes = True
@@ -79,7 +79,7 @@ class B2PmxeSolidifyAdd(bpy.types.Operator):
             if mod is None:
                 mod = obj.modifiers.new(name=GV.SolidfyName, type='SOLIDIFY')
                 mod.show_render = False
-                mod.thickness = scn.b2pmxe_properties.edge_thickness
+                mod.thickness = scn.b2pmxem_properties.edge_thickness
                 mod.offset = 1.0
                 mod.use_flip_normals = True
                 mod.use_rim = False
@@ -95,7 +95,7 @@ class B2PmxeSolidifyAdd(bpy.types.Operator):
 class B2PmxeSolidifyView(bpy.types.Operator):
 
     '''Toggle Solidify Edge show_viewport of all objects'''
-    bl_idname = "b2pmxe.toggle_solidify_view"
+    bl_idname = "b2pmxem.toggle_solidify_view"
     bl_label = "Toggle Solidify Edge viewport"
 
     def execute(self, context):
@@ -115,7 +115,7 @@ class B2PmxeSolidifyView(bpy.types.Operator):
 class B2PmxeSolidifyRender(bpy.types.Operator):
 
     '''Toggle Solidify Edge show_render of all objects'''
-    bl_idname = "b2pmxe.toggle_solidify_render"
+    bl_idname = "b2pmxem.toggle_solidify_render"
     bl_label = "Toggle Solidify Edge render"
 
     def execute(self, context):
@@ -135,7 +135,7 @@ class B2PmxeSolidifyRender(bpy.types.Operator):
 class B2PmxeSolidifyDelete(bpy.types.Operator):
 
     '''Delete Solidify Edge of selected objects'''
-    bl_idname = "b2pmxe.delete_solidify"
+    bl_idname = "b2pmxem.delete_solidify"
     bl_label = "Delete Solidify Edge"
     bl_options = {'REGISTER', 'UNDO'}
 
@@ -175,9 +175,9 @@ def solidify_copy(scn, obj, mode, type):
                 continue
             if mat.name.startswith(GV.SolidfyName):
                 if mode == 'get':
-                    scn.b2pmxe_properties.edge_color = mat.diffuse_color
+                    scn.b2pmxem_properties.edge_color = mat.diffuse_color
                 else:  # mode == 'set'
-                    mat.diffuse_color = scn.b2pmxe_properties.edge_color
+                    mat.diffuse_color = scn.b2pmxem_properties.edge_color
                 break
 
     else:  # type == 'mod'
@@ -185,15 +185,15 @@ def solidify_copy(scn, obj, mode, type):
         mod = obj.modifiers.get(GV.SolidfyName)
         if mod is not None:
             if mode == 'get':
-                scn.b2pmxe_properties.edge_thickness = mod.thickness
+                scn.b2pmxem_properties.edge_thickness = mod.thickness
             else:  # mode == 'set'
-                mod.thickness = scn.b2pmxe_properties.edge_thickness
+                mod.thickness = scn.b2pmxem_properties.edge_thickness
 
 
 class B2PmxeSolidifyGetParam(bpy.types.Operator):
 
     '''Get Solidify Edge parameter of active object'''
-    bl_idname = "b2pmxe.get_solidify_param"
+    bl_idname = "b2pmxem.get_solidify_param"
     bl_label = "Get Solidify Edge parameter"
     bl_options = {'REGISTER', 'UNDO'}
 
@@ -218,7 +218,7 @@ class B2PmxeSolidifyGetParam(bpy.types.Operator):
 class B2PmxeSolidifySetMat(bpy.types.Operator):
 
     '''Set Solidify Edge diffuse_color of selected objects'''
-    bl_idname = "b2pmxe.set_solidify_mat"
+    bl_idname = "b2pmxem.set_solidify_mat"
     bl_label = "Set Solidify Edge diffuse_color"
     bl_options = {'REGISTER', 'UNDO'}
 
@@ -243,7 +243,7 @@ class B2PmxeSolidifySetMat(bpy.types.Operator):
 class B2PmxeSolidifySetMod(bpy.types.Operator):
 
     '''Set Solidify Edge thickness of selected objects'''
-    bl_idname = "b2pmxe.set_solidify_mod"
+    bl_idname = "b2pmxem.set_solidify_mod"
     bl_label = "Set Solidify Edge thickness"
     bl_options = {'REGISTER', 'UNDO'}
 

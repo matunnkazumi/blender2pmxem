@@ -4,10 +4,8 @@
 #
 # pmx.py : 20111204 v 1.0
 #
-import bpy
 import mathutils
 import os
-from struct import *
 
 DEBUG = False
 

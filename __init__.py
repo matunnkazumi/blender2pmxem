@@ -1,10 +1,9 @@
-from . import space_view3d_materials_utils
 from . import add_function
-from . import solidify_edge
 from . import global_variable
 from . import object_applymodifier
 from . import import_pmx
 from . import export_pmx
+from . import validator
 from bpy.props import StringProperty
 from bpy.props import BoolProperty
 from bpy.props import EnumProperty
@@ -22,7 +21,7 @@ import bpy
 bl_info = {
     "name": "MMD PMX Format (Extend)",
     "author": "matunnkazumi",
-    "version": (0, 1, 2),
+    "version": (1, 0, 0),
     "blender": (2, 80, 0),
     "location": "File > Import-Export",
     "description": "Import-Export PMX model data",
@@ -47,6 +46,12 @@ translation_dict = {
         ("*", "Select %d bones"): "ボーンを%dつ選択してください",
         ("*", "'%s' No parent bone found"): "'%s' 親ボーンが見つかりませんでした",
         ("*", "'%s' No parent bone and child bone found"): "'%s' 親ボーンと子ボーンが見つかりませんでした",
+        ("*", "Bone name must be unique in PMX."): "PMXのボーンの名前が重複しています",
+        ("*", "Rigid name must be unique in PMX."): "PMXの剛体の名前が重複しています",
+        ("*", "Joint name must be unique in PMX."): "PMXのジョイントの名前が重複しています",
+        ("*", "Bone name must be unique in XML."): "XMLのボーンの名前が重複しています",
+        ("*", "Rigid name must be unique in XML."): "XMLの剛体の名前が重複しています",
+        ("*", "Joint name must be unique in XML."): "XMLのジョイントの名前が重複しています",
         ("*", "MMD PMX Format (Extend)"): "MMD PMXフォーマット (機能拡張版)",
         ("*", "Import-Export PMX model data"): "PMXモデルをインポート・エクスポートできます",
         ("*", "File > Import-Export"): "ファイル > インポート・エクスポート",
@@ -111,11 +116,11 @@ translation_dict = {
 # ------------------------------------------------------------------------
 #    store properties in the active scene
 # ------------------------------------------------------------------------
-class Blender2PmxeProperties(bpy.types.PropertyGroup):
+class Blender2PmxemProperties(bpy.types.PropertyGroup):
 
     @classmethod
     def register(cls):
-        bpy.types.Scene.b2pmxe_properties = PointerProperty(type=cls)
+        bpy.types.Scene.b2pmxem_properties = PointerProperty(type=cls)
 
         def toggle_shadeless(self, context):
             context.space_data.show_textured_shadeless = self.shadeless
@@ -152,13 +157,13 @@ class Blender2PmxeProperties(bpy.types.PropertyGroup):
 
     @classmethod
     def unregister(cls):
-        del bpy.types.Scene.b2pmxe_properties
+        del bpy.types.Scene.b2pmxem_properties
 
 
 # ------------------------------------------------------------------------
 
 
-class Blender2PmxeAddonPreferences(bpy.types.AddonPreferences):
+class Blender2PmxemAddonPreferences(bpy.types.AddonPreferences):
     bl_idname = __name__
 
     use_T_stance: BoolProperty(
@@ -210,9 +215,9 @@ class Blender2PmxeAddonPreferences(bpy.types.AddonPreferences):
         col.prop(self, "threshold")
 
 
-class ImportBlender2Pmx(bpy.types.Operator, ImportHelper):
+class B2PMXEM_OT_ImportBlender2Pmx(bpy.types.Operator, ImportHelper):
     '''Load a MMD PMX File'''
-    bl_idname = "import.pmx_data_e"
+    bl_idname = "import.pmx_data_em"
     bl_label = "Import PMX Data (Extend)"
     # bl_options = {'PRESET'}
 
@@ -227,6 +232,25 @@ class ImportBlender2Pmx(bpy.types.Operator, ImportHelper):
 
     def execute(self, context):
         keywords = self.as_keywords(ignore=("filter_glob", ))
+
+        with open(keywords['filepath'], "rb") as f:
+            from . import pmx
+            pmx_data = pmx.Model()
+            pmx_data.Load(f)
+
+        validate_result = validator.validate_pmx(pmx_data)
+        if validate_result:
+            l1 = validate_result[0]
+            l2 = validate_result[1] if len(validate_result) > 1 else ""
+            l3 = validate_result[2] if len(validate_result) > 2 else ""
+            bpy.ops.b2pmxem.message('INVOKE_DEFAULT',
+                                    type='ERROR',
+                                    line1=l1,
+                                    line2=l2,
+                                    line3=l3
+                                    )
+            return {'CANCELLED'}
+
         import_pmx.read_pmx_data(context, **keywords)
         return {'FINISHED'}
 
@@ -237,9 +261,9 @@ class ImportBlender2Pmx(bpy.types.Operator, ImportHelper):
         box.prop(self, "adjust_bone_position")
 
 
-class ExportBlender2Pmx(bpy.types.Operator, ExportHelper):
+class B2PMXEM_OT_ExportBlender2Pmx(bpy.types.Operator, ExportHelper):
     '''Save a MMD PMX File'''
-    bl_idname = "export.pmx_data_e"
+    bl_idname = "export.pmx_data_em"
     bl_label = "Export PMX Data (Extend)"
     bl_options = {'PRESET'}
 
@@ -275,7 +299,7 @@ class ExportBlender2Pmx(bpy.types.Operator, ExportHelper):
         file_name = bpy.path.basename(self.filepath)
 
         if file_name == "":
-            bpy.ops.b2pmxe.message('INVOKE_DEFAULT', type='ERROR', line1="Filename is empty.")
+            bpy.ops.b2pmxem.message('INVOKE_DEFAULT', type='ERROR', line1="Filename is empty.")
             return {'CANCELLED'}
 
         arm_obj = context.active_object
@@ -322,9 +346,9 @@ class ExportBlender2Pmx(bpy.types.Operator, ExportHelper):
 #   The error message operator. When invoked, pops up a dialog
 #   window with the given message.
 #
-class B2PmxeMessageOperator(bpy.types.Operator):
-    bl_idname = "b2pmxe.message"
-    bl_label = "B2Pmxe Message"
+class B2PMXEM_OT_MessageOperator(bpy.types.Operator):
+    bl_idname = "b2pmxem.message"
+    bl_label = "B2Pmxem Message"
 
     type: EnumProperty(
         items=(
@@ -371,9 +395,9 @@ class B2PmxeMessageOperator(bpy.types.Operator):
         layout.separator()
 
 
-class B2PmxeMakeXML(bpy.types.Operator):
+class B2PMXEM_OT_MakeXML(bpy.types.Operator):
     '''Make a MMD xml file, and update materials'''
-    bl_idname = "b2pmxe.make_xml"
+    bl_idname = "b2pmxem.make_xml"
     bl_label = "Make XML File"
 
     @classmethod
@@ -405,21 +429,21 @@ class B2PmxeMakeXML(bpy.types.Operator):
         col = split.column(align=True)
 
         col.label(text="Fix Bones:")
-        props = context.scene.b2pmxe_properties
+        props = context.scene.b2pmxem_properties
         row = col.row(align=True)
         row.prop(props, "make_xml_option", expand=True)
         col.separator()
 
         col.label(text="File Select:")
         for file in files:
-            col.operator("b2pmxe.save_as_xml", text=file).filename = file
+            col.operator(B2PMXEM_OT_SaveAsXML.bl_idname, text=file).filename = file
 
         layout.separator()
 
 
-class B2PmxeSaveAsXML(bpy.types.Operator):
+class B2PMXEM_OT_SaveAsXML(bpy.types.Operator):
     '''Save As a MMD XML File.'''
-    bl_idname = "b2pmxe.save_as_xml"
+    bl_idname = "b2pmxem.save_as_xml"
     bl_label = "Save As XML File"
     bl_options = {'UNDO'}
 
@@ -434,7 +458,7 @@ class B2PmxeSaveAsXML(bpy.types.Operator):
         prefs = context.preferences.addons[GV.FolderName].preferences
         use_japanese_name = prefs.use_japanese_name
         xml_save_versions = prefs.saveVersions
-        props = context.scene.b2pmxe_properties
+        props = context.scene.b2pmxem_properties
         arm = context.active_object
 
         directory = bpy.path.abspath("//")
@@ -447,6 +471,19 @@ class B2PmxeSaveAsXML(bpy.types.Operator):
             from . import pmx
             pmx_data = pmx.Model()
             pmx_data.Load(f)
+
+        validate_result = validator.validate_pmx(pmx_data)
+        if validate_result:
+            l1 = validate_result[0]
+            l2 = validate_result[1] if len(validate_result) > 1 else ""
+            l3 = validate_result[2] if len(validate_result) > 2 else ""
+            bpy.ops.b2pmxem.message('INVOKE_DEFAULT',
+                                    type='ERROR',
+                                    line1=l1,
+                                    line2=l2,
+                                    line3=l3
+                                    )
+            return {'CANCELLED'}
 
         if props.make_xml_option == 'TRANSFER':
             import_arm, import_obj = import_pmx.read_pmx_data(context, filepath, bone_transfer=True)
@@ -503,7 +540,7 @@ class B2PmxeSaveAsXML(bpy.types.Operator):
                 # BoneItem Direction
                 bpy.ops.object.mode_set(mode="EDIT", toggle=False)
                 bpy.ops.armature.select_all(action='SELECT')
-                bpy.ops.b2pmxe.calculate_roll()
+                bpy.ops.b2pmxem.calculate_roll()
                 bpy.ops.armature.select_all(action='DESELECT')
                 bpy.ops.object.mode_set(mode='OBJECT')
 
@@ -540,27 +577,27 @@ class B2PMXEM_PT_EditPanel(bpy.types.Panel):
         col.label(text="Tools:")
 
         row = col.row(align=True)
-        row.operator("b2pmxe.delete_right", text="Delete _R", icon="X")
-        row.operator("b2pmxe.select_left", text="Select _L", icon="UV_SYNC_SELECT")
+        row.operator(add_function.B2PMXEM_OT_DeleteRight.bl_idname, text="Delete _R", icon="X")
+        row.operator(add_function.B2PMXEM_OT_SelectLeft.bl_idname, text="Select _L", icon="UV_SYNC_SELECT")
 
-        col.operator("b2pmxe.calculate_roll", icon="EMPTY_DATA")
+        col.operator(add_function.B2PMXEM_OT_RecalculateRoll.bl_idname, icon="EMPTY_DATA")
         col.separator()
-        col.operator("b2pmxe.sleeve_bones", icon="LIBRARY_DATA_DIRECT")
-        col.operator("b2pmxe.twist_bones", icon="LIBRARY_DATA_DIRECT")
-        col.operator("b2pmxe.auto_bone", icon="LIBRARY_DATA_DIRECT")
+        col.operator(add_function.B2PMXEM_OT_SleeveBones.bl_idname, icon="LIBRARY_DATA_DIRECT")
+        col.operator(add_function.B2PMXEM_OT_TwistBones.bl_idname, icon="LIBRARY_DATA_DIRECT")
+        col.operator(add_function.B2PMXEM_OT_AutoBone.bl_idname, icon="LIBRARY_DATA_DIRECT")
         col.separator()
-        col.operator("b2pmxe.mirror_bones", icon="MOD_MIRROR")
+        col.operator(add_function.B2PMXEM_OT_MirrorBones.bl_idname, icon="MOD_MIRROR")
 
         # Rename
         col = layout.column(align=True)
         col.label(text="Name:")
-        col.operator("b2pmxe.rename_chain", icon="LINKED")
+        col.operator(add_function.B2PMXEM_OT_RenameChain.bl_idname, icon="LINKED")
 
         row = col.row(align=True)
-        row.operator("b2pmxe.rename_chain_lr", text="to L/R", icon="LINKED")
-        row.operator("b2pmxe.rename_chain_num", text="to Number", icon="LINKED")
+        row.operator(add_function.B2PMXEM_OT_RenameChainToLR.bl_idname, text="to L/R", icon="LINKED")
+        row.operator(add_function.B2PMXEM_OT_RenameChainToNum.bl_idname, text="to Number", icon="LINKED")
         col.separator()
-        col.operator("b2pmxe.replace_period", text="Replace . to _", icon="DOT")
+        col.operator(add_function.B2PMXEM_OT_ReplacePeriod.bl_idname, text="Replace . to _", icon="DOT")
 
         # Display
         obj = context.object
@@ -588,25 +625,27 @@ class B2PMXEM_PT_PosePanel(bpy.types.Panel):
         col.label(text="Tools:")
 
         row = col.row(align=True)
-        row.operator("b2pmxe.to_stance", text="to T pose", icon="OUTLINER_DATA_ARMATURE").to_A_stance = False
-        row.operator("b2pmxe.to_stance", text="to A pose", icon="OUTLINER_DATA_ARMATURE").to_A_stance = True
+        row.operator(add_function.B2PMXEM_OT_ToStance.bl_idname, text="to T pose",
+                     icon="OUTLINER_DATA_ARMATURE").to_A_stance = False
+        row.operator(add_function.B2PMXEM_OT_ToStance.bl_idname, text="to A pose",
+                     icon="OUTLINER_DATA_ARMATURE").to_A_stance = True
 
         row = col.row(align=True)
-        row.operator("b2pmxe.clear_pose", text="Clear", icon="LOOP_BACK")
-        row.operator("b2pmxe.rebind_armature", text="Rebind", icon="POSE_HLT")
+        row.operator(add_function.B2PMXEM_OT_ClearPose.bl_idname, text="Clear", icon="LOOP_BACK")
+        row.operator(add_function.B2PMXEM_OT_RebindArmature.bl_idname, text="Rebind", icon="POSE_HLT")
         col.separator()
-        col.operator("b2pmxe.lock_location", icon="LOCKED").flag = True
-        col.operator("b2pmxe.lock_rotation", icon="LOCKED").flag = True
+        col.operator(add_function.B2PMXEM_OT_LockLoc.bl_idname, icon="LOCKED").flag = True
+        col.operator(add_function.B2PMXEM_OT_LockRot.bl_idname, icon="LOCKED").flag = True
 
         col = layout.column(align=True)
         col.label(text="Constraints:")
 
-        col.operator("b2pmxe.add_location", icon="LIBRARY_DATA_DIRECT")
-        col.operator("b2pmxe.add_rotation", icon="LIBRARY_DATA_DIRECT")
-        col.operator("b2pmxe.limit_rotation", icon="LIBRARY_DATA_DIRECT")
+        col.operator(add_function.B2PMXEM_OT_AddCopyLoc.bl_idname, icon="LIBRARY_DATA_DIRECT")
+        col.operator(add_function.B2PMXEM_OT_AddCopyRot.bl_idname, icon="LIBRARY_DATA_DIRECT")
+        col.operator(add_function.B2PMXEM_OT_AddLimit.bl_idname, icon="LIBRARY_DATA_DIRECT")
 
         row = col.row(align=True)
-        row.operator_menu_enum("b2pmxe.add_ik", 'type', icon="LIBRARY_DATA_DIRECT")
+        row.operator_menu_enum(add_function.B2PMXEM_OT_AddIK.bl_idname, 'type', icon="LIBRARY_DATA_DIRECT")
 
         mute_type = True
         for bone in context.active_object.pose.bones:
@@ -617,7 +656,7 @@ class B2PMXEM_PT_PosePanel(bpy.types.Panel):
                         break
 
         row.operator(
-            "b2pmxe.mute_ik",
+            add_function.B2PMXEM_OT_MuteIK.bl_idname,
             text="",
             icon="HIDE_OFF" if mute_type else "HIDE_ON"
         ).flag = mute_type
@@ -644,7 +683,6 @@ class B2PMXEM_PT_ObjectPanel(bpy.types.Panel):
         layout = self.layout
 
         ao = context.active_object
-        scn = context.scene
         color_map = None
 
         # Get Solidify Edge Flag
@@ -658,86 +696,76 @@ class B2PMXEM_PT_ObjectPanel(bpy.types.Panel):
 
         # WeightType Group
         row = col.row(align=True)
-        row.operator("b2pmxe.delete_weight_type", text="Delete", icon="X")
+        row.operator(add_function.B2PMXEM_OT_DeleteWeightType.bl_idname, text="Delete", icon="X")
         row.operator(
-            "b2pmxe.create_weight_type",
+            add_function.B2PMXEM_OT_CreateWeightType.bl_idname,
             text="WeightType" if color_map is None else "Reload",
             icon='COLOR'
         )
 
         # Add Driver
         row = col.row(align=True)
-        row.operator("b2pmxe.add_driver", text="Delete", icon="X").delete = True
-        row.operator("b2pmxe.add_driver", text="Add Driver", icon="DRIVER")
+        row.operator(add_function.B2PMXEM_OT_AddDriver.bl_idname, text="Delete", icon="X").delete = True
+        row.operator(add_function.B2PMXEM_OT_AddDriver.bl_idname, text="Add Driver", icon="DRIVER")
 
-        col.operator("b2pmxe.make_xml", icon="FILE_TEXT")
-        col.operator("b2pmxe.apply_modifier", icon="FILE_TICK")
+        col.operator(B2PMXEM_OT_MakeXML.bl_idname, icon="FILE_TEXT")
+        col.operator(object_applymodifier.B2PMXEM_OT_ApplyModifier.bl_idname, icon="FILE_TICK")
         col.separator()
 
         # Append Template
-        col.operator_menu_enum("b2pmxe.append_template", 'type', icon="ARMATURE_DATA")
-
-        # Shading
-        row = layout.row()
-        row.prop(scn.display.shading, 'show_backface_culling')
+        col.operator_menu_enum(add_function.B2PMXEM_OT_AppendTemplate.bl_idname, 'type', icon="ARMATURE_DATA")
 
 
 # Registration
 def menu_func_import(self, context):
-    self.layout.operator(ImportBlender2Pmx.bl_idname, text="PMX File for MMD (Extend) (.pmx)", icon='PLUGIN')
+    self.layout.operator(B2PMXEM_OT_ImportBlender2Pmx.bl_idname, text="PMX File for MMD (Extend) (.pmx)", icon='PLUGIN')
 
 
 def menu_func_export(self, context):
-    self.layout.operator(ExportBlender2Pmx.bl_idname, text="PMX File for MMD (Extend) (.pmx)", icon='PLUGIN')
+    self.layout.operator(B2PMXEM_OT_ExportBlender2Pmx.bl_idname, text="PMX File for MMD (Extend) (.pmx)", icon='PLUGIN')
 
 
 def menu_func_vg(self, context):
     self.layout.separator()
-    self.layout.operator("b2pmxe.mirror_vertexgroup", text=iface_("Mirror active vertex group (L/R)"), icon='ZOOM_IN')
+    self.layout.operator(add_function.B2PMXEM_OT_MirrorVertexGroup.bl_idname,
+                         text=iface_("Mirror active vertex group (L/R)"), icon='ZOOM_IN')
 
 
 classes = [
-    ExportBlender2Pmx,
-    ImportBlender2Pmx,
-    B2PmxeMakeXML,
-    add_function.B2PmxeMirrorVertexGroup,
-    add_function.B2PmxeRecalculateRoll,
-    add_function.B2PmxeAddDriver,
-    add_function.B2PmxeCreateWeightType,
-    add_function.B2PmxeDeleteWeightType,
-    add_function.B2PmxeAppendTemplate,
-    add_function.B2PmxeToStance,
-    add_function.B2PmxeDeleteRight,
-    add_function.B2PmxeSelectLeft,
-    add_function.B2PmxeReplacePeriod,
-    add_function.B2PmxeRenameChain,
-    add_function.B2PmxeRenameChainToLR,
-    add_function.B2PmxeRenameChainToNum,
-    add_function.B2PmxeMirrorBones,
-    add_function.B2PmxeAutoBone,
-    add_function.B2PmxeSleeveBones,
-    add_function.B2PmxeTwistBones,
-    add_function.B2PmxeClearPose,
-    add_function.B2PmxeRebindArmature,
-    add_function.B2PmxeLockRot,
-    add_function.B2PmxeLockLoc,
-    add_function.B2PmxeAddCopyLoc,
-    add_function.B2PmxeAddCopyRot,
-    add_function.B2PmxeAddLimit,
-    add_function.B2PmxeAddIK,
-    add_function.B2PmxeMuteIK,
-    solidify_edge.B2PmxeSolidifyRender,
-    solidify_edge.B2PmxeSolidifyView,
-    solidify_edge.B2PmxeSolidifyGetParam,
-    solidify_edge.B2PmxeSolidifyAdd,
-    solidify_edge.B2PmxeSolidifyDelete,
-    space_view3d_materials_utils.VIEW3D_OT_material_to_texface,
-    space_view3d_materials_utils.VIEW3D_OT_texface_remove,
-    object_applymodifier.B2PmxeApplyModifier,
-    Blender2PmxeAddonPreferences,
-    B2PmxeMessageOperator,
-    B2PmxeSaveAsXML,
-    Blender2PmxeProperties,
+    add_function.B2PMXEM_OT_MirrorVertexGroup,
+    add_function.B2PMXEM_OT_RecalculateRoll,
+    add_function.B2PMXEM_OT_AddDriver,
+    add_function.B2PMXEM_OT_CreateWeightType,
+    add_function.B2PMXEM_OT_DeleteWeightType,
+    add_function.B2PMXEM_OT_AppendTemplate,
+    add_function.B2PMXEM_OT_ToStance,
+    add_function.B2PMXEM_OT_DeleteRight,
+    add_function.B2PMXEM_OT_SelectLeft,
+    add_function.B2PMXEM_OT_ReplacePeriod,
+    add_function.B2PMXEM_OT_RenameChain,
+    add_function.B2PMXEM_OT_RenameChainToLR,
+    add_function.B2PMXEM_OT_RenameChainToNum,
+    add_function.B2PMXEM_OT_MirrorBones,
+    add_function.B2PMXEM_OT_AutoBone,
+    add_function.B2PMXEM_OT_SleeveBones,
+    add_function.B2PMXEM_OT_TwistBones,
+    add_function.B2PMXEM_OT_ClearPose,
+    add_function.B2PMXEM_OT_RebindArmature,
+    add_function.B2PMXEM_OT_LockRot,
+    add_function.B2PMXEM_OT_LockLoc,
+    add_function.B2PMXEM_OT_AddCopyLoc,
+    add_function.B2PMXEM_OT_AddCopyRot,
+    add_function.B2PMXEM_OT_AddLimit,
+    add_function.B2PMXEM_OT_AddIK,
+    add_function.B2PMXEM_OT_MuteIK,
+    object_applymodifier.B2PMXEM_OT_ApplyModifier,
+    Blender2PmxemAddonPreferences,
+    Blender2PmxemProperties,
+    B2PMXEM_OT_ExportBlender2Pmx,
+    B2PMXEM_OT_ImportBlender2Pmx,
+    B2PMXEM_OT_MakeXML,
+    B2PMXEM_OT_SaveAsXML,
+    B2PMXEM_OT_MessageOperator,
     B2PMXEM_PT_EditPanel,
     B2PMXEM_PT_PosePanel,
     B2PMXEM_PT_ObjectPanel,

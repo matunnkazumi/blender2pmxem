@@ -11,7 +11,6 @@ import re
 
 from . import add_function, global_variable
 from bpy_extras.node_shader_utils import PrincipledBSDFWrapper
-from bpy_extras.image_utils import load_image
 
 # global_variable
 GV = global_variable.Init()
@@ -483,7 +482,7 @@ def read_pmx_data(context, filepath="",
 
         # BoneItem Direction
         bpy.ops.armature.select_all(action='SELECT')
-        bpy.ops.b2pmxe.calculate_roll()
+        bpy.ops.b2pmxem.calculate_roll()
         bpy.ops.armature.select_all(action='DESELECT')
 
         bpy.ops.object.mode_set(mode='OBJECT')
@@ -587,15 +586,15 @@ def read_pmx_data(context, filepath="",
                 # Use Alpha
                 textures_dic[tex_index].image.alpha_mode = 'PREMUL'
 
-            except:
+            except RuntimeError:
                 NG_tex_list.append(tex_data.Path)
 
         # print NG_tex_list
         if len(NG_tex_list):
-            bpy.ops.b2pmxe.message('INVOKE_DEFAULT',
-                                   type='INFO',
-                                   line1="Some Texture file not found.",
-                                   use_console=True)
+            bpy.ops.b2pmxem.message('INVOKE_DEFAULT',
+                                    type='INFO',
+                                    line1="Some Texture file not found.",
+                                    use_console=True)
             for data in NG_tex_list:
                 print("   --> %s" % data)
 
@@ -654,11 +653,6 @@ def read_pmx_data(context, filepath="",
                 # Set Material
                 mesh.polygons[index].material_index = dat[0]
 
-                # Set Texture
-                # if pmx_data.Materials[dat[0]].TextureIndex < len(bpy.data.images) and pmx_data.Materials[dat[0]].TextureIndex >= 0:
-                #    if textures_dic.get(pmx_data.Materials[dat[0]].TextureIndex, None) is not None:
-                #        mesh.uv_layers[0].data[index].image = textures_dic[pmx_data.Materials[dat[0]].TextureIndex].image
-
                 # Set UV
                 poly_vert_index = mesh.polygons[index].loop_start
                 uv_data[poly_vert_index + 0].uv = pmx_data.Vertices[mesh.polygons[index].vertices[0]].UV
@@ -711,7 +705,10 @@ def make_xml(pmx_data, filepath, use_japanese_name, xml_save_versions):
 
     # const
     # "\u0030\u003a\u0062\u0061\u0073\u0065\u0028\u56fa\u5b9a\u0029\u0031\u003a\u307e\u3086\u0020\u0032\u003a\u76ee\u0020\u0033\u003a\u30ea\u30c3\u30d7\u0020\u0034\u003a\u305d\u306e\u4ed6"
-    J_Face_Comment = "\u8868\u60C5\u30B0\u30EB\u30FC\u30D7\u0020\u0030\u003A\u4F7F\u7528\u4E0D\u53EF\u0020\u0031\u003A\u307E\u3086\u0020\u0032\u003A\u76EE\u0020\u0033\u003A\u30EA\u30C3\u30D7\u0020\u0034\u003A\u305D\u306E\u4ED6"
+    J_Face_Comment = "\u8868\u60C5\u30B0\u30EB\u30FC\u30D7\u0020\u0030"\
+        "\u003A\u4F7F\u7528\u4E0D\u53EF\u0020\u0031\u003A\u307E\u3086"\
+        "\u0020\u0032\u003A\u76EE\u0020\u0033\u003A\u30EA\u30C3\u30D7"\
+        "\u0020\u0034\u003A\u305D\u306E\u4ED6"
 
     # filename
     root, ext = os.path.splitext(filepath)
@@ -733,7 +730,7 @@ def make_xml(pmx_data, filepath, use_japanese_name, xml_save_versions):
         xml_path = root + str(index) + ".xml"
 
     save_message = 'Save As "%s"' % bpy.path.basename(xml_path)
-    bpy.ops.b2pmxe.message('INVOKE_DEFAULT', type='INFO', line1=save_message)
+    bpy.ops.b2pmxem.message('INVOKE_DEFAULT', type='INFO', line1=save_message)
 
     # print xml_exist_list
     if len(xml_exist_list):
@@ -988,8 +985,10 @@ def make_xml(pmx_data, filepath, use_japanese_name, xml_save_versions):
         # joint_node.set("index",str(joint_index))
         joint_node.set("name", pmx_joint.Name)
         joint_node.set("name_e", pmx_joint.Name_E)
-        joint_node.set("body_A", str(pmx_joint.Parent))
-        joint_node.set("body_B", str(pmx_joint.Child))
+        if pmx_joint.Parent >= 0:
+            joint_node.set("body_A", pmx_data.Rigids[pmx_joint.Parent].Name)
+        if pmx_joint.Child >= 0:
+            joint_node.set("body_B", pmx_data.Rigids[pmx_joint.Child].Name)
 
         set_Vector(joint_node, pmx_joint.Position, "pos")
         set_Vector_Deg(joint_node, pmx_joint.Rotate, "rot")

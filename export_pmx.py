@@ -8,8 +8,15 @@ from bpy.types import Object
 from bpy.types import Material
 from bpy.types import BlendDataObjects
 from . import pmx
-from . import object_applymodifier, global_variable
+from . import object_applymodifier
+from . import global_variable
+from . import validator
 from typing import Dict
+from typing import List
+from typing import Tuple
+from typing import Optional
+from typing import Any
+from typing import Union
 
 # global_variable
 GV = global_variable.Init()
@@ -72,7 +79,56 @@ def exist_object_using_material(material: Material, target_armature: Object, obj
     return False
 
 
-def create_PMMaterial(mat: Material, xml_mat_list, tex_dic: Dict[str, int]) -> pmx.PMMaterial:
+BoneStackEntry = Union[Tuple[str, str], Tuple[str, str, Optional[str]]]
+
+
+def create_bone_stack(arm_obj, xml_bone_list: Dict[str, Any]) -> List[BoneStackEntry]:
+    bone_stack = []  # type: List[BoneStackEntry]
+
+    for bone in arm_obj.data.edit_bones:
+        if (arm_obj.name, bone.name) in bone_stack:
+            continue
+
+        bone_stack.append((arm_obj.name, bone.name))
+
+        for const in arm_obj.pose.bones[bone.name].constraints:
+            if const.type == 'IK':
+                has_child = False
+
+                for child_bone in bone.children:
+                    if child_bone.use_connect:
+                        has_child = True
+                        break
+
+                if not has_child:
+                    bone_stack.append((arm_obj.name, bone.name + "_", bone.name))
+
+                if (const.target.name, const.subtarget) in bone_stack:
+                    bone_stack.remove((const.target.name, const.subtarget))
+
+                bone_stack.append((const.target.name, const.subtarget))
+
+    if xml_bone_list:
+        # insertion-order is preserved from python 3.7
+        b_names = list(xml_bone_list.keys())
+
+        def get_index(e: BoneStackEntry):
+            bone_name = e[1]
+            if bone_name in b_names:
+                return b_names.index(bone_name)
+            else:
+                return float('inf')
+
+        return sorted(bone_stack, key=get_index)
+    else:
+        return bone_stack
+
+
+def create_bone_index(bone_stack: List[BoneStackEntry]) -> Dict[str, int]:
+    return {bone_name[1]: index for index, bone_name in enumerate(bone_stack)}
+
+
+def create_PMMaterial(mat: Material, xml_mat_list, tex_dic: Dict[str, int], filepath: str) -> pmx.PMMaterial:
 
     principled = PrincipledBSDFWrapper(mat, is_readonly=True)
     pmx_mat = pmx.PMMaterial()
@@ -120,7 +176,7 @@ def create_PMMaterial(mat: Material, xml_mat_list, tex_dic: Dict[str, int]) -> p
                                          float(edge_c.get("a", "1.0"))))
 
         deffuse_elm = temp_mat.find("deffuse")
-        if deffuse_elm != None:
+        if deffuse_elm is not None:
             c = (float(deffuse_elm.get("r", r)),
                  float(deffuse_elm.get("g", g)),
                  float(deffuse_elm.get("b", b)),
@@ -128,13 +184,13 @@ def create_PMMaterial(mat: Material, xml_mat_list, tex_dic: Dict[str, int]) -> p
             xml_deffuse = Math.Vector(c)
 
         specular_elm = temp_mat.find("specular")
-        if specular_elm != None:
+        if specular_elm is not None:
             xml_specular = Math.Vector((float(specular_elm.get("r", "0.0")),
                                         float(specular_elm.get("g", "0.0")),
                                         float(specular_elm.get("b", "0.0"))))
 
         ambient_elm = temp_mat.find("ambient")
-        if ambient_elm != None:
+        if ambient_elm is not None:
             xml_ambient = Math.Vector((float(ambient_elm.get("r", "0.0")),
                                        float(ambient_elm.get("g", "0.0")),
                                        float(ambient_elm.get("b", "0.0"))))
@@ -142,15 +198,15 @@ def create_PMMaterial(mat: Material, xml_mat_list, tex_dic: Dict[str, int]) -> p
         pmx_mat.Power = float(temp_mat.get("power", "1"))
 
         sphere_elm = temp_mat.find("sphere")
-        if sphere_elm != None:
+        if sphere_elm is not None:
             path = sphere_elm.get("path")
             pmx_mat.SphereIndex = tex_dic.setdefault(path, len(tex_dic))
             pmx_mat.SphereType = int(sphere_elm.get("type", "0"))
 
-    pmx_mat.Deffuse = xml_deffuse if xml_deffuse != None else Math.Vector((r, g, b, a))
+    pmx_mat.Deffuse = xml_deffuse if xml_deffuse is not None else Math.Vector((r, g, b, a))
 
-    pmx_mat.Specular = xml_specular if xml_specular != None else Math.Vector((0.0, 0.0, 0.0))
-    pmx_mat.Ambient = xml_ambient if xml_ambient != None else pmx_mat.Deffuse.xyz * 0.4
+    pmx_mat.Specular = xml_specular if xml_specular is not None else Math.Vector((0.0, 0.0, 0.0))
+    pmx_mat.Ambient = xml_ambient if xml_ambient is not None else pmx_mat.Deffuse.xyz * 0.4
 
     pmx_mat.FaceLength = 0
 
@@ -161,15 +217,43 @@ def create_PMMaterial(mat: Material, xml_mat_list, tex_dic: Dict[str, int]) -> p
 
     texture = principled.base_color_texture
     if texture and texture.image:
-        filepath = texture.image.filepath
+        image_filepath = texture.image.filepath
 
-        tex_abs_path = bpy.path.abspath(filepath)
+        tex_abs_path = bpy.path.abspath(image_filepath)
         tex_path = bpy.path.relpath(tex_abs_path, tex_base_path)
         tex_path = tex_path.replace("//", "", 1)
 
         pmx_mat.TextureIndex = tex_dic.setdefault(tex_path, len(tex_dic))
 
     return pmx_mat
+
+
+def create_PMJoint(joint, rigid_index: Dict[str, int]) -> pmx.PMJoint:
+
+    pmx_joint = pmx.PMJoint()
+
+    pmx_joint.Name = joint.get("name")
+    pmx_joint.Name_E = joint.get("name_e")
+
+    body_A = joint.get("body_A")
+    pmx_joint.Parent = rigid_index.get(body_A, -1) if body_A else -1
+    body_B = joint.get("body_B")
+    pmx_joint.Child = rigid_index.get(body_B, -1) if body_B else -1
+    pmx_joint.Position = get_Vector(joint.find("pos"))
+    pmx_joint.Rotate = get_Vector_Rad(joint.find("rot"))
+
+    joint_pos_limit = joint.find("pos_limit")
+    pmx_joint.PosLowerLimit = get_Vector(joint_pos_limit.find("from"))
+    pmx_joint.PosUpperLimit = get_Vector(joint_pos_limit.find("to"))
+
+    joint_rot_limit = joint.find("rot_limit")
+    pmx_joint.RotLowerLimit = get_Vector_Rad(joint_rot_limit.find("from"))
+    pmx_joint.RotUpperLimit = get_Vector_Rad(joint_rot_limit.find("to"))
+
+    pmx_joint.PosSpring = get_Vector(joint.find("pos_spring"))
+    pmx_joint.RotSpring = get_Vector(joint.find("rot_spring"))
+
+    return pmx_joint
 
 
 def write_pmx_data(context, filepath="",
@@ -211,6 +295,20 @@ def write_pmx_data(context, filepath="",
             xml_root = def_root
             has_xml_file = has_def_file
 
+        if has_xml_file and xml_root is not None:
+            validate_result = validator.validate_xml(xml_root)
+            if validate_result:
+                l1 = validate_result[0]
+                l2 = validate_result[1] if len(validate_result) > 1 else ""
+                l3 = validate_result[2] if len(validate_result) > 2 else ""
+                bpy.ops.b2pmxem.message('INVOKE_DEFAULT',
+                                        type='ERROR',
+                                        line1=l1,
+                                        line2=l2,
+                                        line3=l3
+                                        )
+                return {'CANCELLED'}
+
         #
         # Header
         #
@@ -249,35 +347,9 @@ def write_pmx_data(context, filepath="",
                 xml_bone_list[bone.get("b_name")] = bone
 
         # make index
-        bone_stack = []
         arm_obj = bpy.context.active_object
-
-        for bone in arm_obj.data.edit_bones:
-            if (arm_obj.name, bone.name) in bone_stack:
-                continue
-
-            bone_stack.append((arm_obj.name, bone.name))
-
-            for const in arm_obj.pose.bones[bone.name].constraints:
-                if const.type == 'IK':
-                    has_child = False
-
-                    for child_bone in bone.children:
-                        if child_bone.use_connect:
-                            has_child = True
-                            break
-
-                    if not has_child:
-                        bone_stack.append((arm_obj.name, bone.name + "_", bone.name))
-
-                    if (const.target.name, const.subtarget) in bone_stack:
-                        bone_stack.remove((const.target.name, const.subtarget))
-
-                    bone_stack.append((const.target.name, const.subtarget))
-
-        bone_index = {}
-        for index, bone_name in enumerate(bone_stack):
-            bone_index[bone_name[1]] = index
+        bone_stack = create_bone_stack(arm_obj, xml_bone_list)
+        bone_index = create_bone_index(bone_stack)
 
         # output bone
         ik_stack = []
@@ -439,7 +511,13 @@ def write_pmx_data(context, filepath="",
                             ik_member = pmx.PMIKLink()
                             ik_member.Index = bone_index.get(cursor.name, -1)
 
-                            if cursor.lock_ik_x or cursor.lock_ik_y or cursor.lock_ik_z or cursor.use_ik_limit_x or cursor.use_ik_limit_y or cursor.use_ik_limit_z:
+                            if cursor.lock_ik_x \
+                               or cursor.lock_ik_y \
+                               or cursor.lock_ik_z \
+                               or cursor.use_ik_limit_x \
+                               or cursor.use_ik_limit_y \
+                               or cursor.use_ik_limit_z:
+
                                 ik_member.UseLimit = 1
                                 ik_member.UpperLimit = Math.Vector((0, 0, 0))
                                 ik_member.LowerLimit = Math.Vector((0, 0, 0))
@@ -553,7 +631,7 @@ def write_pmx_data(context, filepath="",
             if not found:
                 continue
 
-            pmx_mat = create_PMMaterial(mat, xml_mat_list, tex_dic)
+            pmx_mat = create_PMMaterial(mat, xml_mat_list, tex_dic, filepath)
 
             faceTemp[mat.name] = []
             mat_list[mat.name] = pmx_mat
@@ -647,7 +725,7 @@ def write_pmx_data(context, filepath="",
                 try:
                     mesh = apply_mod.Get_Apply_Mesh(mesh_obj)
                 except object_applymodifier.ShapeVertexError as e:
-                    bpy.ops.b2pmxe.message(
+                    bpy.ops.b2pmxem.message(
                         'INVOKE_DEFAULT',
                         type='ERROR',
                         line1="Failed to create some shape keys.",
@@ -871,7 +949,7 @@ def write_pmx_data(context, filepath="",
             for data in OK_normal_list:
                 print("   --> %s" % data)
         elif use_custom_normals:
-            bpy.ops.b2pmxe.message(
+            bpy.ops.b2pmxem.message(
                 'INVOKE_DEFAULT',
                 type='ERROR',
                 line1="Could not use custom split normals data.",
@@ -972,11 +1050,14 @@ def write_pmx_data(context, filepath="",
 
         # Rigid
         # print("Get Rigid")
+        rigid_index = {}  # type: Dict[str, int]
         if has_xml_file and xml_root is not None:
             rigid_root = xml_root.find("rigid_bodies")
             rigid_list = rigid_root.findall("rigid")
 
-            for rigid in rigid_list:
+            for index, rigid in enumerate(rigid_list):
+                rigid_index[rigid.get("name")] = index
+
                 pmx_rigid = pmx.PMRigid()
                 pmx_rigid.Name = rigid.get("name")
                 pmx_rigid.Name_E = rigid.get("name_e")
@@ -1017,26 +1098,7 @@ def write_pmx_data(context, filepath="",
             joint_list = joint_root.findall("constraint")
 
             for joint in joint_list:
-                pmx_joint = pmx.PMJoint()
-                # joint_node.set("index",str(index))
-                pmx_joint.Name = joint.get("name")
-                pmx_joint.Name_E = joint.get("name_e")
-                pmx_joint.Parent = int(joint.get("body_A"))
-                pmx_joint.Child = int(joint.get("body_B"))
-                pmx_joint.Position = get_Vector(joint.find("pos"))
-                pmx_joint.Rotate = get_Vector_Rad(joint.find("rot"))
-
-                joint_pos_limit = joint.find("pos_limit")
-                pmx_joint.PosLowerLimit = get_Vector(joint_pos_limit.find("from"))
-                pmx_joint.PosUpperLimit = get_Vector(joint_pos_limit.find("to"))
-
-                joint_rot_limit = joint.find("rot_limit")
-                pmx_joint.RotLowerLimit = get_Vector_Rad(joint_rot_limit.find("from"))
-                pmx_joint.RotUpperLimit = get_Vector_Rad(joint_rot_limit.find("to"))
-
-                pmx_joint.PosSpring = get_Vector(joint.find("pos_spring"))
-                pmx_joint.RotSpring = get_Vector(joint.find("rot_spring"))
-
+                pmx_joint = create_PMJoint(joint, rigid_index)
                 pmx_data.Joints.append(pmx_joint)
 
         pmx_data.Save(f)
