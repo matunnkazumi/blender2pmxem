@@ -55,6 +55,11 @@ class Init(object):
         self.MasterObj = None
 
     def Set_MasterObj(self, scn, target_obj, shape_keys):
+        # hidden objects is not evaluated
+        # change show, to evaluate
+        prev_hide = target_obj.hide_get()
+        target_obj.hide_set(False)
+
         # has shape_keys
         if shape_keys is not None:
             target_obj.show_only_shape_key = True
@@ -68,6 +73,9 @@ class Init(object):
         # no shape_key
         else:
             self.MasterObj = make_evaluated_object(target_obj)
+
+        # restore hide or show
+        target_obj.hide_set(prev_hide)
 
     def Set_AnimData(self, pre_anim_data):
         if pre_anim_data is not None:
