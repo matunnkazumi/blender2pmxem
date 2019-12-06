@@ -33,7 +33,6 @@ jobs:
           cd ../
           flake8 --config=blender2pmxem/.pep8 blender2pmxem
       - name: mypy
-        continue-on-error: true
         run: |
           cd ../
           mypy --no-incremental --ignore-missing-imports blender2pmxem
