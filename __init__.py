@@ -166,30 +166,65 @@ class Blender2PmxemProperties(bpy.types.PropertyGroup):
 class Blender2PmxemAddonPreferences(bpy.types.AddonPreferences):
     bl_idname = __name__
 
-    use_T_stance: BoolProperty(
+    use_T_stance: BoolProperty(  # type: ignore
         name="Append with T stance",
         description="Append template armature with T stance",
         default=False
     )
-    use_custom_shape: BoolProperty(
+    use_custom_shape: BoolProperty(  # type: ignore
         name="Use Custom Shape",
         description="Use Custom Shape when creating bones",
         default=False
     )
-    use_japanese_name: BoolProperty(
+    use_japanese_name: BoolProperty(  # type: ignore
         name="Use Japanese Bone name",
         description="Append template armature with Japanese bone name",
         default=False
     )
 
-    saveVersions: IntProperty(name="Save Versions", default=0, min=0, max=32)
+    saveVersions: IntProperty(  # type: ignore
+        name="Save Versions",
+        default=0,
+        min=0,
+        max=32
+    )
 
-    rotShoulder: FloatProperty(name="Shoulder", default=0.261799, min=-1.5708, max=1.5708, unit='ROTATION')
-    rotArm: FloatProperty(name="Arm", default=0.401426, min=-1.5708, max=1.5708, unit='ROTATION')
+    rotShoulder: FloatProperty(  # type: ignore
+        name="Shoulder",
+        default=0.261799,
+        min=-1.5708,
+        max=1.5708,
+        unit='ROTATION'
+    )
+    rotArm: FloatProperty(  # type: ignore
+        name="Arm",
+        default=0.401426,
+        min=-1.5708,
+        max=1.5708,
+        unit='ROTATION'
+    )
 
-    twistBones: IntProperty(name="Number", default=3, min=0, max=3)
-    autoInfluence: FloatProperty(name="Influence", default=0.5, min=-1.0, max=1.0, step=1)
-    threshold: FloatProperty(name="Threshold", default=0.01, min=0.0, max=1.0, step=0.001, precision=5)
+    twistBones: IntProperty(  # type: ignore
+        name="Number",
+        default=3,
+        min=0,
+        max=3
+    )
+    autoInfluence: FloatProperty(  # type: ignore
+        name="Influence",
+        default=0.5,
+        min=-1.0,
+        max=1.0,
+        step=1
+    )
+    threshold: FloatProperty(  # type: ignore
+        name="Threshold",
+        default=0.01,
+        min=0.0,
+        max=1.0,
+        step=0.001,
+        precision=5
+    )
 
     def draw(self, context):
         layout = self.layout
@@ -222,9 +257,12 @@ class B2PMXEM_OT_ImportBlender2Pmx(bpy.types.Operator, ImportHelper):
     # bl_options = {'PRESET'}
 
     filename_ext = ".pmx"
-    filter_glob: StringProperty(default="*.pm[dx]", options={'HIDDEN'})
+    filter_glob: StringProperty(  # type: ignore
+        default="*.pm[dx]",
+        options={'HIDDEN'}
+    )
 
-    adjust_bone_position: BoolProperty(
+    adjust_bone_position: BoolProperty(  # type: ignore
         name="Adjust bone position",
         description="Automatically adjust bone position",
         default=False
@@ -269,22 +307,27 @@ class B2PMXEM_OT_ExportBlender2Pmx(bpy.types.Operator, ExportHelper):
 
     # ExportHelper mixin class uses this
     filename_ext = ".pmx"
-    filter_glob: StringProperty(default="*.pmx", options={'HIDDEN'})
+    filter_glob: StringProperty(  # type: ignore
+        default="*.pmx",
+        options={'HIDDEN'}
+    )
 
-    encode_type: EnumProperty(items=(('OPT_Utf-8', "UTF-8", "To use UTF-8 encoding."),
-                                     ('OPT_Utf-16', "UTF-16", "To use UTF-16 encoding."),
-                                     ),
-                              name="Encode",
-                              description="Select the encoding to use",
-                              default='OPT_Utf-16'
-                              )
+    encode_type: EnumProperty(  # type: ignore
+        items=(
+            ('OPT_Utf-8', "UTF-8", "To use UTF-8 encoding."),
+            ('OPT_Utf-16', "UTF-16", "To use UTF-16 encoding."),
+        ),
+        name="Encode",
+        description="Select the encoding to use",
+        default='OPT_Utf-16'
+    )
 
-    use_mesh_modifiers: BoolProperty(
+    use_mesh_modifiers: BoolProperty(  # type: ignore
         name="Apply Modifiers",
         description="Apply modifiers (Warning, may be slow)",
         default=False,
     )
-    use_custom_normals: BoolProperty(
+    use_custom_normals: BoolProperty(  # type: ignore
         name="Custom Normals",
         description="Use custom normals",
         default=False,
@@ -350,15 +393,23 @@ class B2PMXEM_OT_MessageOperator(bpy.types.Operator):
     bl_idname = "b2pmxem.message"
     bl_label = "B2Pmxem Message"
 
-    type: EnumProperty(
+    type: EnumProperty(  # type: ignore
         items=(
             ('ERROR', "Error", ""),
             ('INFO', "Info", ""),
         ), default='ERROR')
-    line1: StringProperty(default="")
-    line2: StringProperty(default="")
-    line3: StringProperty(default="")
-    use_console: BoolProperty(default=False)
+    line1: StringProperty(  # type: ignore
+        default=""
+    )
+    line2: StringProperty(  # type: ignore
+        default=""
+    )
+    line3: StringProperty(  # type: ignore
+        default=""
+    )
+    use_console: BoolProperty(  # type: ignore
+        default=False
+    )
 
     def execute(self, context):
         return {'FINISHED'}
@@ -447,7 +498,10 @@ class B2PMXEM_OT_SaveAsXML(bpy.types.Operator):
     bl_label = "Save As XML File"
     bl_options = {'UNDO'}
 
-    filename: StringProperty(name="Filename", default="")
+    filename: StringProperty(  # type: ignore
+        name="Filename",
+        default=""
+    )
 
     @classmethod
     def poll(cls, context):

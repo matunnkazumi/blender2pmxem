@@ -22,7 +22,7 @@ jobs:
       - name: setup python
         uses: actions/setup-python@v1
         with:
-          python-version: '3.7.4'
+          python-version: '3.7.x'
           architecture: 'x64'
       - name: install lint tools
         run: pip install flake8 mypy
@@ -33,7 +33,6 @@ jobs:
           cd ../
           flake8 --config=blender2pmxem/.pep8 blender2pmxem
       - name: mypy
-        continue-on-error: true
         run: |
           cd ../
           mypy --no-incremental --ignore-missing-imports blender2pmxem
