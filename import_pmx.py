@@ -608,7 +608,7 @@ def read_pmx_data(context, filepath="",
             temp_mattrial = bpy.data.materials.new(blender_mat_name)
             temp_mattrial.use_nodes = True
             temp_principled = PrincipledBSDFWrapper(temp_mattrial, is_readonly=False)
-            temp_principled.base_color = mat_data.Deffuse.xyz
+            temp_principled.base_color = mat_data.Deffuse.xyz.to_tuple()
             temp_principled.alpha = mat_data.Deffuse.w
 
             mat_status.append((len(mat_status), mat_data.FaceLength))
