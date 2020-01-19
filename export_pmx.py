@@ -128,6 +128,28 @@ def create_bone_index(bone_stack: List[BoneStackEntry]) -> Dict[str, int]:
     return {bone_name[1]: index for index, bone_name in enumerate(bone_stack)}
 
 
+def tip_bone_names(bone_name: str) -> Tuple[str, str]:
+    tip_name_jp = ""
+    tip_name_en = ""
+    b_name = bone_name[:-2]
+    lr = bone_name[-2:]
+    find_lr = lr in GV.TextLR
+
+    if b_name in GV.TextAnkle and find_lr:
+        tip_name_jp = GV.GetLR_JP[lr] + GV.GetAnkle_JP[b_name]
+        tip_name_en = GV.GetAnkle_EN[b_name] + lr
+
+    elif find_lr:
+        tip_name_jp = GV.GetLR_JP[lr] + b_name + GV.Tip_JP
+        tip_name_en = b_name + GV.Tip_EN + lr
+
+    else:
+        tip_name_jp = bone_name + GV.Tip_JP
+        tip_name_en = bone_name + GV.Tip_EN
+
+    return tip_name_jp, tip_name_en
+
+
 def create_PMMaterial(mat: Material, xml_mat_list, tex_dic: Dict[str, int], filepath: str) -> pmx.PMMaterial:
 
     principled = PrincipledBSDFWrapper(mat, is_readonly=True)
@@ -362,24 +384,7 @@ def write_pmx_data(context, filepath="",
             # Tail Bone
             if bone is None:
                 bone = arm_obj.data.edit_bones.get(bone_name[2], None)  # get parent
-                tip_name_jp = ""
-                tip_name_en = ""
-                b_name = bone.name[:-2]
-                lr = bone.name[-2:]
-                find_lr = lr in GV.TextLR
-
-                if b_name in GV.TextAnkle and find_lr:
-                    tip_name_jp = GV.GetLR_JP[lr] + GV.GetAnkle_JP[b_name]
-                    tip_name_en = GV.GetAnkle_EN[b_name] + lr
-
-                elif find_lr:
-                    tip_name_jp = GV.GetLR_JP[lr] + b_name + GV.Tip_JP
-                    tip_name_en = b_name + GV.Tip_EN + lr
-
-                else:
-                    tip_name_jp = bone.name + GV.Tip_JP
-                    tip_name_en = bone.name + GV.Tip_EN
-
+                tip_name_jp, tip_name_en = tip_bone_names(bone.name)
                 pmx_bone.Name = tip_name_jp
                 pmx_bone.Name_E = tip_name_en
 
