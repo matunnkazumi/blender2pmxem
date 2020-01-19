@@ -8,6 +8,10 @@ PMX形式のファイルのインポート・エクスポートを行うBlender�
 
 KAGAYAS氏の改変Blender2Pmxe([配布ミラー](https://bowlroll.net/file/145391))を、Blenderの2.80向けに改変したものです。
 
+## 使いかたなど
+
+https://blender2pmxem.netlify.com/
+
 ## ライセンス
 改変元のライセンスに従います。
 
