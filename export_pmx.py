@@ -82,7 +82,7 @@ def exist_object_using_material(material: Material, target_armature: Object, obj
 BoneStackEntry = Union[Tuple[str, str], Tuple[str, str, Optional[str]]]
 
 
-def create_bone_stack(arm_obj, xml_bone_list: Dict[str, Any]) -> List[BoneStackEntry]:
+def create_bone_stack(arm_obj, xml_bone_list: Dict[str, Any], use_japanese_name: bool) -> List[BoneStackEntry]:
     bone_stack = []  # type: List[BoneStackEntry]
 
     for bone in arm_obj.data.edit_bones:
@@ -101,7 +101,9 @@ def create_bone_stack(arm_obj, xml_bone_list: Dict[str, Any]) -> List[BoneStackE
                         break
 
                 if not has_child:
-                    bone_stack.append((arm_obj.name, bone.name + "_", bone.name))
+                    tip_name_jp, tip_name_en = tip_bone_names(bone.name)
+                    search_name = tip_name_jp if use_japanese_name else tip_name_en
+                    bone_stack.append((arm_obj.name, search_name, bone.name))
 
                 if (const.target.name, const.subtarget) in bone_stack:
                     bone_stack.remove((const.target.name, const.subtarget))
@@ -370,7 +372,7 @@ def write_pmx_data(context, filepath="",
 
         # make index
         arm_obj = bpy.context.active_object
-        bone_stack = create_bone_stack(arm_obj, xml_bone_list)
+        bone_stack = create_bone_stack(arm_obj, xml_bone_list, use_japanese_name)
         bone_index = create_bone_index(bone_stack)
 
         # output bone
@@ -493,8 +495,10 @@ def write_pmx_data(context, filepath="",
 
                         if pmx_bone.ToConnectType == 0:
                             # Make Tail
+                            tip_name_jp, tip_name_en = tip_bone_names(bone.name)
+                            search_name = tip_name_jp if use_japanese_name else tip_name_en
                             pmx_bone.ToConnectType = 1
-                            pmx_bone.ChildIndex = bone_index.get(bone.name + "_", -1)
+                            pmx_bone.ChildIndex = bone_index.get(search_name, -1)
 
                         ik.TargetIndex = pmx_bone.ChildIndex
                         ik_bone = const.target.pose.bones[const.subtarget]
