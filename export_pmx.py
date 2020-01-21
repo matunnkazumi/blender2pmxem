@@ -82,7 +82,7 @@ def exist_object_using_material(material: Material, target_armature: Object, obj
 BoneStackEntry = Union[Tuple[str, str], Tuple[str, str, Optional[str]]]
 
 
-def create_bone_stack(arm_obj, xml_bone_list: Dict[str, Any]) -> List[BoneStackEntry]:
+def create_bone_stack(arm_obj, xml_bone_list: Dict[str, Any], use_japanese_name: bool) -> List[BoneStackEntry]:
     bone_stack = []  # type: List[BoneStackEntry]
 
     for bone in arm_obj.data.edit_bones:
@@ -101,7 +101,9 @@ def create_bone_stack(arm_obj, xml_bone_list: Dict[str, Any]) -> List[BoneStackE
                         break
 
                 if not has_child:
-                    bone_stack.append((arm_obj.name, bone.name + "_", bone.name))
+                    tip_name_jp, tip_name_en = tip_bone_names(bone.name)
+                    search_name = tip_name_jp if use_japanese_name else tip_name_en
+                    bone_stack.append((arm_obj.name, search_name, bone.name))
 
                 if (const.target.name, const.subtarget) in bone_stack:
                     bone_stack.remove((const.target.name, const.subtarget))
@@ -126,6 +128,28 @@ def create_bone_stack(arm_obj, xml_bone_list: Dict[str, Any]) -> List[BoneStackE
 
 def create_bone_index(bone_stack: List[BoneStackEntry]) -> Dict[str, int]:
     return {bone_name[1]: index for index, bone_name in enumerate(bone_stack)}
+
+
+def tip_bone_names(bone_name: str) -> Tuple[str, str]:
+    tip_name_jp = ""
+    tip_name_en = ""
+    b_name = bone_name[:-2]
+    lr = bone_name[-2:]
+    find_lr = lr in GV.TextLR
+
+    if b_name in GV.TextAnkle and find_lr:
+        tip_name_jp = GV.GetLR_JP[lr] + GV.GetAnkle_JP[b_name]
+        tip_name_en = GV.GetAnkle_EN[b_name] + lr
+
+    elif find_lr:
+        tip_name_jp = GV.GetLR_JP[lr] + b_name + GV.Tip_JP
+        tip_name_en = b_name + GV.Tip_EN + lr
+
+    else:
+        tip_name_jp = bone_name + GV.Tip_JP
+        tip_name_en = bone_name + GV.Tip_EN
+
+    return tip_name_jp, tip_name_en
 
 
 def create_PMMaterial(mat: Material, xml_mat_list, tex_dic: Dict[str, int], filepath: str) -> pmx.PMMaterial:
@@ -348,7 +372,7 @@ def write_pmx_data(context, filepath="",
 
         # make index
         arm_obj = bpy.context.active_object
-        bone_stack = create_bone_stack(arm_obj, xml_bone_list)
+        bone_stack = create_bone_stack(arm_obj, xml_bone_list, use_japanese_name)
         bone_index = create_bone_index(bone_stack)
 
         # output bone
@@ -362,24 +386,7 @@ def write_pmx_data(context, filepath="",
             # Tail Bone
             if bone is None:
                 bone = arm_obj.data.edit_bones.get(bone_name[2], None)  # get parent
-                tip_name_jp = ""
-                tip_name_en = ""
-                b_name = bone.name[:-2]
-                lr = bone.name[-2:]
-                find_lr = lr in GV.TextLR
-
-                if b_name in GV.TextAnkle and find_lr:
-                    tip_name_jp = GV.GetLR_JP[lr] + GV.GetAnkle_JP[b_name]
-                    tip_name_en = GV.GetAnkle_EN[b_name] + lr
-
-                elif find_lr:
-                    tip_name_jp = GV.GetLR_JP[lr] + b_name + GV.Tip_JP
-                    tip_name_en = b_name + GV.Tip_EN + lr
-
-                else:
-                    tip_name_jp = bone.name + GV.Tip_JP
-                    tip_name_en = bone.name + GV.Tip_EN
-
+                tip_name_jp, tip_name_en = tip_bone_names(bone.name)
                 pmx_bone.Name = tip_name_jp
                 pmx_bone.Name_E = tip_name_en
 
@@ -488,8 +495,10 @@ def write_pmx_data(context, filepath="",
 
                         if pmx_bone.ToConnectType == 0:
                             # Make Tail
+                            tip_name_jp, tip_name_en = tip_bone_names(bone.name)
+                            search_name = tip_name_jp if use_japanese_name else tip_name_en
                             pmx_bone.ToConnectType = 1
-                            pmx_bone.ChildIndex = bone_index.get(bone.name + "_", -1)
+                            pmx_bone.ChildIndex = bone_index.get(search_name, -1)
 
                         ik.TargetIndex = pmx_bone.ChildIndex
                         ik_bone = const.target.pose.bones[const.subtarget]
