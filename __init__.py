@@ -21,7 +21,7 @@ import bpy
 bl_info = {
     "name": "MMD PMX Format (Extend)",
     "author": "matunnkazumi",
-    "version": (1, 0, 3),
+    "version": (1, 0, 4),
     "blender": (2, 80, 0),
     "location": "File > Import-Export",
     "description": "Import-Export PMX model data",

@@ -627,7 +627,7 @@ def read_pmx_data(context, filepath="",
             # self.EdgeSize = 1.0
 
             # Texture
-            if mat_data.TextureIndex != -1:
+            if mat_data.TextureIndex != -1 and mat_data.TextureIndex in textures_dic:
                 temp_tex = textures_dic[mat_data.TextureIndex]
                 temp_principled.base_color_texture.image = temp_tex.image
                 temp_principled.base_color_texture.use_alpha = True
