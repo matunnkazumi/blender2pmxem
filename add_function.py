@@ -1189,7 +1189,7 @@ class B2PMXEM_OT_AppendTemplate(bpy.types.Operator):
             if prefs.use_japanese_name:
                 filepath = os.path.join(os.path.dirname(__file__), "template_dict.csv")
 
-                with open(filepath) as csvfile:
+                with open(filepath, encoding="utf-8") as csvfile:
                     reader = csv.reader(csvfile)
                     toJP = {en: jp for en, jp in reader}
 
