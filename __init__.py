@@ -322,7 +322,7 @@ class B2PMXEM_OT_ExportBlender2Pmx(bpy.types.Operator, ExportHelper):
             index = 0
             while index < len(mats):
                 if mats[index] is None:
-                    mats.pop(index)
+                    mats.pop(index=index)
                     index -= 1
                 index += 1
 
