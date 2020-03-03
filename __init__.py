@@ -21,7 +21,7 @@ import bpy
 bl_info = {
     "name": "MMD PMX Format (Extend)",
     "author": "matunnkazumi",
-    "version": (1, 0, 4),
+    "version": (1, 0, 5),
     "blender": (2, 80, 0),
     "location": "File > Import-Export",
     "description": "Import-Export PMX model data",
@@ -365,7 +365,7 @@ class B2PMXEM_OT_ExportBlender2Pmx(bpy.types.Operator, ExportHelper):
             index = 0
             while index < len(mats):
                 if mats[index] is None:
-                    mats.pop(index)
+                    mats.pop(index=index)
                     index -= 1
                 index += 1
 
