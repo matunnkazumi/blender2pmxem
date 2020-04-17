@@ -10,7 +10,7 @@ KAGAYAS氏の改変Blender2Pmxe([配布ミラー](https://bowlroll.net/file/1453
 
 ## 使いかたなど
 
-https://blender2pmxem.netlify.com/
+https://blender2pmxem.netlify.app/
 
 ## ライセンス
 改変元のライセンスに従います。
