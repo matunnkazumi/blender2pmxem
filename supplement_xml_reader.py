@@ -26,6 +26,7 @@ class Header:
 class SupplementXmlReader:
 
     file_name: str
+    has_xml_file: bool
     def_root: Optional[ElementTree]
     xml_root: Optional[ElementTree]
 
@@ -33,7 +34,7 @@ class SupplementXmlReader:
         import xml.etree.ElementTree as ETree
 
         xml_path = os.path.splitext(pmx_file_path)[0] + ".xml"
-        has_xml_file = os.path.isfile(xml_path)
+        self.has_xml_file = os.path.isfile(xml_path)
 
         default_xml = "default_jp.xml" if use_japanese_name else "default_en.xml"
         def_path = os.path.join(os.path.dirname(__file__), default_xml)
@@ -41,7 +42,7 @@ class SupplementXmlReader:
 
         self.file_name = file_name
         self.def_root = ETree.parse(def_path) if has_def_file else None
-        self.xml_root = ETree.parse(xml_path) if has_xml_file else None
+        self.xml_root = ETree.parse(xml_path) if self.has_xml_file else None
 
         if self.xml_root is None:
             self.xml_root = self.def_root

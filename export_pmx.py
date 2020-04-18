@@ -11,6 +11,7 @@ from . import pmx
 from . import object_applymodifier
 from . import global_variable
 from . import validator
+from . import supplement_xml_reader
 from typing import Dict
 from typing import List
 from typing import Tuple
@@ -293,34 +294,17 @@ def write_pmx_data(context, filepath="",
 
     with open(filepath, "wb") as f:
 
-        import xml.etree.ElementTree as ETree
         pmx_data = None
         pmx_data = pmx.Model()
 
         #
-        # Filepath
-        #
-        file_name = bpy.path.basename(filepath)
-
-        xml_path = os.path.splitext(filepath)[0] + ".xml"
-        has_xml_file = os.path.isfile(xml_path)
-
-        default_xml = "default_jp.xml" if use_japanese_name else "default_en.xml"
-        def_path = os.path.join(os.path.dirname(__file__), default_xml)
-        has_def_file = os.path.isfile(def_path)
-
-        #
         # XML
         #
-        def_root = ETree.parse(def_path) if has_def_file else None
-        xml_root = ETree.parse(xml_path) if has_xml_file else None
+        file_name = bpy.path.basename(filepath)
+        xml_reader = supplement_xml_reader.SupplementXmlReader(file_name, filepath, use_japanese_name)
 
-        if xml_root is None:
-            xml_root = def_root
-            has_xml_file = has_def_file
-
-        if has_xml_file and xml_root is not None:
-            validate_result = validator.validate_xml(xml_root)
+        if xml_reader.xml_root is not None:
+            validate_result = validator.validate_xml(xml_reader.xml_root)
             if validate_result:
                 l1 = validate_result[0]
                 l2 = validate_result[1] if len(validate_result) > 1 else ""
@@ -336,19 +320,15 @@ def write_pmx_data(context, filepath="",
         #
         # Header
         #
-        if has_xml_file and xml_root is not None:
-            infonode = xml_root.find("pmdinfo")
-
+        header = xml_reader.header()
+        if header is not None:
             # Name
-            pmx_data.Name = infonode.findtext("name", file_name)
-            pmx_data.Name_E = infonode.findtext("name_e", pmx_data.Name)
+            pmx_data.Name = header.name
+            pmx_data.Name_E = header.name_e
 
             # Comment
-            pmx_data.Comment = infonode.findtext("comment", "Comment")
-            pmx_data.Comment_E = infonode.findtext("comment_e", "Comment")
-
-            pmx_data.Comment = pmx_data.Comment.replace("\n", "\r\n")
-            pmx_data.Comment_E = pmx_data.Comment_E.replace("\n", "\r\n")
+            pmx_data.Comment = header.comment
+            pmx_data.Comment_E = header.comment_e
 
         # Fixed Stats
         # print("Export to " + encode_type)
@@ -362,13 +342,7 @@ def write_pmx_data(context, filepath="",
         bpy.ops.object.mode_set(mode="EDIT", toggle=False)
 
         # read xml
-        xml_bone_list = {}
-        if has_xml_file and xml_root is not None:
-            bone_root = xml_root.find("bones")
-            bone_list = bone_root.findall("bone")
-
-            for bone in bone_list:
-                xml_bone_list[bone.get("b_name")] = bone
+        xml_bone_list = xml_reader.bone_dict()
 
         # make index
         arm_obj = bpy.context.active_object
@@ -613,16 +587,7 @@ def write_pmx_data(context, filepath="",
         bpy.ops.object.mode_set(mode="OBJECT", toggle=False)
 
         # Material Read
-        xml_mat_index = {}
-        xml_mat_list = {}
-
-        if has_xml_file and xml_root is not None:
-            mat_root = xml_root.find("materials")
-            mat_list = mat_root.findall("material")
-
-            for xml_index, mat in enumerate(mat_list):
-                xml_mat_index[xml_index] = mat.get("b_name")
-                xml_mat_list[mat.get("b_name")] = mat
+        xml_mat_index, xml_mat_list = xml_reader.material()
 
         faceTemp = {}
         tex_dic = {}
@@ -674,26 +639,10 @@ def write_pmx_data(context, filepath="",
             pmx_data.Textures[tex_index].Path = tex
 
         # Face
-        xml_morph_index = {}
-        xml_morph_list = {}
         morph_list = {}
 
         # read default_xml data
-        if has_def_file and def_root is not None:
-            morph_root = def_root.find("morphs")
-            morph_l = morph_root.findall("morph")
-
-            for morph in morph_l:
-                xml_morph_list[morph.get("b_name")] = morph
-
-        if has_xml_file and xml_root is not None:
-            morph_root = xml_root.find("morphs")
-            morph_l = morph_root.findall("morph")
-
-            for xml_index, morph in enumerate(morph_l):
-                # print(morph.get("b_name"))
-                xml_morph_index[xml_index] = morph.get("b_name")
-                xml_morph_list[morph.get("b_name")] = morph
+        xml_morph_index, xml_morph_list = xml_reader.material()
 
         # Vertex
         # print("Get Vertex")
@@ -998,9 +947,8 @@ def write_pmx_data(context, filepath="",
 
         # Label
         # print("Get Label")
-        if has_xml_file and xml_root is not None:
-            label_root = xml_root.find("labels")
-            label_list = label_root.findall("label")
+        if xml_reader.has_xml_file:
+            label_list = xml_reader.label()
 
             for label in label_list:
                 pmx_label = pmx.PMDisplayFrame()
@@ -1060,9 +1008,8 @@ def write_pmx_data(context, filepath="",
         # Rigid
         # print("Get Rigid")
         rigid_index = {}  # type: Dict[str, int]
-        if has_xml_file and xml_root is not None:
-            rigid_root = xml_root.find("rigid_bodies")
-            rigid_list = rigid_root.findall("rigid")
+        if xml_reader.has_xml_file:
+            rigid_list = xml_reader.rigid()
 
             for index, rigid in enumerate(rigid_list):
                 rigid_index[rigid.get("name")] = index
@@ -1102,9 +1049,8 @@ def write_pmx_data(context, filepath="",
 
         # Joint
         # print("Get Joint")
-        if has_xml_file and xml_root is not None:
-            joint_root = xml_root.find("constraints")
-            joint_list = joint_root.findall("constraint")
+        if xml_reader.has_xml_file:
+            joint_list = xml_reader.joint()
 
             for joint in joint_list:
                 pmx_joint = create_PMJoint(joint, rigid_index)
