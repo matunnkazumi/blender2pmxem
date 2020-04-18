@@ -216,9 +216,6 @@ class TestSupplementXmlReader(unittest.TestCase):
         self.assertEqual(list[2].get('body_A'), 'legQ_L')
         self.assertEqual(list[3].get('body_A'), 'legQ_R')
 
-    def test_intentional_failure(self):
-        self.assertTrue(False)
-
 
 if __name__ == '__main__':
     unittest.main()
