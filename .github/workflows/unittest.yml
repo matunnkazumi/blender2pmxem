@@ -13,7 +13,7 @@ on:
 jobs:
   unittest:
     name: Run Unittest
-        runs-on: ubuntu-latest
+    runs-on: ubuntu-latest
     steps:
       - name: checkout
         uses: actions/checkout@master
