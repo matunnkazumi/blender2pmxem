@@ -5,7 +5,6 @@
 # http://creativecommons.org/publicdomain/zero/1.0/deed.ja
 #
 
-import bpy
 import os
 
 from xml.etree.ElementTree import ElementTree
@@ -30,10 +29,8 @@ class SupplementXmlReader:
     def_root: Optional[ElementTree]
     xml_root: Optional[ElementTree]
 
-    def __init__(self, pmx_file_path: str, use_japanese_name: bool) -> None:
+    def __init__(self, file_name: str, pmx_file_path: str, use_japanese_name: bool) -> None:
         import xml.etree.ElementTree as ETree
-
-        file_name = bpy.path.basename(pmx_file_path)
 
         xml_path = os.path.splitext(pmx_file_path)[0] + ".xml"
         has_xml_file = os.path.isfile(xml_path)
