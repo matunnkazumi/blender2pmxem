@@ -57,10 +57,10 @@ class EdgeColor:
 
 
 class Diffuse:
-    a: float = 0.0
-    r: float = 0.0
-    g: float = 0.0
-    b: float = 0.0
+    a: Optional[float]
+    r: Optional[float]
+    g: Optional[float]
+    b: Optional[float]
 
 
 class Specular:
