@@ -1,6 +1,8 @@
 import unittest
 import xml.etree.ElementTree as etree
 
+from typing import Optional
+
 from supplement_xml import elm_to_obj
 from supplement_xml import obj_to_elm
 
@@ -17,6 +19,12 @@ class Test2:
     bbb: int = 1
     ccc: float = 0.1
     ddd: Test1
+
+
+class Test3:
+    aaa: Optional[str]
+    bbb: Optional[int]
+    ccc: Optional[float]
 
 
 class TestSupplementXmlReader(unittest.TestCase):
@@ -42,6 +50,22 @@ class TestSupplementXmlReader(unittest.TestCase):
         obj = elm_to_obj(elm, Test1)
 
         self.assertEqual(obj.dddd, 0)
+
+    def test_read_optional_exist(self):
+        elm = etree.Element('test', attrib={'aaa': 'test', 'bbb': '10', 'ccc': '1.1'})
+        obj = elm_to_obj(elm, Test3)
+
+        self.assertEqual(obj.aaa, 'test')
+        self.assertEqual(obj.bbb, 10)
+        self.assertEqual(obj.ccc, 1.1)
+
+    def test_read_optional_not_exist(self):
+        elm = etree.Element('test')
+        obj = elm_to_obj(elm, Test3)
+
+        self.assertIsNone(obj.aaa)
+        self.assertIsNone(obj.bbb)
+        self.assertIsNone(obj.ccc)
 
     def test_write(self):
         elm = etree.Element('test')

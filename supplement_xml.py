@@ -8,6 +8,7 @@
 from xml.etree.ElementTree import Element
 
 from typing import Optional
+from typing import Union
 from typing import TypeVar
 from typing import Type
 
@@ -19,6 +20,7 @@ def elm_to_obj(element: Element, klass: Type[T]) -> T:
 
     for k, v in obj.__annotations__.items():
         val = element.get(k)
+
         if val is not None:
             if v is int:
                 setattr(obj, k, int(val))
@@ -26,6 +28,15 @@ def elm_to_obj(element: Element, klass: Type[T]) -> T:
                 setattr(obj, k, val)
             elif v is float:
                 setattr(obj, k, float(val))
+            elif v == Union[str, None]:
+                setattr(obj, k, val)
+            elif v == Union[int, None]:
+                setattr(obj, k, int(val))
+            elif v == Union[float, None]:
+                setattr(obj, k, float(val))
+        else:
+            if v == Union[str, None] or v == Union[int, None] or v == Union[float, None]:
+                setattr(obj, k, None)
 
     return obj
 
