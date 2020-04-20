@@ -22,6 +22,8 @@ from .supplement_xml.supplement_xml import Specular as XMLSpecular
 from .supplement_xml.supplement_xml import Ambient as XMLAmbient
 from .supplement_xml.supplement_xml import Sphere as XMLSphere
 
+from typing import List
+
 # global_variable
 GV = global_variable.Init()
 
@@ -458,7 +460,8 @@ def read_pmx_data(context, filepath="",
                         if hasattr(const, "subtarget"):
                             eb.use_connect = False
 
-                            for child in eb.children:
+                            for child in eb.children:
+
                                 child.use_connect = False
 
                             eb_sub = arm_dat.edit_bones[const.subtarget]
@@ -879,13 +882,12 @@ def make_xml(pmx_data: pmx.Model, filepath, use_japanese_name, xml_save_versions
     #
     # Materials
     #
-    material_root = etree.SubElement(root, "materials")
-    material_root.tail = "\r\n"
 
+    material_list: List[XMLMaterial] = []
     for (mat_index, pmx_mat) in enumerate(pmx_data.Materials):
         blender_mat_name = Get_JP_or_EN_Name(pmx_mat.Name, pmx_mat.Name_E, use_japanese_name)
 
-        material = XMLMaterial()
+        material: XMLMaterial = XMLMaterial()
         material.name = pmx_mat.Name
         material.name_e = pmx_mat.Name_E
         material.b_name = blender_mat_name
@@ -907,45 +909,45 @@ def make_xml(pmx_data: pmx.Model, filepath, use_japanese_name, xml_save_versions
         material.on_edge = pmx_mat.OnEdge
         material.edge_size = pmx_mat.EdgeSize
         material.power = pmx_mat.Power
+
         edge_color = XMLEdgeColor()
         edge_color.r = pmx_mat.EdgeColor.x
         edge_color.g = pmx_mat.EdgeColor.y
         edge_color.b = pmx_mat.EdgeColor.z
         edge_color.a = pmx_mat.EdgeColor.w
+        material.edge_color = edge_color
+
         deffuse = XMLDiffuse()
         deffuse.r = pmx_mat.Deffuse.x
         deffuse.g = pmx_mat.Deffuse.y
         deffuse.b = pmx_mat.Deffuse.z
         deffuse.a = pmx_mat.Deffuse.w
+        material.diffuse = deffuse
+
         specular = XMLSpecular()
         specular.r = pmx_mat.Specular.x
         specular.g = pmx_mat.Specular.y
         specular.b = pmx_mat.Specular.z
+        material.specular = specular
+
         ambient = XMLAmbient()
         ambient.r = pmx_mat.Ambient.x
         ambient.g = pmx_mat.Ambient.y
         ambient.b = pmx_mat.Ambient.z
+        material.ambient = ambient
 
         sphere = None
         if pmx_mat.SphereIndex != -1 and len(pmx_data.Textures) > pmx_mat.SphereIndex:
             sphere = XMLSphere()
             sphere.type = pmx_mat.SphereType
             sphere.path = pmx_data.Textures[pmx_mat.SphereIndex].Path
+        material.sphere = sphere
 
-        material_node = etree.SubElement(material_root, "material")
-        material_node.tail = "\r\n"
-        obj_to_elm(material, material_node)
-        material_edge_color = etree.SubElement(material_node, "edge_color")
-        obj_to_elm(edge_color, material_edge_color)
-        material_deffuse = etree.SubElement(material_node, "deffuse")
-        obj_to_elm(deffuse, material_deffuse)
-        material_specular = etree.SubElement(material_node, "specular")
-        obj_to_elm(specular, material_specular)
-        material_ambient = etree.SubElement(material_node, "ambient")
-        obj_to_elm(ambient, material_ambient)
-        if sphere is not None:
-            material_sphere = etree.SubElement(material_node, "sphere")
-            obj_to_elm(sphere, material_sphere)
+        material_list.append(material)
+
+    material_root = make_xml_materials(material_list)
+    material_root.tail = "\r\n"
+    root.append(material_root)
 
     #
     # Rigid
@@ -1047,6 +1049,39 @@ def make_xml_pmdinfo(pmx_data: pmx.Model) -> etree.Element:
     builder.data("\r\n")
     builder.end("pmdinfo")
     return builder.close()
+
+
+def make_xml_materials(mat_list: List[XMLMaterial]) -> etree.Element:
+    builder = etree.TreeBuilder()
+    builder.start("materials", {})
+    builder.data("\r\n")
+
+    for material in mat_list:
+        material_node = builder.start("material", {})
+        obj_to_elm(material, material_node)
+        builder.data("\r\n")
+
+        make_xml_self_closing_with_obj(builder, "edge_color", material.edge_color, 1)
+        make_xml_self_closing_with_obj(builder, "deffuse", material.diffuse, 1)
+        make_xml_self_closing_with_obj(builder, "specular", material.specular, 1)
+        make_xml_self_closing_with_obj(builder, "ambient", material.ambient, 1)
+        if material.sphere is not None:
+            make_xml_self_closing_with_obj(builder, "sphere", material.sphere, 1)
+
+        builder.end("material")
+        builder.data("\r\n")
+
+    builder.end("materials")
+    return builder.close()
+
+
+def make_xml_self_closing_with_obj(builder: etree.TreeBuilder, tagName: str, obj, indent_level: int = 0):
+    if indent_level > 0:
+        builder.data("  " * indent_level)
+    node = builder.start(tagName, {})
+    obj_to_elm(obj, node)
+    builder.end(tagName)
+    builder.data("\r\n")
 
 
 def set_Vector(_node, _data, _name):
