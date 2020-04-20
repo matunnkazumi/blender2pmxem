@@ -13,6 +13,7 @@ from . import add_function, global_variable
 from bpy_extras.node_shader_utils import PrincipledBSDFWrapper
 
 from .supplement_xml.supplement_xml import obj_to_elm
+from .supplement_xml.supplement_xml import Morph as XMLMorph
 from .supplement_xml.supplement_xml import Material as XMLMaterial
 from .supplement_xml.supplement_xml import EdgeColor as XMLEdgeColor
 from .supplement_xml.supplement_xml import Diffuse as XMLDiffuse
@@ -792,13 +793,14 @@ def make_xml(pmx_data, filepath, use_japanese_name, xml_save_versions):
     for (morph_index, pmx_morph) in enumerate(pmx_data.Morphs):
         blender_morph_name = Get_JP_or_EN_Name(pmx_morph.Name.rstrip(), pmx_morph.Name_E.rstrip(), use_japanese_name)
 
+        morph = XMLMorph()
+        morph.group = pmx_morph.Panel
+        morph.name = pmx_morph.Name.rstrip()
+        morph.name_e = pmx_morph.Name_E.rstrip()
+        morph.b_name = blender_morph_name
         morph_node = etree.SubElement(morph_root, "morph")
         morph_node.tail = "\r\n"
-        # morph_node.set('index' , str(morph_index))
-        morph_node.set('group', str(pmx_morph.Panel))
-        morph_node.set('name', pmx_morph.Name.rstrip())
-        morph_node.set('name_e', pmx_morph.Name_E.rstrip())
-        morph_node.set('b_name', blender_morph_name)
+        obj_to_elm(morph, morph_node)
 
     #
     # Bones
