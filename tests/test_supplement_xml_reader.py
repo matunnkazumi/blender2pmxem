@@ -142,11 +142,11 @@ class TestSupplementXmlReader(unittest.TestCase):
             test_content = """
             <ns0:pmxstatus xmlns:ns0="local" xml:lang="jp">
             <morphs>
-            <morph b_name="あ" group="3" name="あ" name_e="A" />
-            <morph b_name="い" group="3" name="い" name_e="I" />
+            <morph b_name="あ" group="1" name="あ" name_e="A" />
+            <morph b_name="い" group="2" name="い" name_e="I" />
             <morph b_name="う" group="3" name="う" name_e="U" />
-            <morph b_name="え" group="3" name="え" name_e="E" />
-            <morph b_name="お" group="3" name="お" name_e="O" />
+            <morph b_name="え" group="4" name="え" name_e="E" />
+            <morph b_name="お" name="お" name_e="O" />
             <morph b_name="にやり" group="3" name="にやり" name_e="Smirk" />
             <morph b_name="困る" group="1" name="困る" name_e="Troubled" />
             </morphs>
@@ -164,13 +164,19 @@ class TestSupplementXmlReader(unittest.TestCase):
         self.assertEqual(index_dict[4], 'お')
         self.assertEqual(index_dict[5], 'にやり')
         self.assertEqual(index_dict[6], '困る')
-        self.assertEqual(element_dict['あ'].get('b_name'), 'あ')
-        self.assertEqual(element_dict['い'].get('b_name'), 'い')
-        self.assertEqual(element_dict['う'].get('b_name'), 'う')
-        self.assertEqual(element_dict['え'].get('b_name'), 'え')
-        self.assertEqual(element_dict['お'].get('b_name'), 'お')
+        self.assertEqual(element_dict['あ'].b_name, 'あ')
+        self.assertEqual(element_dict['い'].b_name, 'い')
+        self.assertEqual(element_dict['う'].b_name, 'う')
+        self.assertEqual(element_dict['え'].b_name, 'え')
+        self.assertEqual(element_dict['お'].b_name, 'お')
+        self.assertEqual(element_dict['あ'].group, 1)
+        self.assertEqual(element_dict['い'].group, 2)
+        self.assertEqual(element_dict['う'].group, 3)
+        self.assertEqual(element_dict['え'].group, 4)
+        self.assertEqual(element_dict['お'].group, 4)
+        self.assertEqual(element_dict['困る'].group, 1)
         # デフォルトXML
-        self.assertEqual(element_dict['もぐもぐ'].get('b_name'), 'もぐもぐ')
+        self.assertEqual(element_dict['もぐもぐ'].b_name, 'もぐもぐ')
 
     def test_label(self):
         file_name = 'test.pmx'

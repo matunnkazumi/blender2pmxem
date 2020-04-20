@@ -116,7 +116,7 @@ class SupplementXmlReader:
         else:
             return supplement_xml.elm_to_obj(child, klass)
 
-    def morph(self) -> Tuple[Dict[int, str], Dict[str, Element]]:
+    def morph(self) -> Tuple[Dict[int, str], Dict[str, supplement_xml.Morph]]:
 
         xml_morph_index = {}
         xml_morph_list = {}
@@ -125,8 +125,9 @@ class SupplementXmlReader:
             morph_root = self.def_root.find("morphs")
             morph_l = morph_root.findall("morph") if morph_root else []
 
-            for morph in morph_l:
-                b_name = morph.get("b_name")
+            for morph_elm in morph_l:
+                morph = supplement_xml.elm_to_obj(morph_elm, supplement_xml.Morph)
+                b_name = morph.b_name
                 if b_name is not None:
                     xml_morph_list[b_name] = morph
 
@@ -134,8 +135,9 @@ class SupplementXmlReader:
             morph_root = self.xml_root.find("morphs")
             morph_l = morph_root.findall("morph") if morph_root else []
 
-            for xml_index, morph in enumerate(morph_l):
-                b_name = morph.get("b_name")
+            for xml_index, morph_elm in enumerate(morph_l):
+                morph = supplement_xml.elm_to_obj(morph_elm, supplement_xml.Morph)
+                b_name = morph.b_name
                 if b_name is not None:
                     xml_morph_index[xml_index] = b_name
                     xml_morph_list[b_name] = morph

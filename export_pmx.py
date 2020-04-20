@@ -646,7 +646,7 @@ def write_pmx_data(context, filepath="",
         morph_list = {}
 
         # read default_xml data
-        xml_morph_index, xml_morph_list = xml_reader.material()
+        xml_morph_index, xml_morph_list = xml_reader.morph()
 
         # Vertex
         # print("Get Vertex")
@@ -869,9 +869,9 @@ def write_pmx_data(context, filepath="",
                             pmd_morph.Panel = 4  # Other
 
                         else:
-                            pmd_morph.Name = xml_morph.get("name", block.name)
-                            pmd_morph.Name_E = xml_morph.get("name_e", block.name)
-                            pmd_morph.Panel = int(xml_morph.get("group", "4"))
+                            pmd_morph.Name = xml_morph.name if xml_morph.name is not None else block.name
+                            pmd_morph.Name_E = xml_morph.name_e if xml_morph.name_e is not None else block.name
+                            pmd_morph.Panel = xml_morph.group
 
                     # calculate relative morph position
                     morph_index = 0

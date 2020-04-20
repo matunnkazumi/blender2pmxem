@@ -51,6 +51,13 @@ def obj_to_elm(obj: Type[T], element: Element):
             element.set(k, str(val))
 
 
+class Morph:
+    group: int = 4
+    name: Optional[str]
+    name_e: Optional[str]
+    b_name: str
+
+
 class EdgeColor:
     a: float = 1.0
     r: float = 0.0
