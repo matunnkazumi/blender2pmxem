@@ -50,7 +50,7 @@ def obj_to_elm(obj: Type[T], element: Element):
 
 
 class EdgeColor:
-    a: float = 0.0
+    a: float = 1.0
     r: float = 0.0
     g: float = 0.0
     b: float = 0.0
@@ -86,12 +86,12 @@ class Material:
     drop_shadow: int = 0
     edge_size: float = 1.0
     ground_shadow: int = 0
-    name: str
-    name_e: str
+    name: Optional[str]
+    name_e: Optional[str]
     on_edge: int = 0
     on_shadow: int = 0
-    toon: int = 0
-    use_systemtoon: int = 0
+    toon: Optional[str]
+    use_systemtoon: int = 1
     power: float = 1.0
 
     edge_color: Optional[EdgeColor]

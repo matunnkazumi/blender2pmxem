@@ -83,24 +83,7 @@ class SupplementXmlReader:
 
         return list
 
-    def material(self) -> Tuple[Dict[int, str], Dict[str, Element]]:
-
-        xml_mat_index = {}
-        xml_mat_list = {}
-
-        if self.xml_root is not None:
-            mat_root = self.xml_root.find("materials")
-            mat_list = mat_root.findall("material") if mat_root else []
-
-            for xml_index, mat in enumerate(mat_list):
-                b_name = mat.get("b_name")
-                if b_name is not None:
-                    xml_mat_index[xml_index] = b_name
-                    xml_mat_list[b_name] = mat
-
-        return (xml_mat_index, xml_mat_list)
-
-    def material2(self) -> Tuple[Dict[int, str], Dict[str, supplement_xml.Material]]:
+    def material(self) -> Tuple[Dict[int, str], Dict[str, supplement_xml.Material]]:
 
         xml_mat_index = {}
         xml_mat_list = {}

@@ -12,6 +12,7 @@ from . import object_applymodifier
 from . import global_variable
 from . import validator
 from .supplement_xml import supplement_xml_reader
+from .supplement_xml.supplement_xml import Material as XMLMaterial
 from typing import Dict
 from typing import List
 from typing import Tuple
@@ -153,7 +154,10 @@ def tip_bone_names(bone_name: str) -> Tuple[str, str]:
     return tip_name_jp, tip_name_en
 
 
-def create_PMMaterial(mat: Material, xml_mat_list, tex_dic: Dict[str, int], filepath: str) -> pmx.PMMaterial:
+def create_PMMaterial(mat: Material,
+                      xml_mat_list: Dict[str, XMLMaterial],
+                      tex_dic: Dict[str, int],
+                      filepath: str) -> pmx.PMMaterial:
 
     principled = PrincipledBSDFWrapper(mat, is_readonly=True)
     pmx_mat = pmx.PMMaterial()
@@ -170,15 +174,15 @@ def create_PMMaterial(mat: Material, xml_mat_list, tex_dic: Dict[str, int], file
     # Load XML Status
     if pmx_mat.Name in xml_mat_list.keys():
         temp_mat = xml_mat_list[pmx_mat.Name]
-        pmx_mat.Name = temp_mat.get("name", mat.name)
-        pmx_mat.Name_E = temp_mat.get("name_e", pmx_mat.Name)
-        pmx_mat.UseSystemToon = int(temp_mat.get("use_systemtoon", "1"))
+        pmx_mat.Name = temp_mat.name if temp_mat.name is not None else mat.name
+        pmx_mat.Name_E = temp_mat.name_e if temp_mat.name_e is not None else pmx_mat.Name
+        pmx_mat.UseSystemToon = temp_mat.use_systemtoon
 
         if pmx_mat.UseSystemToon == 1:
-            pmx_mat.ToonIndex = int(temp_mat.get("toon", "0"))
+            pmx_mat.ToonIndex = int(temp_mat.toon) if temp_mat.toon is not None else 0
 
         else:
-            tex_path = temp_mat.get("toon", "toon01.bmp")
+            tex_path = temp_mat.toon if temp_mat.toon is not None else "toon01.bmp"
 
             if tex_path == "" or tex_path == "-1":
                 pmx_mat.ToonIndex = -1
@@ -186,47 +190,47 @@ def create_PMMaterial(mat: Material, xml_mat_list, tex_dic: Dict[str, int], file
             else:
                 pmx_mat.ToonIndex = tex_dic.setdefault(tex_path, len(tex_dic))
 
-        pmx_mat.Both = int(temp_mat.get("both", "0"))
-        pmx_mat.GroundShadow = int(temp_mat.get("ground_shadow", "0"))
-        pmx_mat.DropShadow = int(temp_mat.get("drop_shadow", "0"))
-        pmx_mat.OnShadow = int(temp_mat.get("on_shadow", "0"))
+        pmx_mat.Both = temp_mat.both
+        pmx_mat.GroundShadow = temp_mat.ground_shadow
+        pmx_mat.DropShadow = temp_mat.drop_shadow
+        pmx_mat.OnShadow = temp_mat.on_shadow
 
-        pmx_mat.OnEdge = int(temp_mat.get("on_edge", "0"))
-        pmx_mat.EdgeSize = float(temp_mat.get("edge_size", "1.0"))
+        pmx_mat.OnEdge = temp_mat.on_edge
+        pmx_mat.EdgeSize = temp_mat.edge_size
 
-        edge_c = temp_mat.find("edge_color")
-        pmx_mat.EdgeColor = Math.Vector((float(edge_c.get("r", "0.0")),
-                                         float(edge_c.get("g", "0.0")),
-                                         float(edge_c.get("b", "0.0")),
-                                         float(edge_c.get("a", "1.0"))))
+        edge_c = temp_mat.edge_color
+        if edge_c is not None:
+            pmx_mat.EdgeColor = Math.Vector((edge_c.r, edge_c.g, edge_c.b, edge_c.a))
+        else:
+            pmx_mat.EdgeColor = Math.Vector((0.0, 0.0, 0.0, 1.0))
 
-        deffuse_elm = temp_mat.find("deffuse")
+        deffuse_elm = temp_mat.diffuse
         if deffuse_elm is not None:
-            c = (float(deffuse_elm.get("r", r)),
-                 float(deffuse_elm.get("g", g)),
-                 float(deffuse_elm.get("b", b)),
-                 float(deffuse_elm.get("a", a)))
+            c = (deffuse_elm.r if deffuse_elm.r is not None else r,
+                 deffuse_elm.g if deffuse_elm.g is not None else g,
+                 deffuse_elm.b if deffuse_elm.b is not None else b,
+                 deffuse_elm.a if deffuse_elm.a is not None else a)
             xml_deffuse = Math.Vector(c)
 
-        specular_elm = temp_mat.find("specular")
+        specular_elm = temp_mat.specular
         if specular_elm is not None:
-            xml_specular = Math.Vector((float(specular_elm.get("r", "0.0")),
-                                        float(specular_elm.get("g", "0.0")),
-                                        float(specular_elm.get("b", "0.0"))))
+            xml_specular = Math.Vector((specular_elm.r,
+                                        specular_elm.g,
+                                        specular_elm.b))
 
-        ambient_elm = temp_mat.find("ambient")
+        ambient_elm = temp_mat.ambient
         if ambient_elm is not None:
-            xml_ambient = Math.Vector((float(ambient_elm.get("r", "0.0")),
-                                       float(ambient_elm.get("g", "0.0")),
-                                       float(ambient_elm.get("b", "0.0"))))
+            xml_ambient = Math.Vector((ambient_elm.r,
+                                       ambient_elm.g,
+                                       ambient_elm.b))
 
-        pmx_mat.Power = float(temp_mat.get("power", "1"))
+        pmx_mat.Power = temp_mat.power
 
-        sphere_elm = temp_mat.find("sphere")
+        sphere_elm = temp_mat.sphere
         if sphere_elm is not None:
-            path = sphere_elm.get("path")
+            path = sphere_elm.path
             pmx_mat.SphereIndex = tex_dic.setdefault(path, len(tex_dic))
-            pmx_mat.SphereType = int(sphere_elm.get("type", "0"))
+            pmx_mat.SphereType = sphere_elm.type
 
     pmx_mat.Deffuse = xml_deffuse if xml_deffuse is not None else Math.Vector((r, g, b, a))
 

@@ -76,33 +76,6 @@ class TestSupplementXmlReader(unittest.TestCase):
             test_content = """
             <ns0:pmxstatus xmlns:ns0="local" xml:lang="jp">
             <materials>
-            <material b_name="mat1" both="0" drop_shadow="1" edge_size="1.0" ground_shadow="1" name="マテリアル1" name_e="mat 1" on_edge="1" on_shadow="1" toon="0" use_systemtoon="1"><edge_color a="1.0" b="0.0" g="0.0" r="0.0" /></material>
-            <material b_name="mat2" both="0" drop_shadow="1" edge_size="1.0" ground_shadow="1" name="マテリアル2" name_e="mat 2" on_edge="1" on_shadow="1" toon="0" use_systemtoon="1"><edge_color a="1.0" b="0.0" g="0.0" r="0.0" /></material>
-            <material b_name="mat3" both="0" drop_shadow="1" edge_size="1.0" ground_shadow="1" name="マテリアル3" name_e="mat 3" on_edge="1" on_shadow="1" toon="0" use_systemtoon="1"><edge_color a="1.0" b="0.0" g="0.0" r="0.0" /></material>
-            </materials>
-            </ns0:pmxstatus>
-            """
-            fp.write(test_content)
-
-        reader = SupplementXmlReader(file_name, file_path, True)
-        index_dict, element_dict = reader.material()
-
-        self.assertEqual(index_dict[0], 'mat1')
-        self.assertEqual(index_dict[1], 'mat2')
-        self.assertEqual(index_dict[2], 'mat3')
-        self.assertEqual(element_dict['mat1'].get('b_name'), 'mat1')
-        self.assertEqual(element_dict['mat2'].get('b_name'), 'mat2')
-        self.assertEqual(element_dict['mat3'].get('b_name'), 'mat3')
-
-    def test_material2(self):
-        file_name = 'test.pmx'
-        file_path = os.path.join(self.test_dir, file_name)
-        xml_file_path = os.path.join(self.test_dir, 'test.xml')
-
-        with open(xml_file_path, 'w') as fp:
-            test_content = """
-            <ns0:pmxstatus xmlns:ns0="local" xml:lang="jp">
-            <materials>
             <material b_name="mat1" both="0" drop_shadow="1" edge_size="1.0" ground_shadow="1" name="マテリアル1" name_e="mat 1" on_edge="1" on_shadow="1" toon="0" use_systemtoon="1"><edge_color a="1.0" b="0.0" g="0.0" r="0.0" /><deffuse a="1.0" b="0.7098038792610168" g="0.9411764740943909" r="1.0" /><specular b="0.07000000029802322" g="0.07000000029802322" r="0.07000000029802322" /><ambient b="0.23999999463558197" g="0.3199999928474426" r="0.44999998807907104" /></material>
             <material b_name="mat2" both="0" drop_shadow="1" edge_size="1.0" ground_shadow="1" name="マテリアル2" name_e="mat 2" on_edge="1" on_shadow="1" toon="0" use_systemtoon="1"><edge_color a="1.0" b="0.0" g="0.0" r="0.0" /><deffuse a="1.0" b="0.7098038792610168" g="0.9411764740943909" r="1.0" /><specular b="0.07000000029802322" g="0.07000000029802322" r="0.07000000029802322" /><ambient b="0.23999999463558197" g="0.3199999928474426" r="0.44999998807907104" /></material>
             <material b_name="mat3" both="0" drop_shadow="1" edge_size="1.0" ground_shadow="1" name="マテリアル3" name_e="mat 3" on_edge="1" on_shadow="1" toon="0" use_systemtoon="1"><edge_color a="1.0" b="0.0" g="0.0" r="0.0" /><deffuse a="1.0" b="1.0" g="1.0" r="1.0" /><specular b="1.0" g="0.0" r="0.0" /><ambient b="0.4000000059604645" g="0.4000000059604645" r="0.4000000059604645" /></material>
@@ -112,7 +85,7 @@ class TestSupplementXmlReader(unittest.TestCase):
             fp.write(test_content)
 
         reader = SupplementXmlReader(file_name, file_path, True)
-        index_dict, element_dict = reader.material2()
+        index_dict, element_dict = reader.material()
 
         self.assertEqual(index_dict[0], 'mat1')
         self.assertEqual(index_dict[1], 'mat2')
@@ -135,7 +108,7 @@ class TestSupplementXmlReader(unittest.TestCase):
         self.assertAlmostEqual(element_dict['mat3'].specular.b, 1.0)
         self.assertAlmostEqual(element_dict['mat3'].ambient.r, 0.4)
 
-    def test_material2_optional_element(self):
+    def test_material_optional_element(self):
         file_name = 'test.pmx'
         file_path = os.path.join(self.test_dir, file_name)
         xml_file_path = os.path.join(self.test_dir, 'test.xml')
@@ -151,7 +124,7 @@ class TestSupplementXmlReader(unittest.TestCase):
             fp.write(test_content)
 
         reader = SupplementXmlReader(file_name, file_path, True)
-        index_dict, element_dict = reader.material2()
+        index_dict, element_dict = reader.material()
 
         self.assertEqual(index_dict[0], 'mat1')
         self.assertIsNone(element_dict['mat1'].edge_color)
