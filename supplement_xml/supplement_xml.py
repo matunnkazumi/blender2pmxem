@@ -44,6 +44,8 @@ def elm_to_obj(element: Element, klass: Type[T]) -> T:
 def obj_to_elm(obj: Type[T], element: Element):
 
     for k, v in obj.__annotations__.items():
+        if v not in [str, int, float, Union[str, None], Union[int, None], Union[float, None]]:
+            continue
         val = getattr(obj, k)
         if val is not None:
             element.set(k, str(val))

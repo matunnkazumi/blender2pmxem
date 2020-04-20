@@ -79,6 +79,20 @@ class TestSupplementXmlReader(unittest.TestCase):
         self.assertEqual(elm.get('aaa'), 'test')
         self.assertEqual(elm.get('bbb'), '100')
         self.assertEqual(elm.get('ccc'), '1.1')
+        self.assertIsNone(elm.get('ddd'))
+
+    def test_write_ignore_object(self):
+        elm = etree.Element('test')
+        obj = Test2()
+        obj.aaa = 'test'
+        obj.bbb = 100
+        obj.ccc = 1.1
+
+        obj_to_elm(obj, elm)
+
+        self.assertEqual(elm.get('aaa'), 'test')
+        self.assertEqual(elm.get('bbb'), '100')
+        self.assertEqual(elm.get('ccc'), '1.1')
 
 
 if __name__ == '__main__':
