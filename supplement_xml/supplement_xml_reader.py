@@ -6,6 +6,7 @@
 #
 
 import os
+import pathlib
 
 from xml.etree.ElementTree import ElementTree
 from xml.etree.ElementTree import Element
@@ -37,7 +38,8 @@ class SupplementXmlReader:
         self.has_xml_file = os.path.isfile(xml_path)
 
         default_xml = "default_jp.xml" if use_japanese_name else "default_en.xml"
-        def_path = os.path.join(os.path.dirname(__file__), default_xml)
+        base_path = pathlib.Path(__file__).parents[1]
+        def_path = os.path.join(base_path, default_xml)
         has_def_file = os.path.isfile(def_path)
 
         self.file_name = file_name

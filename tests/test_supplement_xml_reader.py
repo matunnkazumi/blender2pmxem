@@ -3,7 +3,7 @@ import os
 import shutil
 import tempfile
 
-from supplement_xml_reader import SupplementXmlReader
+from supplement_xml.supplement_xml_reader import SupplementXmlReader
 
 
 class TestSupplementXmlReader(unittest.TestCase):
