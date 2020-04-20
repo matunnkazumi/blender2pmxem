@@ -16,6 +16,8 @@ from typing import List
 from typing import Tuple
 from typing import Optional
 
+from . import supplement_xml
+
 
 class Header:
     name: str
@@ -97,6 +99,39 @@ class SupplementXmlReader:
                     xml_mat_list[b_name] = mat
 
         return (xml_mat_index, xml_mat_list)
+
+    def material2(self) -> Tuple[Dict[int, str], Dict[str, supplement_xml.Material]]:
+
+        xml_mat_index = {}
+        xml_mat_list = {}
+
+        if self.xml_root is not None:
+            mat_root = self.xml_root.find("materials")
+            mat_list = mat_root.findall("material") if mat_root else []
+
+            for xml_index, mat in enumerate(mat_list):
+                b_name = mat.get("b_name")
+                if b_name is not None:
+                    xml_mat_index[xml_index] = b_name
+                    xml_mat_list[b_name] = self._material_element_read(mat)
+
+        return (xml_mat_index, xml_mat_list)
+
+    def _material_element_read(self, element: Element):
+        obj = supplement_xml.elm_to_obj(element, supplement_xml.Material)
+        obj.edge_color = self._find_and_convert(element, 'edge_color', supplement_xml.EdgeColor)
+        obj.diffuse = self._find_and_convert(element, 'deffuse', supplement_xml.Diffuse)
+        obj.specular = self._find_and_convert(element, 'specular', supplement_xml.Specular)
+        obj.ambient = self._find_and_convert(element, 'ambient', supplement_xml.Ambient)
+        obj.sphere = self._find_and_convert(element, 'sphere', supplement_xml.Sphere)
+        return obj
+
+    def _find_and_convert(self, element: Element, child_name: str, klass):
+        child = element.find(child_name)
+        if child is None:
+            return None
+        else:
+            return supplement_xml.elm_to_obj(child, klass)
 
     def morph(self) -> Tuple[Dict[int, str], Dict[str, Element]]:
 
