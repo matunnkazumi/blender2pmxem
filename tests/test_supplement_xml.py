@@ -3,8 +3,8 @@ import xml.etree.ElementTree as etree
 
 from typing import Optional
 
-from supplement_xml import elm_to_obj
-from supplement_xml import obj_to_elm
+from supplement_xml.supplement_xml import elm_to_obj
+from supplement_xml.supplement_xml import obj_to_elm
 
 
 class Test1:

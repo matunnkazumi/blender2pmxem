@@ -11,7 +11,7 @@ from . import pmx
 from . import object_applymodifier
 from . import global_variable
 from . import validator
-from . import supplement_xml_reader
+from .supplement_xml import supplement_xml_reader
 from typing import Dict
 from typing import List
 from typing import Tuple
