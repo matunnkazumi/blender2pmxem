@@ -6,6 +6,7 @@
 #
 
 import os
+import pathlib
 
 from xml.etree.ElementTree import ElementTree
 from xml.etree.ElementTree import Element
@@ -14,6 +15,8 @@ from typing import Dict
 from typing import List
 from typing import Tuple
 from typing import Optional
+
+from . import supplement_xml
 
 
 class Header:
@@ -37,7 +40,8 @@ class SupplementXmlReader:
         self.has_xml_file = os.path.isfile(xml_path)
 
         default_xml = "default_jp.xml" if use_japanese_name else "default_en.xml"
-        def_path = os.path.join(os.path.dirname(__file__), default_xml)
+        base_path = pathlib.Path(__file__).parents[1]
+        def_path = os.path.join(base_path, default_xml)
         has_def_file = os.path.isfile(def_path)
 
         self.file_name = file_name
@@ -79,7 +83,7 @@ class SupplementXmlReader:
 
         return list
 
-    def material(self) -> Tuple[Dict[int, str], Dict[str, Element]]:
+    def material(self) -> Tuple[Dict[int, str], Dict[str, supplement_xml.Material]]:
 
         xml_mat_index = {}
         xml_mat_list = {}
@@ -92,11 +96,27 @@ class SupplementXmlReader:
                 b_name = mat.get("b_name")
                 if b_name is not None:
                     xml_mat_index[xml_index] = b_name
-                    xml_mat_list[b_name] = mat
+                    xml_mat_list[b_name] = self._material_element_read(mat)
 
         return (xml_mat_index, xml_mat_list)
 
-    def morph(self) -> Tuple[Dict[int, str], Dict[str, Element]]:
+    def _material_element_read(self, element: Element):
+        obj = supplement_xml.elm_to_obj(element, supplement_xml.Material)
+        obj.edge_color = self._find_and_convert(element, 'edge_color', supplement_xml.EdgeColor)
+        obj.diffuse = self._find_and_convert(element, 'deffuse', supplement_xml.Diffuse)
+        obj.specular = self._find_and_convert(element, 'specular', supplement_xml.Specular)
+        obj.ambient = self._find_and_convert(element, 'ambient', supplement_xml.Ambient)
+        obj.sphere = self._find_and_convert(element, 'sphere', supplement_xml.Sphere)
+        return obj
+
+    def _find_and_convert(self, element: Element, child_name: str, klass):
+        child = element.find(child_name)
+        if child is None:
+            return None
+        else:
+            return supplement_xml.elm_to_obj(child, klass)
+
+    def morph(self) -> Tuple[Dict[int, str], Dict[str, supplement_xml.Morph]]:
 
         xml_morph_index = {}
         xml_morph_list = {}
@@ -105,8 +125,9 @@ class SupplementXmlReader:
             morph_root = self.def_root.find("morphs")
             morph_l = morph_root.findall("morph") if morph_root else []
 
-            for morph in morph_l:
-                b_name = morph.get("b_name")
+            for morph_elm in morph_l:
+                morph = supplement_xml.elm_to_obj(morph_elm, supplement_xml.Morph)
+                b_name = morph.b_name
                 if b_name is not None:
                     xml_morph_list[b_name] = morph
 
@@ -114,8 +135,9 @@ class SupplementXmlReader:
             morph_root = self.xml_root.find("morphs")
             morph_l = morph_root.findall("morph") if morph_root else []
 
-            for xml_index, morph in enumerate(morph_l):
-                b_name = morph.get("b_name")
+            for xml_index, morph_elm in enumerate(morph_l):
+                morph = supplement_xml.elm_to_obj(morph_elm, supplement_xml.Morph)
+                b_name = morph.b_name
                 if b_name is not None:
                     xml_morph_index[xml_index] = b_name
                     xml_morph_list[b_name] = morph
