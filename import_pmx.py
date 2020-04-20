@@ -12,6 +12,7 @@ import re
 from . import add_function, global_variable
 from bpy_extras.node_shader_utils import PrincipledBSDFWrapper
 
+from . import pmx
 from .supplement_xml.supplement_xml import obj_to_elm
 from .supplement_xml.supplement_xml import Morph as XMLMorph
 from .supplement_xml.supplement_xml import Material as XMLMaterial
@@ -457,7 +458,7 @@ def read_pmx_data(context, filepath="",
                         if hasattr(const, "subtarget"):
                             eb.use_connect = False
 
-                            for child in eb.children:
+                            for child in eb.children:
                                 child.use_connect = False
 
                             eb_sub = arm_dat.edit_bones[const.subtarget]
@@ -710,7 +711,7 @@ def read_pmx_data(context, filepath="",
     return
 
 
-def make_xml(pmx_data, filepath, use_japanese_name, xml_save_versions):
+def make_xml(pmx_data: pmx.Model, filepath, use_japanese_name, xml_save_versions):
 
     # const
     # "\u0030\u003a\u0062\u0061\u0073\u0065\u0028\u56fa\u5b9a\u0029\u0031\u003a\u307e\u3086\u0020\u0032\u003a\u76ee\u0020\u0033\u003a\u30ea\u30c3\u30d7\u0020\u0034\u003a\u305d\u306e\u4ed6"
@@ -758,20 +759,9 @@ def make_xml(pmx_data, filepath, use_japanese_name, xml_save_versions):
     #   Comment
 
     # Add Info
-    infonode = etree.SubElement(root, "pmdinfo")
+    infonode = make_xml_pmdinfo(pmx_data)
     infonode.tail = "\r\n"
-
-    # Add Name
-    pmx_name = etree.SubElement(infonode, "name")
-    pmx_name.text = pmx_data.Name.rstrip()
-    pmx_name_e = etree.SubElement(infonode, "name_e")
-    pmx_name_e.text = pmx_data.Name_E.rstrip()
-
-    # Add Comment
-    pmx_cmment = etree.SubElement(infonode, "comment")
-    pmx_cmment.text = pmx_data.Comment.rstrip()
-    pmx_cmment_e = etree.SubElement(infonode, "comment_e")
-    pmx_cmment_e.text = pmx_data.Comment_E.rstrip()
+    root.append(infonode)
 
     #
     # Morphs
@@ -1031,6 +1021,32 @@ def make_xml(pmx_data, filepath, use_japanese_name, xml_save_versions):
     tree = etree.ElementTree(root)
     tree.write(xml_path, encoding="utf-8")
     return blender_bone_list
+
+
+def make_xml_pmdinfo(pmx_data: pmx.Model) -> etree.Element:
+    builder = etree.TreeBuilder()
+    builder.start("pmdinfo", {})
+    builder.data("\r\n")
+    # Add Name
+    builder.start("name", {})
+    builder.data(pmx_data.Name.rstrip())
+    builder.end("name")
+    builder.data("\r\n")
+    builder.start("name_e", {})
+    builder.data(pmx_data.Name_E.rstrip())
+    builder.end("name_e")
+    builder.data("\r\n")
+    # Add Comment
+    builder.start("comment", {})
+    builder.data(pmx_data.Comment.rstrip())
+    builder.end("comment")
+    builder.data("\r\n")
+    builder.start("comment_e", {})
+    builder.data(pmx_data.Comment_E.rstrip())
+    builder.end("comment_e")
+    builder.data("\r\n")
+    builder.end("pmdinfo")
+    return builder.close()
 
 
 def set_Vector(_node, _data, _name):
