@@ -748,7 +748,7 @@ def make_xml(pmx_data: pmx.Model, filepath, use_japanese_name, xml_save_versions
     # XML
     #
     root = etree.Element('{local}pmxstatus', attrib={'{http://www.w3.org/XML/1998/namespace}lang': 'jp'})
-    root.text = "\r\n"
+    root.text = "\n"
 
     #
     # Header
@@ -757,7 +757,7 @@ def make_xml(pmx_data: pmx.Model, filepath, use_japanese_name, xml_save_versions
 
     # Add Info
     infonode = make_xml_pmdinfo(pmx_data)
-    infonode.tail = "\r\n"
+    infonode.tail = "\n"
     root.append(infonode)
 
     #
@@ -782,15 +782,15 @@ def make_xml(pmx_data: pmx.Model, filepath, use_japanese_name, xml_save_versions
         morph_list.append(morph)
 
     morph_root = make_xml_morphs(morph_list)
-    morph_root.tail = "\r\n"
+    morph_root.tail = "\n"
     root.append(morph_root)
 
     #
     # Bones
     #
     bone_root = etree.SubElement(root, "bones")
-    bone_root.text = "\r\n"
-    bone_root.tail = "\r\n"
+    bone_root.text = "\n"
+    bone_root.tail = "\n"
 
     blender_bone_list = {}
 
@@ -801,7 +801,7 @@ def make_xml(pmx_data: pmx.Model, filepath, use_japanese_name, xml_save_versions
     for (bone_index, pmx_bone) in enumerate(pmx_data.Bones):
         blender_bone_name = blender_bone_list[bone_index]
         bone_node = etree.SubElement(bone_root, "bone")
-        bone_node.tail = "\r\n"
+        bone_node.tail = "\n"
         # bone_node.set("index" , str(bone_index))
         bone_node.set("name", pmx_bone.Name)
         bone_node.set("name_e", pmx_bone.Name_E)
@@ -842,14 +842,14 @@ def make_xml(pmx_data: pmx.Model, filepath, use_japanese_name, xml_save_versions
 
     # Add Labels
     labels_root = etree.SubElement(root, "labels")
-    labels_root.text = "\r\n"
-    labels_root.tail = "\r\n"
+    labels_root.text = "\n"
+    labels_root.tail = "\n"
 
     for (label_index, pmx_label) in enumerate(pmx_data.DisplayFrames):
         label_node = etree.SubElement(labels_root, "label")
         if len(pmx_label.Members) > 0:
-            label_node.text = "\r\n"
-        label_node.tail = "\r\n"
+            label_node.text = "\n"
+        label_node.tail = "\n"
         # label_node.set("index" , str(label_index))
         label_node.set("name", pmx_label.Name)
         label_node.set("name_e", pmx_label.Name_E)
@@ -857,7 +857,7 @@ def make_xml(pmx_data: pmx.Model, filepath, use_japanese_name, xml_save_versions
 
         for (index, member) in enumerate(pmx_label.Members):
             member_node = etree.SubElement(label_node, "tab")
-            member_node.tail = "\r\n"
+            member_node.tail = "\n"
             # member_node.set("index" , str(index))
 
             if member[0] == 0:
@@ -939,19 +939,19 @@ def make_xml(pmx_data: pmx.Model, filepath, use_japanese_name, xml_save_versions
         material_list.append(material)
 
     material_root = make_xml_materials(material_list)
-    material_root.tail = "\r\n"
+    material_root.tail = "\n"
     root.append(material_root)
 
     #
     # Rigid
     #
     rigid_root = etree.SubElement(root, "rigid_bodies")
-    rigid_root.text = "\r\n"
-    rigid_root.tail = "\r\n"
+    rigid_root.text = "\n"
+    rigid_root.tail = "\n"
 
     for (rigid_index, pmx_rigid) in enumerate(pmx_data.Rigids):
         rigid_node = etree.SubElement(rigid_root, "rigid")
-        rigid_node.tail = "\r\n"
+        rigid_node.tail = "\n"
         # rigid_node.set("index",str(rigid_index))
         rigid_node.set("name", pmx_rigid.Name)
         rigid_node.set("name_e", pmx_rigid.Name_E)
@@ -984,13 +984,13 @@ def make_xml(pmx_data: pmx.Model, filepath, use_japanese_name, xml_save_versions
     # Joint
     #
     joint_root = etree.SubElement(root, "constraints")
-    joint_root.text = "\r\n"
-    joint_root.tail = "\r\n"
+    joint_root.text = "\n"
+    joint_root.tail = "\n"
 
     for (joint_index, pmx_joint) in enumerate(pmx_data.Joints):
 
         joint_node = etree.SubElement(joint_root, "constraint")
-        joint_node.tail = "\r\n"
+        joint_node.tail = "\n"
         # joint_node.set("index",str(joint_index))
         joint_node.set("name", pmx_joint.Name)
         joint_node.set("name_e", pmx_joint.Name_E)
@@ -1014,7 +1014,8 @@ def make_xml(pmx_data: pmx.Model, filepath, use_japanese_name, xml_save_versions
         set_Vector(joint_node, pmx_joint.RotSpring, "rot_spring")
 
     tree = etree.ElementTree(root)
-    tree.write(xml_path, encoding="utf-8")
+    with open(xml_path, 'w+', encoding="utf-8", newline="\r\n") as f:
+        tree.write(f, encoding="unicode")
     return blender_bone_list
 
 
@@ -1048,7 +1049,7 @@ def make_xml_morphs(list: List[XMLMorph]) -> etree.Element:
 
     J_Face_Comment = "表情グループ 0:使用不可 1:まゆ 2:目 3:リップ 4:その他"
     morph_comment = etree.Comment(J_Face_Comment)
-    morph_comment.tail = "\r\n"
+    morph_comment.tail = "\n"
     morphs_elm.insert(0, morph_comment)
 
     return morphs_elm

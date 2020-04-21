@@ -16,7 +16,7 @@ class UtilTreeBuilder(TreeBuilder):
         super().__init__()
 
     def new_line(self):
-        self.data("\r\n")
+        self.data("\n")
 
     def start_end(self, tag_name: str, data: str) -> Element:
         self.start(tag_name, {})
