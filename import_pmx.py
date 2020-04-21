@@ -12,7 +12,7 @@ import re
 from . import add_function, global_variable
 from bpy_extras.node_shader_utils import PrincipledBSDFWrapper
 
-from .supplement_xml.supplement_xml import obj_to_elm
+from . import pmx
 from .supplement_xml.supplement_xml import Morph as XMLMorph
 from .supplement_xml.supplement_xml import Material as XMLMaterial
 from .supplement_xml.supplement_xml import EdgeColor as XMLEdgeColor
@@ -20,6 +20,9 @@ from .supplement_xml.supplement_xml import Diffuse as XMLDiffuse
 from .supplement_xml.supplement_xml import Specular as XMLSpecular
 from .supplement_xml.supplement_xml import Ambient as XMLAmbient
 from .supplement_xml.supplement_xml import Sphere as XMLSphere
+from .supplement_xml.supplement_xml_writer import UtilTreeBuilder
+
+from typing import List
 
 # global_variable
 GV = global_variable.Init()
@@ -458,6 +461,7 @@ def read_pmx_data(context, filepath="",
                             eb.use_connect = False
 
                             for child in eb.children:
+
                                 child.use_connect = False
 
                             eb_sub = arm_dat.edit_bones[const.subtarget]
@@ -710,14 +714,7 @@ def read_pmx_data(context, filepath="",
     return
 
 
-def make_xml(pmx_data, filepath, use_japanese_name, xml_save_versions):
-
-    # const
-    # "\u0030\u003a\u0062\u0061\u0073\u0065\u0028\u56fa\u5b9a\u0029\u0031\u003a\u307e\u3086\u0020\u0032\u003a\u76ee\u0020\u0033\u003a\u30ea\u30c3\u30d7\u0020\u0034\u003a\u305d\u306e\u4ed6"
-    J_Face_Comment = "\u8868\u60C5\u30B0\u30EB\u30FC\u30D7\u0020\u0030"\
-        "\u003A\u4F7F\u7528\u4E0D\u53EF\u0020\u0031\u003A\u307E\u3086"\
-        "\u0020\u0032\u003A\u76EE\u0020\u0033\u003A\u30EA\u30C3\u30D7"\
-        "\u0020\u0034\u003A\u305D\u306E\u4ED6"
+def make_xml(pmx_data: pmx.Model, filepath, use_japanese_name, xml_save_versions):
 
     # filename
     root, ext = os.path.splitext(filepath)
@@ -751,6 +748,7 @@ def make_xml(pmx_data, filepath, use_japanese_name, xml_save_versions):
     # XML
     #
     root = etree.Element('{local}pmxstatus', attrib={'{http://www.w3.org/XML/1998/namespace}lang': 'jp'})
+    root.text = "\r\n"
 
     #
     # Header
@@ -758,31 +756,13 @@ def make_xml(pmx_data, filepath, use_japanese_name, xml_save_versions):
     #   Comment
 
     # Add Info
-    infonode = etree.SubElement(root, "pmdinfo")
+    infonode = make_xml_pmdinfo(pmx_data)
     infonode.tail = "\r\n"
-
-    # Add Name
-    pmx_name = etree.SubElement(infonode, "name")
-    pmx_name.text = pmx_data.Name.rstrip()
-    pmx_name_e = etree.SubElement(infonode, "name_e")
-    pmx_name_e.text = pmx_data.Name_E.rstrip()
-
-    # Add Comment
-    pmx_cmment = etree.SubElement(infonode, "comment")
-    pmx_cmment.text = pmx_data.Comment.rstrip()
-    pmx_cmment_e = etree.SubElement(infonode, "comment_e")
-    pmx_cmment_e.text = pmx_data.Comment_E.rstrip()
+    root.append(infonode)
 
     #
     # Morphs
     #
-
-    # Add Morph
-    morph_root = etree.SubElement(root, "morphs")
-    morph_root.tail = "\r\n"
-    morph_comment = etree.Comment(J_Face_Comment)
-    morph_comment.tail = "\r\n"
-    morph_root.append(morph_comment)
 
     # Morph
     # Name    # morph name
@@ -790,6 +770,7 @@ def make_xml(pmx_data, filepath, use_japanese_name, xml_save_versions):
     # Panel   # [1:Eyebrows 2:Mouth 3:Eye 4:Other 0:System]
     # Type    # [0:Group 1:Vertex 2:Bone 3:UV 4:ExUV1 5:ExUV2 6:ExUV3 7:ExUV4 8:Material]
     # Offsets # offset data
+    morph_list: List[XMLMorph] = []
     for (morph_index, pmx_morph) in enumerate(pmx_data.Morphs):
         blender_morph_name = Get_JP_or_EN_Name(pmx_morph.Name.rstrip(), pmx_morph.Name_E.rstrip(), use_japanese_name)
 
@@ -798,14 +779,17 @@ def make_xml(pmx_data, filepath, use_japanese_name, xml_save_versions):
         morph.name = pmx_morph.Name.rstrip()
         morph.name_e = pmx_morph.Name_E.rstrip()
         morph.b_name = blender_morph_name
-        morph_node = etree.SubElement(morph_root, "morph")
-        morph_node.tail = "\r\n"
-        obj_to_elm(morph, morph_node)
+        morph_list.append(morph)
+
+    morph_root = make_xml_morphs(morph_list)
+    morph_root.tail = "\r\n"
+    root.append(morph_root)
 
     #
     # Bones
     #
     bone_root = etree.SubElement(root, "bones")
+    bone_root.text = "\r\n"
     bone_root.tail = "\r\n"
 
     blender_bone_list = {}
@@ -863,6 +847,8 @@ def make_xml(pmx_data, filepath, use_japanese_name, xml_save_versions):
 
     for (label_index, pmx_label) in enumerate(pmx_data.DisplayFrames):
         label_node = etree.SubElement(labels_root, "label")
+        if len(pmx_label.Members) > 0:
+            label_node.text = "\r\n"
         label_node.tail = "\r\n"
         # label_node.set("index" , str(label_index))
         label_node.set("name", pmx_label.Name)
@@ -889,13 +875,12 @@ def make_xml(pmx_data, filepath, use_japanese_name, xml_save_versions):
     #
     # Materials
     #
-    material_root = etree.SubElement(root, "materials")
-    material_root.tail = "\r\n"
 
+    material_list: List[XMLMaterial] = []
     for (mat_index, pmx_mat) in enumerate(pmx_data.Materials):
         blender_mat_name = Get_JP_or_EN_Name(pmx_mat.Name, pmx_mat.Name_E, use_japanese_name)
 
-        material = XMLMaterial()
+        material: XMLMaterial = XMLMaterial()
         material.name = pmx_mat.Name
         material.name_e = pmx_mat.Name_E
         material.b_name = blender_mat_name
@@ -917,45 +902,45 @@ def make_xml(pmx_data, filepath, use_japanese_name, xml_save_versions):
         material.on_edge = pmx_mat.OnEdge
         material.edge_size = pmx_mat.EdgeSize
         material.power = pmx_mat.Power
+
         edge_color = XMLEdgeColor()
         edge_color.r = pmx_mat.EdgeColor.x
         edge_color.g = pmx_mat.EdgeColor.y
         edge_color.b = pmx_mat.EdgeColor.z
         edge_color.a = pmx_mat.EdgeColor.w
+        material.edge_color = edge_color
+
         deffuse = XMLDiffuse()
         deffuse.r = pmx_mat.Deffuse.x
         deffuse.g = pmx_mat.Deffuse.y
         deffuse.b = pmx_mat.Deffuse.z
         deffuse.a = pmx_mat.Deffuse.w
+        material.diffuse = deffuse
+
         specular = XMLSpecular()
         specular.r = pmx_mat.Specular.x
         specular.g = pmx_mat.Specular.y
         specular.b = pmx_mat.Specular.z
+        material.specular = specular
+
         ambient = XMLAmbient()
         ambient.r = pmx_mat.Ambient.x
         ambient.g = pmx_mat.Ambient.y
         ambient.b = pmx_mat.Ambient.z
+        material.ambient = ambient
 
         sphere = None
         if pmx_mat.SphereIndex != -1 and len(pmx_data.Textures) > pmx_mat.SphereIndex:
             sphere = XMLSphere()
             sphere.type = pmx_mat.SphereType
             sphere.path = pmx_data.Textures[pmx_mat.SphereIndex].Path
+        material.sphere = sphere
 
-        material_node = etree.SubElement(material_root, "material")
-        material_node.tail = "\r\n"
-        obj_to_elm(material, material_node)
-        material_edge_color = etree.SubElement(material_node, "edge_color")
-        obj_to_elm(edge_color, material_edge_color)
-        material_deffuse = etree.SubElement(material_node, "deffuse")
-        obj_to_elm(deffuse, material_deffuse)
-        material_specular = etree.SubElement(material_node, "specular")
-        obj_to_elm(specular, material_specular)
-        material_ambient = etree.SubElement(material_node, "ambient")
-        obj_to_elm(ambient, material_ambient)
-        if sphere is not None:
-            material_sphere = etree.SubElement(material_node, "sphere")
-            obj_to_elm(sphere, material_sphere)
+        material_list.append(material)
+
+    material_root = make_xml_materials(material_list)
+    material_root.tail = "\r\n"
+    root.append(material_root)
 
     #
     # Rigid
@@ -1031,6 +1016,72 @@ def make_xml(pmx_data, filepath, use_japanese_name, xml_save_versions):
     tree = etree.ElementTree(root)
     tree.write(xml_path, encoding="utf-8")
     return blender_bone_list
+
+
+def make_xml_pmdinfo(pmx_data: pmx.Model) -> etree.Element:
+    builder = UtilTreeBuilder()
+    builder.start("pmdinfo", {})
+    builder.new_line()
+    # Add Name
+    builder.start_end("name", pmx_data.Name.rstrip())
+    builder.new_line()
+    builder.start_end("name_e", pmx_data.Name_E.rstrip())
+    builder.new_line()
+    # Add Comment
+    builder.start_end("comment", pmx_data.Comment.rstrip())
+    builder.new_line()
+    builder.start_end("comment_e", pmx_data.Comment_E.rstrip())
+    builder.new_line()
+    builder.end("pmdinfo")
+    return builder.close()
+
+
+def make_xml_morphs(list: List[XMLMorph]) -> etree.Element:
+    builder = UtilTreeBuilder()
+    builder.start("morphs", {})
+
+    for morph in list:
+        make_xml_self_closing_with_obj(builder, "morph", morph, 0)
+
+    builder.end("moprh")
+    morphs_elm = builder.close()
+
+    J_Face_Comment = "表情グループ 0:使用不可 1:まゆ 2:目 3:リップ 4:その他"
+    morph_comment = etree.Comment(J_Face_Comment)
+    morph_comment.tail = "\r\n"
+    morphs_elm.insert(0, morph_comment)
+
+    return morphs_elm
+
+
+def make_xml_materials(mat_list: List[XMLMaterial]) -> etree.Element:
+    builder = UtilTreeBuilder()
+    builder.start("materials", {})
+    builder.new_line()
+
+    for material in mat_list:
+        builder.start_with_obj("material", material)
+        builder.new_line()
+
+        make_xml_self_closing_with_obj(builder, "edge_color", material.edge_color, 1)
+        make_xml_self_closing_with_obj(builder, "deffuse", material.diffuse, 1)
+        make_xml_self_closing_with_obj(builder, "specular", material.specular, 1)
+        make_xml_self_closing_with_obj(builder, "ambient", material.ambient, 1)
+        if material.sphere is not None:
+            make_xml_self_closing_with_obj(builder, "sphere", material.sphere, 1)
+
+        builder.end("material")
+        builder.new_line()
+
+    builder.end("materials")
+    return builder.close()
+
+
+def make_xml_self_closing_with_obj(builder: UtilTreeBuilder, tagName: str, obj, indent_level: int = 0):
+    if indent_level > 0:
+        builder.data("  " * indent_level)
+    builder.self_closing_with_obj(tagName, obj)
+    builder.new_line()
 
 
 def set_Vector(_node, _data, _name):
