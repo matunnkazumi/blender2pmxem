@@ -748,6 +748,7 @@ def make_xml(pmx_data: pmx.Model, filepath, use_japanese_name, xml_save_versions
     # XML
     #
     root = etree.Element('{local}pmxstatus', attrib={'{http://www.w3.org/XML/1998/namespace}lang': 'jp'})
+    root.text = "\r\n"
 
     #
     # Header
@@ -788,6 +789,7 @@ def make_xml(pmx_data: pmx.Model, filepath, use_japanese_name, xml_save_versions
     # Bones
     #
     bone_root = etree.SubElement(root, "bones")
+    bone_root.text = "\r\n"
     bone_root.tail = "\r\n"
 
     blender_bone_list = {}
@@ -845,6 +847,8 @@ def make_xml(pmx_data: pmx.Model, filepath, use_japanese_name, xml_save_versions
 
     for (label_index, pmx_label) in enumerate(pmx_data.DisplayFrames):
         label_node = etree.SubElement(labels_root, "label")
+        if len(pmx_label.Members) > 0:
+            label_node.text = "\r\n"
         label_node.tail = "\r\n"
         # label_node.set("index" , str(label_index))
         label_node.set("name", pmx_label.Name)
