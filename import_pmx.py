@@ -716,13 +716,6 @@ def read_pmx_data(context, filepath="",
 
 def make_xml(pmx_data: pmx.Model, filepath, use_japanese_name, xml_save_versions):
 
-    # const
-    # "\u0030\u003a\u0062\u0061\u0073\u0065\u0028\u56fa\u5b9a\u0029\u0031\u003a\u307e\u3086\u0020\u0032\u003a\u76ee\u0020\u0033\u003a\u30ea\u30c3\u30d7\u0020\u0034\u003a\u305d\u306e\u4ed6"
-    J_Face_Comment = "\u8868\u60C5\u30B0\u30EB\u30FC\u30D7\u0020\u0030"\
-        "\u003A\u4F7F\u7528\u4E0D\u53EF\u0020\u0031\u003A\u307E\u3086"\
-        "\u0020\u0032\u003A\u76EE\u0020\u0033\u003A\u30EA\u30C3\u30D7"\
-        "\u0020\u0034\u003A\u305D\u306E\u4ED6"
-
     # filename
     root, ext = os.path.splitext(filepath)
     xml_path = root + ".xml"
@@ -770,19 +763,13 @@ def make_xml(pmx_data: pmx.Model, filepath, use_japanese_name, xml_save_versions
     # Morphs
     #
 
-    # Add Morph
-    morph_root = etree.SubElement(root, "morphs")
-    morph_root.tail = "\r\n"
-    morph_comment = etree.Comment(J_Face_Comment)
-    morph_comment.tail = "\r\n"
-    morph_root.append(morph_comment)
-
     # Morph
     # Name    # morph name
     # Name_E  # morph name English
     # Panel   # [1:Eyebrows 2:Mouth 3:Eye 4:Other 0:System]
     # Type    # [0:Group 1:Vertex 2:Bone 3:UV 4:ExUV1 5:ExUV2 6:ExUV3 7:ExUV4 8:Material]
     # Offsets # offset data
+    morph_list: List[XMLMorph] = []
     for (morph_index, pmx_morph) in enumerate(pmx_data.Morphs):
         blender_morph_name = Get_JP_or_EN_Name(pmx_morph.Name.rstrip(), pmx_morph.Name_E.rstrip(), use_japanese_name)
 
@@ -791,9 +778,11 @@ def make_xml(pmx_data: pmx.Model, filepath, use_japanese_name, xml_save_versions
         morph.name = pmx_morph.Name.rstrip()
         morph.name_e = pmx_morph.Name_E.rstrip()
         morph.b_name = blender_morph_name
-        morph_node = etree.SubElement(morph_root, "morph")
-        morph_node.tail = "\r\n"
-        obj_to_elm(morph, morph_node)
+        morph_list.append(morph)
+
+    morph_root = make_xml_morphs(morph_list)
+    morph_root.tail = "\r\n"
+    root.append(morph_root)
 
     #
     # Bones
@@ -1049,6 +1038,24 @@ def make_xml_pmdinfo(pmx_data: pmx.Model) -> etree.Element:
     builder.data("\r\n")
     builder.end("pmdinfo")
     return builder.close()
+
+
+def make_xml_morphs(list: List[XMLMorph]) -> etree.Element:
+    builder = etree.TreeBuilder()
+    builder.start("morphs", {})
+
+    for morph in list:
+        make_xml_self_closing_with_obj(builder, "morph", morph, 0)
+
+    builder.end("moprh")
+    morphs_elm = builder.close()
+
+    J_Face_Comment = "表情グループ 0:使用不可 1:まゆ 2:目 3:リップ 4:その他"
+    morph_comment = etree.Comment(J_Face_Comment)
+    morph_comment.tail = "\r\n"
+    morphs_elm.insert(0, morph_comment)
+
+    return morphs_elm
 
 
 def make_xml_materials(mat_list: List[XMLMaterial]) -> etree.Element:
