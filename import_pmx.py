@@ -13,7 +13,6 @@ from . import add_function, global_variable
 from bpy_extras.node_shader_utils import PrincipledBSDFWrapper
 
 from . import pmx
-from .supplement_xml.supplement_xml import obj_to_elm
 from .supplement_xml.supplement_xml import Morph as XMLMorph
 from .supplement_xml.supplement_xml import Material as XMLMaterial
 from .supplement_xml.supplement_xml import EdgeColor as XMLEdgeColor
@@ -21,6 +20,7 @@ from .supplement_xml.supplement_xml import Diffuse as XMLDiffuse
 from .supplement_xml.supplement_xml import Specular as XMLSpecular
 from .supplement_xml.supplement_xml import Ambient as XMLAmbient
 from .supplement_xml.supplement_xml import Sphere as XMLSphere
+from .supplement_xml.supplement_xml_writer import UtilTreeBuilder
 
 from typing import List
 
@@ -1015,33 +1015,25 @@ def make_xml(pmx_data: pmx.Model, filepath, use_japanese_name, xml_save_versions
 
 
 def make_xml_pmdinfo(pmx_data: pmx.Model) -> etree.Element:
-    builder = etree.TreeBuilder()
+    builder = UtilTreeBuilder()
     builder.start("pmdinfo", {})
-    builder.data("\r\n")
+    builder.new_line()
     # Add Name
-    builder.start("name", {})
-    builder.data(pmx_data.Name.rstrip())
-    builder.end("name")
-    builder.data("\r\n")
-    builder.start("name_e", {})
-    builder.data(pmx_data.Name_E.rstrip())
-    builder.end("name_e")
-    builder.data("\r\n")
+    builder.start_end("name", pmx_data.Name.rstrip())
+    builder.new_line()
+    builder.start_end("name_e", pmx_data.Name_E.rstrip())
+    builder.new_line()
     # Add Comment
-    builder.start("comment", {})
-    builder.data(pmx_data.Comment.rstrip())
-    builder.end("comment")
-    builder.data("\r\n")
-    builder.start("comment_e", {})
-    builder.data(pmx_data.Comment_E.rstrip())
-    builder.end("comment_e")
-    builder.data("\r\n")
+    builder.start_end("comment", pmx_data.Comment.rstrip())
+    builder.new_line()
+    builder.start_end("comment_e", pmx_data.Comment_E.rstrip())
+    builder.new_line()
     builder.end("pmdinfo")
     return builder.close()
 
 
 def make_xml_morphs(list: List[XMLMorph]) -> etree.Element:
-    builder = etree.TreeBuilder()
+    builder = UtilTreeBuilder()
     builder.start("morphs", {})
 
     for morph in list:
@@ -1059,14 +1051,13 @@ def make_xml_morphs(list: List[XMLMorph]) -> etree.Element:
 
 
 def make_xml_materials(mat_list: List[XMLMaterial]) -> etree.Element:
-    builder = etree.TreeBuilder()
+    builder = UtilTreeBuilder()
     builder.start("materials", {})
-    builder.data("\r\n")
+    builder.new_line()
 
     for material in mat_list:
-        material_node = builder.start("material", {})
-        obj_to_elm(material, material_node)
-        builder.data("\r\n")
+        builder.start_with_obj("material", material)
+        builder.new_line()
 
         make_xml_self_closing_with_obj(builder, "edge_color", material.edge_color, 1)
         make_xml_self_closing_with_obj(builder, "deffuse", material.diffuse, 1)
@@ -1076,19 +1067,17 @@ def make_xml_materials(mat_list: List[XMLMaterial]) -> etree.Element:
             make_xml_self_closing_with_obj(builder, "sphere", material.sphere, 1)
 
         builder.end("material")
-        builder.data("\r\n")
+        builder.new_line()
 
     builder.end("materials")
     return builder.close()
 
 
-def make_xml_self_closing_with_obj(builder: etree.TreeBuilder, tagName: str, obj, indent_level: int = 0):
+def make_xml_self_closing_with_obj(builder: UtilTreeBuilder, tagName: str, obj, indent_level: int = 0):
     if indent_level > 0:
         builder.data("  " * indent_level)
-    node = builder.start(tagName, {})
-    obj_to_elm(obj, node)
-    builder.end(tagName)
-    builder.data("\r\n")
+    builder.self_closing_with_obj(tagName, obj)
+    builder.new_line()
 
 
 def set_Vector(_node, _data, _name):
