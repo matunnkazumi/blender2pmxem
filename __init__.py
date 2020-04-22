@@ -279,15 +279,10 @@ class B2PMXEM_OT_ImportBlender2Pmx(bpy.types.Operator, ImportHelper):
 
         validate_result = validator.validate_pmx(pmx_data)
         if validate_result:
-            l1 = validate_result[0]
-            l2 = validate_result[1] if len(validate_result) > 1 else ""
-            l3 = validate_result[2] if len(validate_result) > 2 else ""
-            bpy.ops.b2pmxem.message('INVOKE_DEFAULT',
-                                    type='ERROR',
-                                    line1=l1,
-                                    line2=l2,
-                                    line3=l3
-                                    )
+            msg = '\n'.join(validate_result)
+            bpy.ops.b2pmxem.multiline_message('INVOKE_DEFAULT',
+                                              type='ERROR',
+                                              lines=msg)
             return {'CANCELLED'}
 
         import_pmx.read_pmx_data(context, **keywords)
@@ -581,15 +576,10 @@ class B2PMXEM_OT_SaveAsXML(bpy.types.Operator):
 
         validate_result = validator.validate_pmx(pmx_data)
         if validate_result:
-            l1 = validate_result[0]
-            l2 = validate_result[1] if len(validate_result) > 1 else ""
-            l3 = validate_result[2] if len(validate_result) > 2 else ""
-            bpy.ops.b2pmxem.message('INVOKE_DEFAULT',
-                                    type='ERROR',
-                                    line1=l1,
-                                    line2=l2,
-                                    line3=l3
-                                    )
+            msg = '\n'.join(validate_result)
+            bpy.ops.b2pmxem.multiline_message('INVOKE_DEFAULT',
+                                              type='ERROR',
+                                              lines=msg)
             return {'CANCELLED'}
 
         if props.make_xml_option == 'TRANSFER':
