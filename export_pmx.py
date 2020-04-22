@@ -310,15 +310,10 @@ def write_pmx_data(context, filepath="",
         if xml_reader.xml_root is not None:
             validate_result = validator.validate_xml(xml_reader.xml_root)
             if validate_result:
-                l1 = validate_result[0]
-                l2 = validate_result[1] if len(validate_result) > 1 else ""
-                l3 = validate_result[2] if len(validate_result) > 2 else ""
-                bpy.ops.b2pmxem.message('INVOKE_DEFAULT',
-                                        type='ERROR',
-                                        line1=l1,
-                                        line2=l2,
-                                        line3=l3
-                                        )
+                msg = '\n'.join(validate_result)
+                bpy.ops.b2pmxem.multiline_message('INVOKE_DEFAULT',
+                                                  type='ERROR',
+                                                  lines=msg)
                 return {'CANCELLED'}
 
         #
