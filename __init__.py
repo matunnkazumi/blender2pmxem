@@ -17,6 +17,7 @@ from bpy.app.translations import pgettext_iface as iface_
 from glob import glob
 import os
 import bpy
+from itertools import zip_longest
 
 bl_info = {
     "name": "MMD PMX Format (Extend)",
@@ -446,6 +447,58 @@ class B2PMXEM_OT_MessageOperator(bpy.types.Operator):
         layout.separator()
 
 
+#
+#   The error message operator. When invoked, pops up a dialog
+#   window with the given message for multiple lines.
+#
+class B2PMXEM_OT_MultiLineMessageOperator(bpy.types.Operator):
+    bl_idname = "b2pmxem.multiline_message"
+    bl_label = "B2Pmxem Multiline Message"
+
+    type: EnumProperty(  # type: ignore
+        items=(
+            ('ERROR', "Error", ""),
+            ('INFO', "Info", ""),
+        ), default='ERROR')
+    lines: StringProperty(  # type: ignore
+        default=""
+    )
+    use_console: BoolProperty(  # type: ignore
+        default=False
+    )
+
+    def execute(self, context):
+        return {'FINISHED'}
+
+    def invoke(self, context, event):
+        wm = context.window_manager
+        return wm.invoke_popup(self, width=360)
+
+    def draw(self, context):
+        layout = self.layout
+
+        if self.type == 'ERROR':
+            layout.label(text=iface_("Error") + ":", icon='ERROR')
+        elif self.type == 'INFO':
+            layout.label(text=iface_("Info") + ":", icon='INFO')
+
+        row = layout.split(factor=0.05)
+        row.label(text="")
+        col = row.column(align=True)
+
+        line_list = self.lines.splitlines()
+        type_text = "[{0:s}]".format(self.type)
+
+        for msg, pre in zip_longest(line_list, [type_text], fillvalue=" " * (len(type_text))):
+            col.label(text=msg)
+            print("{0:s} {1:s}".format(pre, msg))
+
+        if self.use_console:
+            col.label(text="See the console log for more information.")
+
+        layout.separator()
+
+
 class B2PMXEM_OT_MakeXML(bpy.types.Operator):
     '''Make a MMD xml file, and update materials'''
     bl_idname = "b2pmxem.make_xml"
@@ -820,6 +873,7 @@ classes = [
     B2PMXEM_OT_MakeXML,
     B2PMXEM_OT_SaveAsXML,
     B2PMXEM_OT_MessageOperator,
+    B2PMXEM_OT_MultiLineMessageOperator,
     B2PMXEM_PT_EditPanel,
     B2PMXEM_PT_PosePanel,
     B2PMXEM_PT_ObjectPanel,
