@@ -905,14 +905,6 @@ def write_pmx_data(context, filepath="",
             print("Exported using custom normals:")
             for data in OK_normal_list:
                 print("   --> %s" % data)
-        elif use_custom_normals:
-            bpy.ops.b2pmxem.message(
-                'INVOKE_DEFAULT',
-                type='ERROR',
-                line1="Could not use custom split normals data.",
-                line2="Enable 'Auto Smooth' option.",
-                line3="or settings of modifier is incorrect."
-            )
 
         # Set Face
         # print("Get Face")
@@ -1059,6 +1051,24 @@ def write_pmx_data(context, filepath="",
 
         GV.SetVertCount(len(pmx_data.Vertices))
         GV.PrintTime(filepath, type='export')
+
+    # finish notification
+    if len(OK_normal_list):
+        bpy.ops.b2pmxem.message(
+            'INVOKE_DEFAULT',
+            type='INFO',
+            line1="Export finished.",
+        )
+    elif use_custom_normals:
+        bpy.ops.b2pmxem.multiline_message(
+            'INVOKE_DEFAULT',
+            type='ERROR',
+            lines="\n".join(["Export finished.",
+                             "",
+                             "Could not use custom split normals data.",
+                             "Enable 'Auto Smooth' option.",
+                             "or settings of modifier is incorrect."])
+        )
 
     return {'FINISHED'}
 

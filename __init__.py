@@ -110,6 +110,7 @@ translation_dict = {
         ("*", "Fix bone position"): "ボーンの位置を修正する",
         ("*", "Transfer"): "転送",
         ("*", "Transfer bones and weights"): "ボーンとウェイトを転送する",
+        ("*", "Export finished."): "エクスポートが完了しました",
     }
 }
 
