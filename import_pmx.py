@@ -13,6 +13,7 @@ from . import add_function, global_variable
 from bpy_extras.node_shader_utils import PrincipledBSDFWrapper
 
 from . import pmx
+from .pmx import PMMorph
 from .pmx import PMMaterial
 from .pmx import PMTexture
 from .supplement_xml.supplement_xml import Morph as XMLMorph
@@ -769,23 +770,13 @@ def make_xml(pmx_data: pmx.Model, filepath, use_japanese_name, xml_save_versions
     # Morphs
     #
 
-    # Morph
-    # Name    # morph name
-    # Name_E  # morph name English
-    # Panel   # [1:Eyebrows 2:Mouth 3:Eye 4:Other 0:System]
-    # Type    # [0:Group 1:Vertex 2:Bone 3:UV 4:ExUV1 5:ExUV2 6:ExUV3 7:ExUV4 8:Material]
-    # Offsets # offset data
-    morph_list: List[XMLMorph] = []
-    for (morph_index, pmx_morph) in enumerate(pmx_data.Morphs):
-        blender_morph_name = Get_JP_or_EN_Name(pmx_morph.Name.rstrip(), pmx_morph.Name_E.rstrip(), use_japanese_name)
+    blender_morph_list = {
+        morph_index: Get_JP_or_EN_Name(pmx_morph.Name, pmx_morph.Name_E, use_japanese_name)
 
-        morph = XMLMorph()
-        morph.group = pmx_morph.Panel
-        morph.name = pmx_morph.Name.rstrip()
-        morph.name_e = pmx_morph.Name_E.rstrip()
-        morph.b_name = blender_morph_name
-        morph_list.append(morph)
+        for (morph_index, pmx_morph) in enumerate(pmx_data.Morphs)
+    }
 
+    morph_list = convert_morph(pmx_data.Morphs, blender_morph_list)
     morph_root = make_xml_morphs(morph_list)
     morph_root.tail = "\n"
     root.append(morph_root)
@@ -986,7 +977,28 @@ def make_xml_pmdinfo(pmx_data: pmx.Model) -> etree.Element:
     return builder.close()
 
 
-def make_xml_morphs(list: List[XMLMorph]) -> etree.Element:
+def convert_morph(src: Iterable[PMMorph],
+                  index_dict: Dict[int, str]) -> Generator[XMLMorph, None, None]:
+    # Morph
+    # Name    # morph name
+    # Name_E  # morph name English
+    # Panel   # [1:Eyebrows 2:Mouth 3:Eye 4:Other 0:System]
+    # Type    # [0:Group 1:Vertex 2:Bone 3:UV 4:ExUV1 5:ExUV2 6:ExUV3 7:ExUV4 8:Material]
+    # Offsets # offset data
+
+    for (morph_index, pmx_morph) in enumerate(src):
+        blender_morph_name = index_dict[morph_index]
+
+        morph = XMLMorph()
+        morph.group = pmx_morph.Panel
+        morph.name = pmx_morph.Name.rstrip()
+        morph.name_e = pmx_morph.Name_E.rstrip()
+        morph.b_name = blender_morph_name
+
+        yield morph
+
+
+def make_xml_morphs(list: Iterable[XMLMorph]) -> etree.Element:
     builder = UtilTreeBuilder()
     builder.start("morphs", {})
 
