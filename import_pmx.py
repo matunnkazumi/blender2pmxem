@@ -13,6 +13,8 @@ from . import add_function, global_variable
 from bpy_extras.node_shader_utils import PrincipledBSDFWrapper
 
 from . import pmx
+from .pmx import PMMaterial
+from .pmx import PMTexture
 from .supplement_xml.supplement_xml import Morph as XMLMorph
 from .supplement_xml.supplement_xml import Material as XMLMaterial
 from .supplement_xml.supplement_xml import EdgeColor as XMLEdgeColor
@@ -23,6 +25,9 @@ from .supplement_xml.supplement_xml import Sphere as XMLSphere
 from .supplement_xml.supplement_xml_writer import UtilTreeBuilder
 
 from typing import List
+from typing import Dict
+from typing import Iterable
+from typing import Generator
 
 # global_variable
 GV = global_variable.Init()
@@ -876,68 +881,12 @@ def make_xml(pmx_data: pmx.Model, filepath, use_japanese_name, xml_save_versions
     # Materials
     #
 
-    material_list: List[XMLMaterial] = []
-    for (mat_index, pmx_mat) in enumerate(pmx_data.Materials):
-        blender_mat_name = Get_JP_or_EN_Name(pmx_mat.Name, pmx_mat.Name_E, use_japanese_name)
+    blender_mat_list = {
+        mat_index: Get_JP_or_EN_Name(pmx_mat.Name, pmx_mat.Name_E, use_japanese_name)
+        for (mat_index, pmx_mat) in enumerate(pmx_data.Materials)
+    }
 
-        material: XMLMaterial = XMLMaterial()
-        material.name = pmx_mat.Name
-        material.name_e = pmx_mat.Name_E
-        material.b_name = blender_mat_name
-        material.use_systemtoon = pmx_mat.UseSystemToon
-
-        if pmx_mat.UseSystemToon == 1:
-            material.toon = str(pmx_mat.ToonIndex)
-
-        elif pmx_mat.ToonIndex < 0:
-            material.toon = "-1"
-
-        else:
-            material.toon = str(pmx_data.Textures[pmx_mat.ToonIndex].Path)
-
-        material.both = pmx_mat.Both
-        material.ground_shadow = pmx_mat.GroundShadow
-        material.drop_shadow = pmx_mat.DropShadow
-        material.on_shadow = pmx_mat.OnShadow
-        material.on_edge = pmx_mat.OnEdge
-        material.edge_size = pmx_mat.EdgeSize
-        material.power = pmx_mat.Power
-
-        edge_color = XMLEdgeColor()
-        edge_color.r = pmx_mat.EdgeColor.x
-        edge_color.g = pmx_mat.EdgeColor.y
-        edge_color.b = pmx_mat.EdgeColor.z
-        edge_color.a = pmx_mat.EdgeColor.w
-        material.edge_color = edge_color
-
-        deffuse = XMLDiffuse()
-        deffuse.r = pmx_mat.Deffuse.x
-        deffuse.g = pmx_mat.Deffuse.y
-        deffuse.b = pmx_mat.Deffuse.z
-        deffuse.a = pmx_mat.Deffuse.w
-        material.diffuse = deffuse
-
-        specular = XMLSpecular()
-        specular.r = pmx_mat.Specular.x
-        specular.g = pmx_mat.Specular.y
-        specular.b = pmx_mat.Specular.z
-        material.specular = specular
-
-        ambient = XMLAmbient()
-        ambient.r = pmx_mat.Ambient.x
-        ambient.g = pmx_mat.Ambient.y
-        ambient.b = pmx_mat.Ambient.z
-        material.ambient = ambient
-
-        sphere = None
-        if pmx_mat.SphereIndex != -1 and len(pmx_data.Textures) > pmx_mat.SphereIndex:
-            sphere = XMLSphere()
-            sphere.type = pmx_mat.SphereType
-            sphere.path = pmx_data.Textures[pmx_mat.SphereIndex].Path
-        material.sphere = sphere
-
-        material_list.append(material)
-
+    material_list = convert_material(pmx_data.Materials, blender_mat_list, pmx_data.Textures)
     material_root = make_xml_materials(material_list)
     material_root.tail = "\n"
     root.append(material_root)
@@ -1055,7 +1004,73 @@ def make_xml_morphs(list: List[XMLMorph]) -> etree.Element:
     return morphs_elm
 
 
-def make_xml_materials(mat_list: List[XMLMaterial]) -> etree.Element:
+def convert_material(src: Iterable[PMMaterial],
+                     index_dict: Dict[int, str],
+                     pmtextures: List[PMTexture]) -> Generator[XMLMaterial, None, None]:
+
+    for (mat_index, pmx_mat) in enumerate(src):
+        blender_mat_name = index_dict[mat_index]
+
+        material: XMLMaterial = XMLMaterial()
+        material.name = pmx_mat.Name
+        material.name_e = pmx_mat.Name_E
+        material.b_name = blender_mat_name
+        material.use_systemtoon = pmx_mat.UseSystemToon
+
+        if pmx_mat.UseSystemToon == 1:
+            material.toon = str(pmx_mat.ToonIndex)
+
+        elif pmx_mat.ToonIndex < 0:
+            material.toon = "-1"
+
+        else:
+            material.toon = str(pmtextures[pmx_mat.ToonIndex].Path)
+
+        material.both = pmx_mat.Both
+        material.ground_shadow = pmx_mat.GroundShadow
+        material.drop_shadow = pmx_mat.DropShadow
+        material.on_shadow = pmx_mat.OnShadow
+        material.on_edge = pmx_mat.OnEdge
+        material.edge_size = pmx_mat.EdgeSize
+        material.power = pmx_mat.Power
+
+        edge_color = XMLEdgeColor()
+        edge_color.r = pmx_mat.EdgeColor.x
+        edge_color.g = pmx_mat.EdgeColor.y
+        edge_color.b = pmx_mat.EdgeColor.z
+        edge_color.a = pmx_mat.EdgeColor.w
+        material.edge_color = edge_color
+
+        deffuse = XMLDiffuse()
+        deffuse.r = pmx_mat.Deffuse.x
+        deffuse.g = pmx_mat.Deffuse.y
+        deffuse.b = pmx_mat.Deffuse.z
+        deffuse.a = pmx_mat.Deffuse.w
+        material.diffuse = deffuse
+
+        specular = XMLSpecular()
+        specular.r = pmx_mat.Specular.x
+        specular.g = pmx_mat.Specular.y
+        specular.b = pmx_mat.Specular.z
+        material.specular = specular
+
+        ambient = XMLAmbient()
+        ambient.r = pmx_mat.Ambient.x
+        ambient.g = pmx_mat.Ambient.y
+        ambient.b = pmx_mat.Ambient.z
+        material.ambient = ambient
+
+        sphere = None
+        if pmx_mat.SphereIndex != -1 and len(pmtextures) > pmx_mat.SphereIndex:
+            sphere = XMLSphere()
+            sphere.type = pmx_mat.SphereType
+            sphere.path = pmtextures[pmx_mat.SphereIndex].Path
+        material.sphere = sphere
+
+        yield material
+
+
+def make_xml_materials(mat_list: Iterable[XMLMaterial]) -> etree.Element:
     builder = UtilTreeBuilder()
     builder.start("materials", {})
     builder.new_line()
