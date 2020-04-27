@@ -26,7 +26,7 @@ from .supplement_xml.supplement_xml import Ambient as XMLAmbient
 from .supplement_xml.supplement_xml import Sphere as XMLSphere
 from .supplement_xml.supplement_xml import RGBDiff as XMLRGBDiff
 from .supplement_xml.supplement_xml import RGBADiff as XMLRGBADiff
-from .supplement_xml.supplement_xml import MaterailMorphOffset as XMLMaterailMorphOffset
+from .supplement_xml.supplement_xml import MaterialMorphOffset as XMLMaterialMorphOffset
 from .supplement_xml.supplement_xml_writer import UtilTreeBuilder
 
 from typing import List
@@ -1015,9 +1015,10 @@ def as_RGBDiff(color: mathutils.Vector) -> XMLRGBDiff:
     return XMLRGBDiff(*(color.to_tuple()))
 
 
-def convert_material_morph(src: Iterable[PMMorphOffset], bone_index_dict: Dict[int, str]):
+def convert_material_morph(src: Iterable[PMMorphOffset],
+                           bone_index_dict: Dict[int, str]) -> Generator[XMLMaterialMorphOffset, None, None]:
     for pmx_offset in src:
-        offset = XMLMaterailMorphOffset()
+        offset = XMLMaterialMorphOffset()
         offset.material_name = bone_index_dict[pmx_offset.Index]
         offset.effect_type = pmx_offset.MatEffectType
         offset.diffuse = as_RGBADiff(pmx_offset.MatDiffuse)
@@ -1051,7 +1052,7 @@ def make_xml_morphs(list: Iterable[XMLMorph]) -> etree.Element:
                 make_xml_self_closing_with_obj(builder, "mat_diffuse", offset.diffuse, 3)
                 make_xml_self_closing_with_obj(builder, "mat_speculer", offset.speculer, 3)
                 make_xml_self_closing_with_obj(builder, "mat_ambient", offset.ambient, 3)
-                make_xml_self_closing_with_obj(builder, "mat_edgecolor", offset.edge_color, 3)
+                make_xml_self_closing_with_obj(builder, "mat_edge_color", offset.edge_color, 3)
                 make_xml_self_closing_with_obj(builder, "mat_texture", offset.texture, 3)
                 make_xml_self_closing_with_obj(builder, "mat_sphere", offset.sphere, 3)
                 make_xml_self_closing_with_obj(builder, "mat_toon", offset.toon, 3)

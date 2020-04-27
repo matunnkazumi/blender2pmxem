@@ -12,7 +12,7 @@ from typing import Union
 from typing import TypeVar
 from typing import Type
 from typing import Iterable
-from typing import NamedTuple
+from dataclasses import dataclass
 
 T = TypeVar('T')
 
@@ -105,20 +105,22 @@ class Material:
     sphere: Optional[Sphere]
 
 
-class RGBDiff(NamedTuple):
+@dataclass
+class RGBDiff:
     r: float = 0.0
     g: float = 0.0
     b: float = 0.0
 
 
-class RGBADiff(NamedTuple):
+@dataclass
+class RGBADiff:
     r: float = 0.0
     g: float = 0.0
     b: float = 0.0
     a: float = 0.0
 
 
-class MaterailMorphOffset:
+class MaterialMorphOffset:
     material_name: str
     effect_type: int = 0
     diffuse: RGBADiff = RGBADiff()
@@ -139,4 +141,4 @@ class Morph:
     b_name: str
     type: int = 1
 
-    offsets: Iterable[MaterailMorphOffset] = []
+    offsets: Iterable[MaterialMorphOffset] = []
