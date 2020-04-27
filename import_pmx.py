@@ -16,6 +16,7 @@ from . import pmx
 from .pmx import PMMorph
 from .pmx import PMMaterial
 from .pmx import PMTexture
+from .pmx import PMMorphOffset
 from .supplement_xml.supplement_xml import Morph as XMLMorph
 from .supplement_xml.supplement_xml import Material as XMLMaterial
 from .supplement_xml.supplement_xml import EdgeColor as XMLEdgeColor
@@ -23,6 +24,9 @@ from .supplement_xml.supplement_xml import Diffuse as XMLDiffuse
 from .supplement_xml.supplement_xml import Specular as XMLSpecular
 from .supplement_xml.supplement_xml import Ambient as XMLAmbient
 from .supplement_xml.supplement_xml import Sphere as XMLSphere
+from .supplement_xml.supplement_xml import RGBDiff as XMLRGBDiff
+from .supplement_xml.supplement_xml import RGBADiff as XMLRGBADiff
+from .supplement_xml.supplement_xml import MaterailMorphOffset as XMLMaterailMorphOffset
 from .supplement_xml.supplement_xml_writer import UtilTreeBuilder
 
 from typing import List
@@ -751,6 +755,19 @@ def make_xml(pmx_data: pmx.Model, filepath, use_japanese_name, xml_save_versions
             print("   --> %s" % data)
 
     #
+    # name and index relation
+    #
+    blender_morph_list = {
+        morph_index: Get_JP_or_EN_Name(pmx_morph.Name, pmx_morph.Name_E, use_japanese_name)
+
+        for (morph_index, pmx_morph) in enumerate(pmx_data.Morphs)
+    }
+    blender_mat_list = {
+        mat_index: Get_JP_or_EN_Name(pmx_mat.Name, pmx_mat.Name_E, use_japanese_name)
+        for (mat_index, pmx_mat) in enumerate(pmx_data.Materials)
+    }
+
+    #
     # XML
     #
     root = etree.Element('{local}pmxstatus', attrib={'{http://www.w3.org/XML/1998/namespace}lang': 'jp'})
@@ -769,14 +786,7 @@ def make_xml(pmx_data: pmx.Model, filepath, use_japanese_name, xml_save_versions
     #
     # Morphs
     #
-
-    blender_morph_list = {
-        morph_index: Get_JP_or_EN_Name(pmx_morph.Name, pmx_morph.Name_E, use_japanese_name)
-
-        for (morph_index, pmx_morph) in enumerate(pmx_data.Morphs)
-    }
-
-    morph_list = convert_morph(pmx_data.Morphs, blender_morph_list)
+    morph_list = convert_morph(pmx_data.Morphs, blender_morph_list, blender_mat_list)
     morph_root = make_xml_morphs(morph_list)
     morph_root.tail = "\n"
     root.append(morph_root)
@@ -871,12 +881,6 @@ def make_xml(pmx_data: pmx.Model, filepath, use_japanese_name, xml_save_versions
     #
     # Materials
     #
-
-    blender_mat_list = {
-        mat_index: Get_JP_or_EN_Name(pmx_mat.Name, pmx_mat.Name_E, use_japanese_name)
-        for (mat_index, pmx_mat) in enumerate(pmx_data.Materials)
-    }
-
     material_list = convert_material(pmx_data.Materials, blender_mat_list, pmx_data.Textures)
     material_root = make_xml_materials(material_list)
     material_root.tail = "\n"
@@ -978,7 +982,8 @@ def make_xml_pmdinfo(pmx_data: pmx.Model) -> etree.Element:
 
 
 def convert_morph(src: Iterable[PMMorph],
-                  index_dict: Dict[int, str]) -> Generator[XMLMorph, None, None]:
+                  index_dict: Dict[int, str],
+                  bone_index_dict: Dict[int, str]) -> Generator[XMLMorph, None, None]:
     # Morph
     # Name    # morph name
     # Name_E  # morph name English
@@ -994,8 +999,37 @@ def convert_morph(src: Iterable[PMMorph],
         morph.name = pmx_morph.Name.rstrip()
         morph.name_e = pmx_morph.Name_E.rstrip()
         morph.b_name = blender_morph_name
+        morph.type = pmx_morph.Type
+
+        if pmx_morph.Type == 8:
+            morph.offsets = convert_material_morph(pmx_morph.Offsets, bone_index_dict)
 
         yield morph
+
+
+def as_RGBADiff(color: mathutils.Vector) -> XMLRGBADiff:
+    return XMLRGBADiff(*(color.to_tuple()))
+
+
+def as_RGBDiff(color: mathutils.Vector) -> XMLRGBDiff:
+    return XMLRGBDiff(*(color.to_tuple()))
+
+
+def convert_material_morph(src: Iterable[PMMorphOffset], bone_index_dict: Dict[int, str]):
+    for pmx_offset in src:
+        offset = XMLMaterailMorphOffset()
+        offset.material_name = bone_index_dict[pmx_offset.Index]
+        offset.effect_type = pmx_offset.MatEffectType
+        offset.diffuse = as_RGBADiff(pmx_offset.MatDiffuse)
+        offset.speculer = as_RGBDiff(pmx_offset.MatSpeculer)
+        offset.power = pmx_offset.MatPower
+        offset.ambient = as_RGBDiff(pmx_offset.MatAmbient)
+        offset.edge_color = as_RGBADiff(pmx_offset.MatEdgeColor)
+        offset.edge_size = pmx_offset.MatEdgeSize
+        offset.texture = as_RGBADiff(pmx_offset.MatTexture)
+        offset.sphere = as_RGBADiff(pmx_offset.MatSphere)
+        offset.toon = as_RGBADiff(pmx_offset.MatToon)
+        yield offset
 
 
 def make_xml_morphs(list: Iterable[XMLMorph]) -> etree.Element:
@@ -1003,7 +1037,36 @@ def make_xml_morphs(list: Iterable[XMLMorph]) -> etree.Element:
     builder.start("morphs", {})
 
     for morph in list:
-        make_xml_self_closing_with_obj(builder, "morph", morph, 0)
+        if morph.type == 8:
+            builder.start_with_obj("morph", morph)
+            builder.new_line()
+
+            builder.data("  ")
+            builder.start("material_offsets")
+            builder.new_line()
+            for offset in morph.offsets:
+                builder.data("    ")
+                builder.start_with_obj("material_offset", offset)
+                builder.new_line()
+                make_xml_self_closing_with_obj(builder, "mat_diffuse", offset.diffuse, 3)
+                make_xml_self_closing_with_obj(builder, "mat_speculer", offset.speculer, 3)
+                make_xml_self_closing_with_obj(builder, "mat_ambient", offset.ambient, 3)
+                make_xml_self_closing_with_obj(builder, "mat_edgecolor", offset.edge_color, 3)
+                make_xml_self_closing_with_obj(builder, "mat_texture", offset.texture, 3)
+                make_xml_self_closing_with_obj(builder, "mat_sphere", offset.sphere, 3)
+                make_xml_self_closing_with_obj(builder, "mat_toon", offset.toon, 3)
+                builder.data("    ")
+                builder.end("material_offset")
+                builder.new_line()
+
+            builder.data("  ")
+            builder.end("material_offsets")
+            builder.new_line()
+
+            builder.end("morph")
+            builder.new_line()
+        else:
+            make_xml_self_closing_with_obj(builder, "morph", morph, 0)
 
     builder.end("moprh")
     morphs_elm = builder.close()
