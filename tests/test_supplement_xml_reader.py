@@ -229,6 +229,7 @@ class TestSupplementXmlReader(unittest.TestCase):
             </material_offset>
             <material_offset edge_size="0.5" effect_type="0" material_name="ddd" power="0.4">
             </material_offset>
+            <material_offset />
             </material_offsets>
             </morph>
             </morphs>
@@ -301,6 +302,11 @@ class TestSupplementXmlReader(unittest.TestCase):
         self.assertEqual(astuple(offset.texture), (0.0, 0.0, 0.0, 0.0))
         self.assertEqual(astuple(offset.sphere), (0.0, 0.0, 0.0, 0.0))
         self.assertEqual(astuple(offset.toon), (0.0, 0.0, 0.0, 0.0))
+        offset = next(iter_m_C)
+        self.assertAlmostEqual(offset.edge_size, 0.0)
+        self.assertAlmostEqual(offset.power, 0.0)
+        self.assertEqual(offset.effect_type, 0)
+        self.assertEqual(offset.material_name, None)
         with self.assertRaises(StopIteration):
             next(iter_m_C)
 

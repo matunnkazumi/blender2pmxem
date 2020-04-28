@@ -287,10 +287,13 @@ def create_material_PMMorph(xml_morph: XMLMorph,  mat_name_list: List[str]) -> p
 
     def filter_map() -> Generator[pmx.PMMorphOffset, None, None]:
         for offset in xml_morph.offsets:
-            for i, name in enumerate(mat_name_list):
-                if offset.material_name == name:
-                    yield create_material_PMMorphOffset(offset, i)
-                    break
+            if offset.material_name is not None:
+                for i, name in enumerate(mat_name_list):
+                    if offset.material_name == name:
+                        yield create_material_PMMorphOffset(offset, i)
+                        break
+            else:
+                yield create_material_PMMorphOffset(offset, -1)
 
     pm_morph = pmx.PMMorph()
     pm_morph.Name = xml_morph.name

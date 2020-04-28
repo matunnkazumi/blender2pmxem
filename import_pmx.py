@@ -983,7 +983,7 @@ def make_xml_pmdinfo(pmx_data: pmx.Model) -> etree.Element:
 
 def convert_morph(src: Iterable[PMMorph],
                   index_dict: Dict[int, str],
-                  bone_index_dict: Dict[int, str]) -> Generator[XMLMorph, None, None]:
+                  mat_index_dict: Dict[int, str]) -> Generator[XMLMorph, None, None]:
     # Morph
     # Name    # morph name
     # Name_E  # morph name English
@@ -1002,7 +1002,7 @@ def convert_morph(src: Iterable[PMMorph],
         morph.type = pmx_morph.Type
 
         if pmx_morph.Type == 8:
-            morph.offsets = convert_material_morph(pmx_morph.Offsets, bone_index_dict)
+            morph.offsets = convert_material_morph(pmx_morph.Offsets, mat_index_dict)
 
         yield morph
 
@@ -1016,10 +1016,10 @@ def as_RGBDiff(color: mathutils.Vector) -> XMLRGBDiff:
 
 
 def convert_material_morph(src: Iterable[PMMorphOffset],
-                           bone_index_dict: Dict[int, str]) -> Generator[XMLMaterialMorphOffset, None, None]:
+                           mat_index_dict: Dict[int, str]) -> Generator[XMLMaterialMorphOffset, None, None]:
     for pmx_offset in src:
         offset = XMLMaterialMorphOffset()
-        offset.material_name = bone_index_dict[pmx_offset.Index]
+        offset.material_name = mat_index_dict[pmx_offset.Index] if pmx_offset.Index != -1 else None
         offset.effect_type = pmx_offset.MatEffectType
         offset.diffuse = as_RGBADiff(pmx_offset.MatDiffuse)
         offset.speculer = as_RGBDiff(pmx_offset.MatSpeculer)

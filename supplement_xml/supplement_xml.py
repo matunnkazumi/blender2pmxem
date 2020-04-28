@@ -121,7 +121,7 @@ class RGBADiff:
 
 
 class MaterialMorphOffset:
-    material_name: str
+    material_name: Optional[str]
     effect_type: int = 0
     diffuse: RGBADiff = RGBADiff()
     speculer: RGBDiff = RGBDiff()
