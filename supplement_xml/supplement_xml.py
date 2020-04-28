@@ -11,6 +11,8 @@ from typing import Optional
 from typing import Union
 from typing import TypeVar
 from typing import Type
+from typing import Iterable
+from dataclasses import dataclass
 
 T = TypeVar('T')
 
@@ -49,13 +51,6 @@ def obj_to_elm(obj: Type[T], element: Element):
         val = getattr(obj, k)
         if val is not None:
             element.set(k, str(val))
-
-
-class Morph:
-    group: int = 4
-    name: Optional[str]
-    name_e: Optional[str]
-    b_name: str
 
 
 class EdgeColor:
@@ -108,3 +103,42 @@ class Material:
     specular: Optional[Specular]
     ambient: Optional[Ambient]
     sphere: Optional[Sphere]
+
+
+@dataclass
+class RGBDiff:
+    r: float = 0.0
+    g: float = 0.0
+    b: float = 0.0
+
+
+@dataclass
+class RGBADiff:
+    r: float = 0.0
+    g: float = 0.0
+    b: float = 0.0
+    a: float = 0.0
+
+
+class MaterialMorphOffset:
+    material_name: Optional[str]
+    effect_type: int = 0
+    diffuse: RGBADiff = RGBADiff()
+    speculer: RGBDiff = RGBDiff()
+    power: float = 0.0
+    ambient: RGBDiff = RGBDiff()
+    edge_color: RGBADiff = RGBADiff()
+    edge_size: float = 0.0
+    texture: RGBADiff = RGBADiff()
+    sphere: RGBADiff = RGBADiff()
+    toon: RGBADiff = RGBADiff()
+
+
+class Morph:
+    group: int = 4
+    name: Optional[str]
+    name_e: Optional[str]
+    b_name: str
+    type: int = 1
+
+    offsets: Iterable[MaterialMorphOffset] = []

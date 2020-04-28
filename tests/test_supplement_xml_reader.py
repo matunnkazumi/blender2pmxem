@@ -2,6 +2,7 @@ import unittest
 import os
 import shutil
 import tempfile
+from dataclasses import astuple
 
 from supplement_xml.supplement_xml_reader import SupplementXmlReader
 
@@ -174,9 +175,140 @@ class TestSupplementXmlReader(unittest.TestCase):
         self.assertEqual(element_dict['う'].group, 3)
         self.assertEqual(element_dict['え'].group, 4)
         self.assertEqual(element_dict['お'].group, 4)
+        self.assertEqual(element_dict['あ'].type, 1)
+        self.assertEqual(element_dict['い'].type, 1)
+        self.assertEqual(element_dict['う'].type, 1)
+        self.assertEqual(element_dict['え'].type, 1)
+        self.assertEqual(element_dict['お'].type, 1)
         self.assertEqual(element_dict['困る'].group, 1)
         # デフォルトXML
         self.assertEqual(element_dict['もぐもぐ'].b_name, 'もぐもぐ')
+
+    def test_morph_material_offset(self):
+        file_name = 'test.pmx'
+        file_path = os.path.join(self.test_dir, file_name)
+        xml_file_path = os.path.join(self.test_dir, 'test.xml')
+
+        with open(xml_file_path, 'w') as fp:
+            test_content = """
+            <ns0:pmxstatus xmlns:ns0="local" xml:lang="jp">
+            <morphs>
+            <morph b_name="A" group="1" name="A" name_e="A" />
+            <morph b_name="B" group="2" name="B" name_e="I" type="8">
+            <material_offsets>
+            <material_offset edge_size="0.3" effect_type="1" material_name="aaa" power="0.1">
+            <mat_diffuse a="1.0" b="3.0" g="2.0" r="1.0" />
+            <mat_speculer b="1.0" g="3.0" r="3.0" />
+            <mat_ambient b="6.0" g="5.0" r="4.0" />
+            <mat_edge_color a="2.0" b="3.0" g="4.0" r="1.0" />
+            <mat_texture a="5.0" b="4.0" g="3.0" r="2.0" />
+            <mat_sphere a="1.0" b="2.0" g="3.0" r="4.0" />
+            <mat_toon a="2.0" b="3.0" g="6.0" r="7.0" />
+            </material_offset>
+            <material_offset material_name="bbb">
+            <mat_diffuse a="1.0" b="0.0" g="0.0" r="0.0" />
+            <mat_speculer b="0.0" g="0.0" r="0.0" />
+            <mat_ambient b="0.0" g="0.0" r="0.0" />
+            <mat_edge_color a="0.0" b="0.0" g="0.0" r="0.0" />
+            <mat_texture a="0.0" b="0.0" g="0.0" r="0.0" />
+            <mat_sphere a="0.0" b="0.0" g="0.0" r="0.0" />
+            <mat_toon a="0.0" b="0.0" g="0.0" r="0.0" />
+            </material_offset>
+            </material_offsets>
+            </morph>
+            <morph b_name="C" group="3" name="C" name_e="U" type="8">
+            <material_offsets>
+            <material_offset edge_size="1.0" effect_type="1" material_name="ccc" power="0.3">
+            <mat_diffuse a="1.0" b="0.0" g="0.0" r="0.0" />
+            <mat_speculer b="0.0" g="0.0" r="0.0" />
+            <mat_ambient b="0.0" g="0.0" r="0.0" />
+            <mat_edge_color a="0.0" b="0.0" g="0.0" r="0.0" />
+            <mat_texture a="0.0" b="0.0" g="0.0" r="0.0" />
+            <mat_sphere a="0.0" b="0.0" g="0.0" r="0.0" />
+            <mat_toon a="0.0" b="0.0" g="0.0" r="0.0" />
+            </material_offset>
+            <material_offset edge_size="0.5" effect_type="0" material_name="ddd" power="0.4">
+            </material_offset>
+            <material_offset />
+            </material_offsets>
+            </morph>
+            </morphs>
+            </ns0:pmxstatus>
+            """
+            fp.write(test_content)
+
+        reader = SupplementXmlReader(file_name, file_path, True)
+        index_dict, element_dict = reader.morph()
+
+        m_A = element_dict['A']
+        m_B = element_dict['B']
+        m_C = element_dict['C']
+
+        self.assertEqual(m_A.type, 1)
+        self.assertEqual(len(m_A.offsets), 0)
+
+        iter_m_B = iter(m_B.offsets)
+        offset = next(iter_m_B)
+        self.assertEqual(m_B.type, 8)
+        self.assertAlmostEqual(offset.edge_size, 0.3)
+        self.assertAlmostEqual(offset.power, 0.1)
+        self.assertEqual(offset.effect_type, 1)
+        self.assertEqual(offset.material_name, "aaa")
+        self.assertEqual(astuple(offset.diffuse), (1.0, 2.0, 3.0, 1.0))
+        self.assertEqual(astuple(offset.speculer), (3.0, 3.0, 1.0))
+        self.assertEqual(astuple(offset.ambient), (4.0, 5.0, 6.0))
+        self.assertEqual(astuple(offset.edge_color), (1.0, 4.0, 3.0, 2.0))
+        self.assertEqual(astuple(offset.texture), (2.0, 3.0, 4.0, 5.0))
+        self.assertEqual(astuple(offset.sphere), (4.0, 3.0, 2.0, 1.0))
+        self.assertEqual(astuple(offset.toon), (7.0, 6.0, 3.0, 2.0))
+        offset = next(iter_m_B)
+        self.assertAlmostEqual(offset.edge_size, 0)
+        self.assertAlmostEqual(offset.power, 0)
+        self.assertEqual(offset.effect_type, 0)
+        self.assertEqual(offset.material_name, "bbb")
+        self.assertEqual(astuple(offset.diffuse), (0.0, 0.0, 0.0, 1.0))
+        self.assertEqual(astuple(offset.speculer), (0.0, 0.0, 0.0))
+        self.assertEqual(astuple(offset.ambient), (0.0, 0.0, 0.0))
+        self.assertEqual(astuple(offset.edge_color), (0.0, 0.0, 0.0, 0.0))
+        self.assertEqual(astuple(offset.texture), (0.0, 0.0, 0.0, 0.0))
+        self.assertEqual(astuple(offset.sphere), (0.0, 0.0, 0.0, 0.0))
+        self.assertEqual(astuple(offset.toon), (0.0, 0.0, 0.0, 0.0))
+        with self.assertRaises(StopIteration):
+            next(iter_m_B)
+
+        iter_m_C = iter(m_C.offsets)
+        offset = next(iter_m_C)
+        self.assertEqual(m_C.type, 8)
+        self.assertAlmostEqual(offset.edge_size, 1.0)
+        self.assertAlmostEqual(offset.power, 0.3)
+        self.assertEqual(offset.effect_type, 1)
+        self.assertEqual(offset.material_name, "ccc")
+        self.assertEqual(astuple(offset.diffuse), (0.0, 0.0, 0.0, 1.0))
+        self.assertEqual(astuple(offset.speculer), (0.0, 0.0, 0.0))
+        self.assertEqual(astuple(offset.ambient), (0.0, 0.0, 0.0))
+        self.assertEqual(astuple(offset.edge_color), (0.0, 0.0, 0.0, 0.0))
+        self.assertEqual(astuple(offset.texture), (0.0, 0.0, 0.0, 0.0))
+        self.assertEqual(astuple(offset.sphere), (0.0, 0.0, 0.0, 0.0))
+        self.assertEqual(astuple(offset.toon), (0.0, 0.0, 0.0, 0.0))
+        offset = next(iter_m_C)
+        self.assertAlmostEqual(offset.edge_size, 0.5)
+        self.assertAlmostEqual(offset.power, 0.4)
+        self.assertEqual(offset.effect_type, 0)
+        self.assertEqual(offset.material_name, "ddd")
+        self.assertEqual(astuple(offset.diffuse), (0.0, 0.0, 0.0, 0.0))
+        self.assertEqual(astuple(offset.speculer), (0.0, 0.0, 0.0))
+        self.assertEqual(astuple(offset.ambient), (0.0, 0.0, 0.0))
+        self.assertEqual(astuple(offset.edge_color), (0.0, 0.0, 0.0, 0.0))
+        self.assertEqual(astuple(offset.texture), (0.0, 0.0, 0.0, 0.0))
+        self.assertEqual(astuple(offset.sphere), (0.0, 0.0, 0.0, 0.0))
+        self.assertEqual(astuple(offset.toon), (0.0, 0.0, 0.0, 0.0))
+        offset = next(iter_m_C)
+        self.assertAlmostEqual(offset.edge_size, 0.0)
+        self.assertAlmostEqual(offset.power, 0.0)
+        self.assertEqual(offset.effect_type, 0)
+        self.assertEqual(offset.material_name, None)
+        with self.assertRaises(StopIteration):
+            next(iter_m_C)
 
     def test_label(self):
         file_name = 'test.pmx'

@@ -15,6 +15,7 @@ from typing import Dict
 from typing import List
 from typing import Tuple
 from typing import Optional
+from typing import Generator
 
 from . import supplement_xml
 
@@ -137,12 +138,37 @@ class SupplementXmlReader:
 
             for xml_index, morph_elm in enumerate(morph_l):
                 morph = supplement_xml.elm_to_obj(morph_elm, supplement_xml.Morph)
+                if morph.type == 8:
+                    morph.offsets = self.material_morph_offset(morph_elm)
+
                 b_name = morph.b_name
                 if b_name is not None:
                     xml_morph_index[xml_index] = b_name
                     xml_morph_list[b_name] = morph
 
         return (xml_morph_index, xml_morph_list)
+
+    def material_morph_offset(self, elm: Element) -> Generator[supplement_xml.MaterialMorphOffset, None, None]:
+
+        for offset_elm in elm.findall('material_offsets/material_offset'):
+
+            def as_color(child_name, klass):
+                child = offset_elm.find(child_name)
+                if child is None:
+                    return klass()
+                else:
+                    return supplement_xml.elm_to_obj(child, klass)
+
+            offset = supplement_xml.elm_to_obj(offset_elm, supplement_xml.MaterialMorphOffset)
+            offset.diffuse = as_color('mat_diffuse', supplement_xml.RGBADiff)
+            offset.speculer = as_color('mat_speculer', supplement_xml.RGBDiff)
+            offset.ambient = as_color('mat_ambient', supplement_xml.RGBDiff)
+            offset.edge_color = as_color('mat_edge_color', supplement_xml.RGBADiff)
+            offset.texture = as_color('mat_texture', supplement_xml.RGBADiff)
+            offset.sphere = as_color('mat_sphere', supplement_xml.RGBADiff)
+            offset.toon = as_color('mat_toon', supplement_xml.RGBADiff)
+
+            yield offset
 
     def label(self) -> List[Element]:
         return self._element_list("labels", "label")
