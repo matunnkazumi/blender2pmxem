@@ -2,23 +2,29 @@ import bpy
 import mathutils as Math
 import os
 from math import radians
+from dataclasses import astuple
 
-from bpy_extras.node_shader_utils import PrincipledBSDFWrapper
-from bpy.types import Object
-from bpy.types import Material
-from bpy.types import BlendDataObjects
-from . import pmx
-from . import object_applymodifier
-from . import global_variable
-from . import validator
-from .supplement_xml import supplement_xml_reader
-from .supplement_xml.supplement_xml import Material as XMLMaterial
 from typing import Dict
 from typing import List
 from typing import Tuple
 from typing import Optional
 from typing import Any
 from typing import Union
+from typing import Generator
+
+from bpy_extras.node_shader_utils import PrincipledBSDFWrapper
+from bpy.types import Object
+from bpy.types import Material
+from bpy.types import BlendDataObjects
+
+from . import pmx
+from . import object_applymodifier
+from . import global_variable
+from . import validator
+from .supplement_xml import supplement_xml_reader
+from .supplement_xml.supplement_xml import Material as XMLMaterial
+from .supplement_xml.supplement_xml import Morph as XMLMorph
+from .supplement_xml.supplement_xml import MaterialMorphOffset as XMLMaterialMorphOffset
 
 # global_variable
 GV = global_variable.Init()
@@ -255,6 +261,54 @@ def create_PMMaterial(mat: Material,
         pmx_mat.TextureIndex = tex_dic.setdefault(tex_path, len(tex_dic))
 
     return pmx_mat
+
+
+def as_vector(dc) -> Math.Vector:
+    return Math.Vector(astuple(dc))
+
+
+def create_material_PMMorphOffset(xml_morph_offset: XMLMaterialMorphOffset, mat_index: int) -> pmx.PMMorphOffset:
+    offset = pmx.PMMorphOffset()
+    offset.Index = mat_index
+    offset.MatEffectType = xml_morph_offset.effect_type
+    offset.MatDiffuse = as_vector(xml_morph_offset.diffuse)
+    offset.MatSpeculer = as_vector(xml_morph_offset.speculer)
+    offset.MatPower = xml_morph_offset.power
+    offset.MatAmbient = as_vector(xml_morph_offset.ambient)
+    offset.MatEdgeColor = as_vector(xml_morph_offset.edge_color)
+    offset.MatEdgeSize = xml_morph_offset.edge_size
+    offset.MatTexture = as_vector(xml_morph_offset.texture)
+    offset.MatSphere = as_vector(xml_morph_offset.sphere)
+    offset.MatToon = as_vector(xml_morph_offset.toon)
+    return offset
+
+
+def create_material_PMMorph(xml_morph: XMLMorph,  mat_name_list: List[str]) -> pmx.PMMorph:
+
+    def filter_map() -> Generator[pmx.PMMorphOffset, None, None]:
+        for offset in xml_morph.offsets:
+            for i, name in enumerate(mat_name_list):
+                if offset.material_name == name:
+                    yield create_material_PMMorphOffset(offset, i)
+                    break
+
+    pm_morph = pmx.PMMorph()
+    pm_morph.Name = xml_morph.name
+    pm_morph.Name_E = xml_morph.name_e
+    pm_morph.Panel = xml_morph.group
+    pm_morph.Type = 8
+    pm_morph.Offsets = [o for o in filter_map()]
+    return pm_morph
+
+
+def create_material_morph_dict(xml_morph_list: Dict[str, XMLMorph],
+                               mat_name_list: List[str]) -> Dict[str, pmx.PMMorph]:
+    def filter_map() -> Generator[Tuple[str, pmx.PMMorph], None, None]:
+        for k, v in xml_morph_list.items():
+            if v.type == 8:
+                yield k, create_material_PMMorph(v, mat_name_list)
+
+    return {k: v for k, v in filter_map()}
 
 
 def create_PMJoint(joint, rigid_index: Dict[str, int]) -> pmx.PMJoint:
@@ -905,6 +959,10 @@ def write_pmx_data(context, filepath="",
             print("Exported using custom normals:")
             for data in OK_normal_list:
                 print("   --> %s" % data)
+
+        # Material Morph
+        material_morph_dict = create_material_morph_dict(xml_morph_list, mat_name_List)
+        morph_list.update(material_morph_dict)
 
         # Set Face
         # print("Get Face")
