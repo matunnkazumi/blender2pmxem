@@ -1039,33 +1039,7 @@ def make_xml_morphs(list: Iterable[XMLMorph]) -> etree.Element:
 
     for morph in list:
         if morph.type == 8:
-            builder.start_with_obj("morph", morph)
-            builder.new_line()
-
-            builder.data("  ")
-            builder.start("material_offsets")
-            builder.new_line()
-            for offset in morph.offsets:
-                builder.data("    ")
-                builder.start_with_obj("material_offset", offset)
-                builder.new_line()
-                make_xml_self_closing_with_obj(builder, "mat_diffuse", offset.diffuse, 3)
-                make_xml_self_closing_with_obj(builder, "mat_speculer", offset.speculer, 3)
-                make_xml_self_closing_with_obj(builder, "mat_ambient", offset.ambient, 3)
-                make_xml_self_closing_with_obj(builder, "mat_edge_color", offset.edge_color, 3)
-                make_xml_self_closing_with_obj(builder, "mat_texture", offset.texture, 3)
-                make_xml_self_closing_with_obj(builder, "mat_sphere", offset.sphere, 3)
-                make_xml_self_closing_with_obj(builder, "mat_toon", offset.toon, 3)
-                builder.data("    ")
-                builder.end("material_offset")
-                builder.new_line()
-
-            builder.data("  ")
-            builder.end("material_offsets")
-            builder.new_line()
-
-            builder.end("morph")
-            builder.new_line()
+            make_xml_material_morph(builder, morph)
         else:
             make_xml_self_closing_with_obj(builder, "morph", morph, 0)
 
@@ -1078,6 +1052,42 @@ def make_xml_morphs(list: Iterable[XMLMorph]) -> etree.Element:
     morphs_elm.insert(0, morph_comment)
 
     return morphs_elm
+
+
+def make_xml_material_morph(builder: UtilTreeBuilder, morph: XMLMorph):
+    builder.start_with_obj("morph", morph)
+    builder.new_line()
+
+    builder.data("  ")
+    builder.start("material_offsets")
+    builder.new_line()
+    for offset in morph.offsets:
+        make_xml_material_morph_offset(builder, offset, 2)
+
+    builder.data("  ")
+    builder.end("material_offsets")
+    builder.new_line()
+
+    builder.end("morph")
+    builder.new_line()
+
+
+def make_xml_material_morph_offset(builder: UtilTreeBuilder,
+                                   offset: XMLMaterialMorphOffset,
+                                   indent_level: int):
+    builder.data("  " * indent_level)
+    builder.start_with_obj("material_offset", offset)
+    builder.new_line()
+    make_xml_self_closing_with_obj(builder, "mat_diffuse", offset.diffuse, indent_level + 1)
+    make_xml_self_closing_with_obj(builder, "mat_speculer", offset.speculer, indent_level + 1)
+    make_xml_self_closing_with_obj(builder, "mat_ambient", offset.ambient, indent_level + 1)
+    make_xml_self_closing_with_obj(builder, "mat_edge_color", offset.edge_color, indent_level + 1)
+    make_xml_self_closing_with_obj(builder, "mat_texture", offset.texture, indent_level + 1)
+    make_xml_self_closing_with_obj(builder, "mat_sphere", offset.sphere, indent_level + 1)
+    make_xml_self_closing_with_obj(builder, "mat_toon", offset.toon, indent_level + 1)
+    builder.data("  " * indent_level)
+    builder.end("material_offset")
+    builder.new_line()
 
 
 def convert_material(src: Iterable[PMMaterial],
