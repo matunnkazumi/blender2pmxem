@@ -134,6 +134,29 @@ class MaterialMorphOffset:
     toon: RGBADiff = RGBADiff()
 
 
+@dataclass
+class Move:
+    x: float = 0.0
+    y: float = 0.0
+    z: float = 0.0
+
+
+@dataclass
+class Rotate:
+    x: float = 0.0
+    y: float = 0.0
+    z: float = 0.0
+
+
+class BoneMorphOffset:
+    bone_name: str
+    move: Move = Move()
+    rotate: Rotate = Rotate()
+
+
+MorphOffsets = Union[Iterable[MaterialMorphOffset], Iterable[BoneMorphOffset]]
+
+
 class Morph:
     group: int = 4
     name: Optional[str]
@@ -141,4 +164,4 @@ class Morph:
     b_name: str
     type: int = 1
 
-    offsets: Iterable[MaterialMorphOffset] = []
+    offsets: MorphOffsets = []

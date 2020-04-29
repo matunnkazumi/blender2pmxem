@@ -310,6 +310,79 @@ class TestSupplementXmlReader(unittest.TestCase):
         with self.assertRaises(StopIteration):
             next(iter_m_C)
 
+    def test_morph_bone_offset(self):
+        file_name = 'test.pmx'
+        file_path = os.path.join(self.test_dir, file_name)
+        xml_file_path = os.path.join(self.test_dir, 'test.xml')
+
+        with open(xml_file_path, 'w') as fp:
+            test_content = """
+            <ns0:pmxstatus xmlns:ns0="local" xml:lang="jp">
+            <morphs>
+            <morph b_name="A" group="1" name="A" name_e="A" />
+            <morph b_name="B" group="2" name="B" name_e="I" type="2">
+            <bone_offsets>
+            <bone_offset bone_name="aaa">
+            <bone_move x="0.1" y="0.2" z="0.3" />
+            <bone_rotate x="0.4" y="0.5" z="0.6" />
+            </bone_offset>
+            <bone_offset bone_name="bbb">
+            <bone_move x="0.7" y="0.8" z="0.9" />
+            <bone_rotate x="1.0" y="1.1" z="1.2" />
+            </bone_offset>
+            </bone_offsets>
+            </morph>
+            <morph b_name="C" group="3" name="C" name_e="U" type="2">
+            <bone_offsets>
+            <bone_offset bone_name="ccc">
+            <bone_move x="0.0" y="0.0" z="0.0" />
+            <bone_rotate x="0.0" y="0.0" z="0.0" />
+            </bone_offset>
+            <bone_offset bone_name="ddd">
+            </bone_offset>
+            </bone_offsets>
+            </morph>
+            </morphs>
+            </ns0:pmxstatus>
+            """
+            fp.write(test_content)
+
+        reader = SupplementXmlReader(file_name, file_path, True)
+        index_dict, element_dict = reader.morph()
+
+        m_A = element_dict['A']
+        m_B = element_dict['B']
+        m_C = element_dict['C']
+
+        self.assertEqual(m_A.type, 1)
+        self.assertEqual(len(m_A.offsets), 0)
+
+        iter_m_B = iter(m_B.offsets)
+        offset = next(iter_m_B)
+        self.assertEqual(m_B.type, 2)
+        self.assertEqual(offset.bone_name, "aaa")
+        self.assertEqual(astuple(offset.move), (0.1, 0.2, 0.3))
+        self.assertEqual(astuple(offset.rotate), (0.4, 0.5, 0.6))
+        offset = next(iter_m_B)
+        self.assertEqual(offset.bone_name, "bbb")
+        self.assertEqual(astuple(offset.move), (0.7, 0.8, 0.9))
+        self.assertEqual(astuple(offset.rotate), (1.0, 1.1, 1.2))
+        with self.assertRaises(StopIteration):
+            next(iter_m_B)
+
+        iter_m_C = iter(m_C.offsets)
+        offset = next(iter_m_C)
+        self.assertEqual(m_C.type, 2)
+        self.assertEqual(offset.bone_name, "ccc")
+        self.assertEqual(astuple(offset.move), (0.0, 0.0, 0.0))
+        self.assertEqual(astuple(offset.rotate), (0.0, 0.0, 0.0))
+        offset = next(iter_m_C)
+        self.assertEqual(offset.bone_name, "ddd")
+        self.assertEqual(astuple(offset.move), (0.0, 0.0, 0.0))
+        self.assertEqual(astuple(offset.rotate), (0.0, 0.0, 0.0))
+        with self.assertRaises(StopIteration):
+            next(iter_m_C)
+
     def test_label(self):
         file_name = 'test.pmx'
         file_path = os.path.join(self.test_dir, file_name)
