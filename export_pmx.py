@@ -11,6 +11,7 @@ from typing import Optional
 from typing import Any
 from typing import Union
 from typing import Generator
+from typing import Callable
 
 from bpy_extras.node_shader_utils import PrincipledBSDFWrapper
 from bpy.types import Object
@@ -24,7 +25,10 @@ from . import validator
 from .supplement_xml import supplement_xml_reader
 from .supplement_xml.supplement_xml import Material as XMLMaterial
 from .supplement_xml.supplement_xml import Morph as XMLMorph
+from .supplement_xml.supplement_xml import MorphOffsets as XMLMorphOffsets
 from .supplement_xml.supplement_xml import MaterialMorphOffset as XMLMaterialMorphOffset
+from .supplement_xml.supplement_xml import BoneMorphOffset as XMLBoneMorphOffset
+from .supplement_xml.supplement_xml import Rotate as XMLRotate
 
 # global_variable
 GV = global_variable.Init()
@@ -265,6 +269,60 @@ def create_PMMaterial(mat: Material,
 
 def as_vector(dc) -> Math.Vector:
     return Math.Vector(astuple(dc))
+
+
+MorphOffsetConverter = Callable[[XMLMorphOffsets], Generator[pmx.PMMorphOffset, None, None]]
+
+
+def create_PMMorph(xml_morph: XMLMorph, type: int, converter: MorphOffsetConverter) -> pmx.PMMorph:
+
+    pm_morph = pmx.PMMorph()
+    pm_morph.Name = xml_morph.name
+    pm_morph.Name_E = xml_morph.name_e
+    pm_morph.Panel = xml_morph.group
+    pm_morph.Type = type
+    pm_morph.Offsets = [o for o in converter(xml_morph.offsets)]
+    return pm_morph
+
+
+def create_PMMorph_dict(xml_morph_list: Dict[str, XMLMorph],
+                        type: int,
+                        converter: MorphOffsetConverter) -> Dict[str, pmx.PMMorph]:
+
+    def filter_map() -> Generator[Tuple[str, pmx.PMMorph], None, None]:
+        for k, v in xml_morph_list.items():
+            if v.type == type:
+                yield k, create_PMMorph(v, type, converter)
+
+    return {k: v for k, v in filter_map()}
+
+
+def pmx_euler2quat(eular: XMLRotate) -> Math.Vector:
+    radian = (radians(eular.x), radians(eular.y), radians(eular.z))
+    rotate_euler = Math.Euler(radian, "ZXY")
+    rotate_quat = rotate_euler.to_quaternion()
+    return Math.Vector((rotate_quat.x, rotate_quat.y, rotate_quat.z, rotate_quat.w))
+
+
+def create_bone_PMMorphOffset(xml_morph_offset: XMLBoneMorphOffset, bone_index: int) -> pmx.PMMorphOffset:
+    offset = pmx.PMMorphOffset()
+    offset.Index = bone_index
+    offset.Move = as_vector(xml_morph_offset.move)
+    offset.Rotate = pmx_euler2quat(xml_morph_offset.rotate)
+    return offset
+
+
+def create_bone_morph_dict(xml_morph_list: Dict[str, XMLMorph],
+                           bone_name_list: List[str]) -> Dict[str, pmx.PMMorph]:
+
+    def converter(offsets) -> Generator[pmx.PMMorphOffset, None, None]:
+        for offset in offsets:
+            for i, name in enumerate(bone_name_list):
+                if offset.bone_name == name:
+                    yield create_bone_PMMorphOffset(offset, i)
+                    break
+
+    return create_PMMorph_dict(xml_morph_list, 2, converter)
 
 
 def create_material_PMMorphOffset(xml_morph_offset: XMLMaterialMorphOffset, mat_index: int) -> pmx.PMMorphOffset:
@@ -962,6 +1020,10 @@ def write_pmx_data(context, filepath="",
             print("Exported using custom normals:")
             for data in OK_normal_list:
                 print("   --> %s" % data)
+
+        # Bone Moprh
+        bone_morph_dict = create_bone_morph_dict(xml_morph_list, bone_index)
+        morph_list.update(bone_morph_dict)
 
         # Material Morph
         material_morph_dict = create_material_morph_dict(xml_morph_list, mat_name_List)
