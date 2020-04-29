@@ -18,6 +18,7 @@ from .pmx import PMMaterial
 from .pmx import PMTexture
 from .pmx import PMMorphOffset
 from .supplement_xml.supplement_xml import Morph as XMLMorph
+from .supplement_xml.supplement_xml import GroupMorphOffset as XMLGroupMorphOffset
 from .supplement_xml.supplement_xml import Move as XMLMove
 from .supplement_xml.supplement_xml import Rotate as XMLRotate
 from .supplement_xml.supplement_xml import BoneMorphOffset as XMLBoneMorphOffset
@@ -794,7 +795,8 @@ def make_xml(pmx_data: pmx.Model, filepath, use_japanese_name, xml_save_versions
     #
     # Morphs
     #
-    morph_list = convert_morph(pmx_data.Morphs, blender_morph_list, blender_mat_list, blender_bone_list)
+    morph_list = convert_morph(pmx_data.Morphs, blender_morph_list, blender_mat_list,
+                               blender_bone_list, blender_morph_list)
     morph_root = make_xml_morphs(morph_list)
     morph_root.tail = "\n"
     root.append(morph_root)
@@ -986,7 +988,8 @@ def make_xml_pmdinfo(pmx_data: pmx.Model) -> etree.Element:
 def convert_morph(src: Iterable[PMMorph],
                   index_dict: Dict[int, str],
                   mat_index_dict: Dict[int, str],
-                  bone_index_dict: Dict[int, str]) -> Generator[XMLMorph, None, None]:
+                  bone_index_dict: Dict[int, str],
+                  morph_index_dict: Dict[int, str]) -> Generator[XMLMorph, None, None]:
     # Morph
     # Name    # morph name
     # Name_E  # morph name English
@@ -1004,12 +1007,23 @@ def convert_morph(src: Iterable[PMMorph],
         morph.b_name = blender_morph_name
         morph.type = pmx_morph.Type
 
-        if pmx_morph.Type == 2:
+        if pmx_morph.Type == 0:
+            morph.offsets = convert_group_morph(pmx_morph.Offsets, morph_index_dict)
+        elif pmx_morph.Type == 2:
             morph.offsets = convert_bone_morph(pmx_morph.Offsets, bone_index_dict)
         elif pmx_morph.Type == 8:
             morph.offsets = convert_material_morph(pmx_morph.Offsets, mat_index_dict)
 
         yield morph
+
+
+def convert_group_morph(src: Iterable[PMMorphOffset],
+                        morph_index_dict: Dict[int, str]) -> Generator[XMLGroupMorphOffset, None, None]:
+    for pmx_offset in src:
+        offset = XMLGroupMorphOffset()
+        offset.morph_name = morph_index_dict[pmx_offset.Index]
+        offset.power = pmx_offset.Power
+        yield offset
 
 
 # PMX Editor の表示に合わせた クォータニオン → オイラー角変換
@@ -1064,7 +1078,9 @@ def make_xml_morphs(list: Iterable[XMLMorph]) -> etree.Element:
     builder.start("morphs", {})
 
     for morph in list:
-        if morph.type == 2:
+        if morph.type == 0:
+            make_xml_group_morph(builder, morph)
+        elif morph.type == 2:
             make_xml_bone_morph(builder, morph)
         elif morph.type == 8:
             make_xml_material_morph(builder, morph)
@@ -1080,6 +1096,31 @@ def make_xml_morphs(list: Iterable[XMLMorph]) -> etree.Element:
     morphs_elm.insert(0, morph_comment)
 
     return morphs_elm
+
+
+def make_xml_group_morph(builder: UtilTreeBuilder, morph: XMLMorph):
+    builder.start_with_obj("morph", morph)
+    builder.new_line()
+
+    builder.data("  ")
+    builder.start("group_offsets")
+    builder.new_line()
+    for offset in morph.offsets:
+        make_xml_group_morph_offset(builder, offset, 2)
+
+    builder.data("  ")
+    builder.end("group_offsets")
+    builder.new_line()
+
+    builder.end("morph")
+    builder.new_line()
+
+
+def make_xml_group_morph_offset(builder: UtilTreeBuilder,
+                                offset: XMLGroupMorphOffset,
+                                indent_level: int):
+
+    make_xml_self_closing_with_obj(builder, "group_offset", offset, indent_level)
 
 
 def make_xml_bone_morph(builder: UtilTreeBuilder, morph: XMLMorph):
