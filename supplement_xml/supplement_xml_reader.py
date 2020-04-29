@@ -138,7 +138,9 @@ class SupplementXmlReader:
 
             for xml_index, morph_elm in enumerate(morph_l):
                 morph = supplement_xml.elm_to_obj(morph_elm, supplement_xml.Morph)
-                if morph.type == 8:
+                if morph.type == 2:
+                    morph.offsets = self.bone_morph_offset(morph_elm)
+                elif morph.type == 8:
                     morph.offsets = self.material_morph_offset(morph_elm)
 
                 b_name = morph.b_name
@@ -147,6 +149,23 @@ class SupplementXmlReader:
                     xml_morph_list[b_name] = morph
 
         return (xml_morph_index, xml_morph_list)
+
+    def bone_morph_offset(self, elm: Element) -> Generator[supplement_xml.BoneMorphOffset, None, None]:
+
+        for offset_elm in elm.findall('bone_offsets/bone_offset'):
+
+            def read_child(child_name, klass):
+                child = offset_elm.find(child_name)
+                if child is None:
+                    return klass()
+                else:
+                    return supplement_xml.elm_to_obj(child, klass)
+
+            offset = supplement_xml.elm_to_obj(offset_elm, supplement_xml.BoneMorphOffset)
+            offset.move = read_child('bone_move', supplement_xml.Move)
+            offset.rotate = read_child('bone_rotate', supplement_xml.Rotate)
+
+            yield offset
 
     def material_morph_offset(self, elm: Element) -> Generator[supplement_xml.MaterialMorphOffset, None, None]:
 
