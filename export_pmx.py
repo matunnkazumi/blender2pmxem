@@ -341,10 +341,11 @@ def create_material_PMMorphOffset(xml_morph_offset: XMLMaterialMorphOffset, mat_
     return offset
 
 
-def create_material_PMMorph(xml_morph: XMLMorph,  mat_name_list: List[str]) -> pmx.PMMorph:
+def create_material_morph_dict(xml_morph_list: Dict[str, XMLMorph],
+                               mat_name_list: List[str]) -> Dict[str, pmx.PMMorph]:
 
-    def filter_map() -> Generator[pmx.PMMorphOffset, None, None]:
-        for offset in xml_morph.offsets:
+    def converter(offsets) -> Generator[pmx.PMMorphOffset, None, None]:
+        for offset in offsets:
             if offset.material_name is not None:
                 for i, name in enumerate(mat_name_list):
                     if offset.material_name == name:
@@ -353,23 +354,7 @@ def create_material_PMMorph(xml_morph: XMLMorph,  mat_name_list: List[str]) -> p
             else:
                 yield create_material_PMMorphOffset(offset, -1)
 
-    pm_morph = pmx.PMMorph()
-    pm_morph.Name = xml_morph.name
-    pm_morph.Name_E = xml_morph.name_e
-    pm_morph.Panel = xml_morph.group
-    pm_morph.Type = 8
-    pm_morph.Offsets = [o for o in filter_map()]
-    return pm_morph
-
-
-def create_material_morph_dict(xml_morph_list: Dict[str, XMLMorph],
-                               mat_name_list: List[str]) -> Dict[str, pmx.PMMorph]:
-    def filter_map() -> Generator[Tuple[str, pmx.PMMorph], None, None]:
-        for k, v in xml_morph_list.items():
-            if v.type == 8:
-                yield k, create_material_PMMorph(v, mat_name_list)
-
-    return {k: v for k, v in filter_map()}
+    return create_PMMorph_dict(xml_morph_list, 8, converter)
 
 
 def create_PMJoint(joint, rigid_index: Dict[str, int]) -> pmx.PMJoint:
