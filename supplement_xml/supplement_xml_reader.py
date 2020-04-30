@@ -140,7 +140,7 @@ class SupplementXmlReader:
                 morph = supplement_xml.elm_to_obj(morph_elm, supplement_xml.Morph)
                 if morph.type == 0:
                     morph.offsets = self.group_morph_offset(morph_elm)
-                if morph.type == 2:
+                elif morph.type == 2:
                     morph.offsets = self.bone_morph_offset(morph_elm)
                 elif morph.type == 8:
                     morph.offsets = self.material_morph_offset(morph_elm)
