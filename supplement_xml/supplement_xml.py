@@ -50,7 +50,10 @@ def obj_to_elm(obj: Type[T], element: Element):
             continue
         val = getattr(obj, k)
         if val is not None:
-            element.set(k, str(val))
+            if v in [float, Union[float, None]]:
+                element.set(k, f'{val:.8}')
+            else:
+                element.set(k, str(val))
 
 
 class EdgeColor:
