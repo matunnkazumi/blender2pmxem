@@ -47,7 +47,8 @@ translation_dict = {
         ("*", "Select %d bones"): "ボーンを%dつ選択してください",
         ("*", "'%s' No parent bone found"): "'%s' 親ボーンが見つかりませんでした",
         ("*", "'%s' No parent bone and child bone found"): "'%s' 親ボーンと子ボーンが見つかりませんでした",
-        ("*", "Morph name must be unique in PMX."): "PMXのモーフの名前が重複しています",
+        ("*", "Morph Japanese name must be unique in PMX."): "PMXのモーフの日本語名が重複しています",
+        ("*", "Morph English name must be unique in PMX."): "PMXのモーフの英語名が重複しています",
         ("*", "Bone name must be unique in PMX."): "PMXのボーンの名前が重複しています",
         ("*", "Rigid name must be unique in PMX."): "PMXの剛体の名前が重複しています",
         ("*", "Joint name must be unique in PMX."): "PMXのジョイントの名前が重複しています",
@@ -275,12 +276,15 @@ class B2PMXEM_OT_ImportBlender2Pmx(bpy.types.Operator, ImportHelper):
     def execute(self, context):
         keywords = self.as_keywords(ignore=("filter_glob", ))
 
+        prefs = context.preferences.addons[GV.FolderName].preferences
+        use_japanese_name = prefs.use_japanese_name
+
         with open(keywords['filepath'], "rb") as f:
             from . import pmx
             pmx_data = pmx.Model()
             pmx_data.Load(f)
 
-        validate_result = validator.validate_pmx(pmx_data)
+        validate_result = validator.validate_pmx(pmx_data, use_japanese_name)
         if validate_result:
             msg = '\n'.join(validate_result)
             bpy.ops.b2pmxem.multiline_message('INVOKE_DEFAULT',
@@ -577,7 +581,7 @@ class B2PMXEM_OT_SaveAsXML(bpy.types.Operator):
             pmx_data = pmx.Model()
             pmx_data.Load(f)
 
-        validate_result = validator.validate_pmx(pmx_data)
+        validate_result = validator.validate_pmx(pmx_data, use_japanese_name)
         if validate_result:
             msg = '\n'.join(validate_result)
             bpy.ops.b2pmxem.multiline_message('INVOKE_DEFAULT',
