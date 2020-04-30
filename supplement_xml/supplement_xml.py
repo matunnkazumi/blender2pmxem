@@ -105,6 +105,11 @@ class Material:
     sphere: Optional[Sphere]
 
 
+class GroupMorphOffset:
+    morph_name: str
+    power: float = 0.0
+
+
 @dataclass
 class RGBDiff:
     r: float = 0.0
@@ -154,7 +159,7 @@ class BoneMorphOffset:
     rotate: Rotate = Rotate()
 
 
-MorphOffsets = Union[Iterable[MaterialMorphOffset], Iterable[BoneMorphOffset]]
+MorphOffsets = Union[Iterable[MaterialMorphOffset], Iterable[BoneMorphOffset], Iterable[GroupMorphOffset]]
 
 
 class Morph:

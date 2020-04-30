@@ -383,6 +383,65 @@ class TestSupplementXmlReader(unittest.TestCase):
         with self.assertRaises(StopIteration):
             next(iter_m_C)
 
+    def test_morph_group_offset(self):
+        file_name = 'test.pmx'
+        file_path = os.path.join(self.test_dir, file_name)
+        xml_file_path = os.path.join(self.test_dir, 'test.xml')
+
+        with open(xml_file_path, 'w') as fp:
+            test_content = """
+            <ns0:pmxstatus xmlns:ns0="local" xml:lang="jp">
+            <morphs>
+            <morph b_name="A" group="1" name="A" name_e="A" />
+            <morph b_name="B" group="2" name="B" name_e="I" type="0">
+            <group_offsets>
+            <group_offset morph_name="aaa" power="1.0" />
+            <group_offset morph_name="bbb" power="2.0" />
+            <group_offset morph_name="ccc" power="3.0" />
+            </group_offsets>
+            </morph>
+            <morph b_name="C" group="3" name="C" name_e="U" type="0">
+            <group_offsets>
+            <group_offset morph_name="ddd" />
+            </group_offsets>
+            </morph>
+            </morphs>
+            </ns0:pmxstatus>
+            """
+            fp.write(test_content)
+
+        reader = SupplementXmlReader(file_name, file_path, True)
+        index_dict, element_dict = reader.morph()
+
+        m_A = element_dict['A']
+        m_B = element_dict['B']
+        m_C = element_dict['C']
+
+        self.assertEqual(m_A.type, 1)
+        self.assertEqual(len(m_A.offsets), 0)
+
+        iter_m_B = iter(m_B.offsets)
+        offset = next(iter_m_B)
+        self.assertEqual(m_B.type, 0)
+        self.assertEqual(offset.morph_name, "aaa")
+        self.assertAlmostEqual(offset.power, 1.0)
+        offset = next(iter_m_B)
+        self.assertEqual(offset.morph_name, "bbb")
+        self.assertAlmostEqual(offset.power, 2.0)
+        offset = next(iter_m_B)
+        self.assertEqual(offset.morph_name, "ccc")
+        self.assertAlmostEqual(offset.power, 3.0)
+        with self.assertRaises(StopIteration):
+            next(iter_m_B)
+
+        iter_m_C = iter(m_C.offsets)
+        offset = next(iter_m_C)
+        self.assertEqual(m_C.type, 0)
+        self.assertEqual(offset.morph_name, "ddd")
+        self.assertAlmostEqual(offset.power, 0.0)
+        with self.assertRaises(StopIteration):
+            next(iter_m_C)
+
     def test_label(self):
         file_name = 'test.pmx'
         file_path = os.path.join(self.test_dir, file_name)

@@ -26,6 +26,7 @@ from .supplement_xml import supplement_xml_reader
 from .supplement_xml.supplement_xml import Material as XMLMaterial
 from .supplement_xml.supplement_xml import Morph as XMLMorph
 from .supplement_xml.supplement_xml import MorphOffsets as XMLMorphOffsets
+from .supplement_xml.supplement_xml import GroupMorphOffset as XMLGroupMorphOffset
 from .supplement_xml.supplement_xml import MaterialMorphOffset as XMLMaterialMorphOffset
 from .supplement_xml.supplement_xml import BoneMorphOffset as XMLBoneMorphOffset
 from .supplement_xml.supplement_xml import Rotate as XMLRotate
@@ -297,6 +298,25 @@ def create_PMMorph_dict(xml_morph_list: Dict[str, XMLMorph],
     return {k: v for k, v in filter_map()}
 
 
+def create_group_PMMorphOffset(xml_morph_offset: XMLGroupMorphOffset, morph_index: int) -> pmx.PMMorphOffset:
+    offset = pmx.PMMorphOffset()
+    offset.Index = morph_index
+    offset.Power = xml_morph_offset.power
+    return offset
+
+
+def create_group_PMMorph(xml_morph: XMLMorph, index_dict: Dict[str, int]) -> pmx.PMMorph:
+
+    def converter(offsets) -> Generator[pmx.PMMorphOffset, None, None]:
+        for offset in offsets:
+            for name, index in index_dict.items():
+                if offset.morph_name == name:
+                    yield create_group_PMMorphOffset(offset, index)
+                    break
+
+    return create_PMMorph(xml_morph, 0, converter)
+
+
 def pmx_euler2quat(eular: XMLRotate) -> Math.Vector:
     radian = (radians(eular.x), radians(eular.y), radians(eular.z))
     rotate_euler = Math.Euler(radian, "ZXY")
@@ -355,6 +375,40 @@ def create_material_morph_dict(xml_morph_list: Dict[str, XMLMorph],
                 yield create_material_PMMorphOffset(offset, -1)
 
     return create_PMMorph_dict(xml_morph_list, 8, converter)
+
+
+def sort_and_resolve_PMMorph(xml_morph_list: Dict[str, XMLMorph],
+                             pm_morph_dict: Dict[str, pmx.PMMorph]) -> Tuple[List[pmx.PMMorph], Dict[str, int]]:
+
+    def output_morph_names_in_xml() -> Generator[str, None, None]:
+        for name, morph in xml_morph_list.items():
+            if morph.type == 0:  # Group Morph
+                yield name
+            else:
+                if name in pm_morph_dict:
+                    yield name
+
+    index_dict = {k: i for i, k in enumerate(output_morph_names_in_xml())}
+
+    def morphs_in_xml() -> Generator[pmx.PMMorph, None, None]:
+        for name in output_morph_names_in_xml():
+            xml_morph = xml_morph_list[name]
+            if xml_morph.type == 0:
+                yield create_group_PMMorph(xml_morph, index_dict)
+            else:
+                yield pm_morph_dict[name]
+
+    output_morph_names_not_in_xml = [name for name in pm_morph_dict.keys() if name not in index_dict]
+
+    def morphs_not_in_xml() -> Generator[pmx.PMMorph, None, None]:
+        for name, morph in pm_morph_dict.items():
+            if name in output_morph_names_not_in_xml:
+                yield morph
+
+    morph_list = list(morphs_in_xml()) + list(morphs_not_in_xml())
+    name_list = list(output_morph_names_in_xml()) + output_morph_names_not_in_xml
+    name_index_dict = {k: i for i, k in enumerate(name_list)}
+    return morph_list, name_index_dict
 
 
 def create_PMJoint(joint, rigid_index: Dict[str, int]) -> pmx.PMJoint:
@@ -1006,14 +1060,6 @@ def write_pmx_data(context, filepath="",
             for data in OK_normal_list:
                 print("   --> %s" % data)
 
-        # Bone Moprh
-        bone_morph_dict = create_bone_morph_dict(xml_morph_list, bone_index)
-        morph_list.update(bone_morph_dict)
-
-        # Material Morph
-        material_morph_dict = create_material_morph_dict(xml_morph_list, mat_name_List)
-        morph_list.update(material_morph_dict)
-
         # Set Face
         # print("Get Face")
         for i, mat_name in enumerate(mat_name_List):
@@ -1024,25 +1070,17 @@ def write_pmx_data(context, filepath="",
                 pmx_data.Faces.append(face)
 
         # Set Morph
-        keys = list(xml_morph_index.keys())
-        keys.sort()
-        # print(keys)
 
-        morph_tag_index = {}
-        index = 0
-        for key in keys:
-            m_name = xml_morph_index[key]
-            if m_name in morph_list.keys():
-                pmx_data.Morphs.append(morph_list[m_name])
-                morph_tag_index[m_name] = index
-                index += 1
+        # Bone Moprh
+        bone_morph_dict = create_bone_morph_dict(xml_morph_list, bone_index)
+        morph_list.update(bone_morph_dict)
 
-        for m_name, morph in morph_list.items():
-            check_index = morph_tag_index.get(m_name, -1)
-            if check_index == -1:
-                pmx_data.Morphs.append(morph)
-                morph_tag_index[m_name] = index
-                index += 1
+        # Material Morph
+        material_morph_dict = create_material_morph_dict(xml_morph_list, mat_name_List)
+        morph_list.update(material_morph_dict)
+
+        # Group Morph and set to PMX
+        pmx_data.Morphs, morph_tag_index = sort_and_resolve_PMMorph(xml_morph_list, morph_list)
 
         # Label
         # print("Get Label")
