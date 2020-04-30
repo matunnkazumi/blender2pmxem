@@ -156,15 +156,16 @@ class TestSupplementXmlReader(unittest.TestCase):
             fp.write(test_content)
 
         reader = SupplementXmlReader(file_name, file_path, True)
-        index_dict, element_dict = reader.morph()
+        element_dict = reader.morph()
+        index_order = list(element_dict.keys())
 
-        self.assertEqual(index_dict[0], 'あ')
-        self.assertEqual(index_dict[1], 'い')
-        self.assertEqual(index_dict[2], 'う')
-        self.assertEqual(index_dict[3], 'え')
-        self.assertEqual(index_dict[4], 'お')
-        self.assertEqual(index_dict[5], 'にやり')
-        self.assertEqual(index_dict[6], '困る')
+        self.assertEqual(index_order[0], 'あ')
+        self.assertEqual(index_order[1], 'い')
+        self.assertEqual(index_order[2], 'う')
+        self.assertEqual(index_order[3], 'え')
+        self.assertEqual(index_order[4], 'お')
+        self.assertEqual(index_order[5], 'にやり')
+        self.assertEqual(index_order[6], '困る')
         self.assertEqual(element_dict['あ'].b_name, 'あ')
         self.assertEqual(element_dict['い'].b_name, 'い')
         self.assertEqual(element_dict['う'].b_name, 'う')
@@ -238,7 +239,7 @@ class TestSupplementXmlReader(unittest.TestCase):
             fp.write(test_content)
 
         reader = SupplementXmlReader(file_name, file_path, True)
-        index_dict, element_dict = reader.morph()
+        element_dict = reader.morph()
 
         m_A = element_dict['A']
         m_B = element_dict['B']
@@ -348,7 +349,7 @@ class TestSupplementXmlReader(unittest.TestCase):
             fp.write(test_content)
 
         reader = SupplementXmlReader(file_name, file_path, True)
-        index_dict, element_dict = reader.morph()
+        element_dict = reader.morph()
 
         m_A = element_dict['A']
         m_B = element_dict['B']
@@ -411,7 +412,7 @@ class TestSupplementXmlReader(unittest.TestCase):
             fp.write(test_content)
 
         reader = SupplementXmlReader(file_name, file_path, True)
-        index_dict, element_dict = reader.morph()
+        element_dict = reader.morph()
 
         m_A = element_dict['A']
         m_B = element_dict['B']
