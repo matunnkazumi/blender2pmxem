@@ -117,20 +117,9 @@ class SupplementXmlReader:
         else:
             return supplement_xml.elm_to_obj(child, klass)
 
-    def morph(self) -> Tuple[Dict[int, str], Dict[str, supplement_xml.Morph]]:
+    def morph(self) -> Dict[str, supplement_xml.Morph]:
 
-        xml_morph_index = {}
         xml_morph_list = {}
-
-        if self.def_root is not None:
-            morph_root = self.def_root.find("morphs")
-            morph_l = morph_root.findall("morph") if morph_root else []
-
-            for morph_elm in morph_l:
-                morph = supplement_xml.elm_to_obj(morph_elm, supplement_xml.Morph)
-                b_name = morph.b_name
-                if b_name is not None:
-                    xml_morph_list[b_name] = morph
 
         if self.xml_root is not None:
             morph_root = self.xml_root.find("morphs")
@@ -147,10 +136,19 @@ class SupplementXmlReader:
 
                 b_name = morph.b_name
                 if b_name is not None:
-                    xml_morph_index[xml_index] = b_name
                     xml_morph_list[b_name] = morph
 
-        return (xml_morph_index, xml_morph_list)
+        if self.def_root is not None:
+            morph_root = self.def_root.find("morphs")
+            morph_l = morph_root.findall("morph") if morph_root else []
+
+            for morph_elm in morph_l:
+                morph = supplement_xml.elm_to_obj(morph_elm, supplement_xml.Morph)
+                b_name = morph.b_name
+                if b_name is not None and b_name not in xml_morph_list:
+                    xml_morph_list[b_name] = morph
+
+        return xml_morph_list
 
     def group_morph_offset(self, elm: Element) -> Generator[supplement_xml.GroupMorphOffset, None, None]:
 

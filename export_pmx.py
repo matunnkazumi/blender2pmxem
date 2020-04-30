@@ -795,7 +795,7 @@ def write_pmx_data(context, filepath="",
         morph_list = {}
 
         # read default_xml data
-        xml_morph_index, xml_morph_list = xml_reader.morph()
+        xml_morph_list = xml_reader.morph()
 
         # Vertex
         # print("Get Vertex")
