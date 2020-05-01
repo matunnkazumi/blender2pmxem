@@ -201,6 +201,9 @@ def create_PMMaterial(mat: Material,
             else:
                 pmx_mat.ToonIndex = tex_dic.setdefault(tex_path, len(tex_dic))
 
+        if temp_mat.memo:
+            pmx_mat.Comment = temp_mat.memo.replace("\n", "\r\n")
+
         pmx_mat.Both = temp_mat.both
         pmx_mat.GroundShadow = temp_mat.ground_shadow
         pmx_mat.DropShadow = temp_mat.drop_shadow

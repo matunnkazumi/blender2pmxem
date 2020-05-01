@@ -100,6 +100,7 @@ class Material:
     toon: Optional[str]
     use_systemtoon: int = 1
     power: float = 1.0
+    memo: Optional[str]
 
     edge_color: Optional[EdgeColor]
     diffuse: Optional[Diffuse]

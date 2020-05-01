@@ -1220,6 +1220,10 @@ def convert_material(src: Iterable[PMMaterial],
         material.on_edge = pmx_mat.OnEdge
         material.edge_size = pmx_mat.EdgeSize
         material.power = pmx_mat.Power
+        if pmx_mat.Comment:
+            material.memo = pmx_mat.Comment
+        else:
+            material.memo = None
 
         edge_color = XMLEdgeColor()
         edge_color.r = pmx_mat.EdgeColor.x
