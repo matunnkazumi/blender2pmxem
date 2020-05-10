@@ -1202,21 +1202,28 @@ def write_pmx_data(context, filepath="",
         GV.PrintTime(filepath, type='export')
 
     # finish notification
-    if len(OK_normal_list):
+    if use_custom_normals:
+        if len(OK_normal_list):
+            bpy.ops.b2pmxem.message(
+                'INVOKE_DEFAULT',
+                type='INFO',
+                line1="Export finished.",
+            )
+        else:
+            bpy.ops.b2pmxem.multiline_message(
+                'INVOKE_DEFAULT',
+                type='ERROR',
+                lines="\n".join(["Export finished.",
+                                 "",
+                                 "Could not use custom split normals data.",
+                                 "Enable 'Auto Smooth' option.",
+                                 "or settings of modifier is incorrect."])
+            )
+    else:
         bpy.ops.b2pmxem.message(
             'INVOKE_DEFAULT',
             type='INFO',
             line1="Export finished.",
-        )
-    elif use_custom_normals:
-        bpy.ops.b2pmxem.multiline_message(
-            'INVOKE_DEFAULT',
-            type='ERROR',
-            lines="\n".join(["Export finished.",
-                             "",
-                             "Could not use custom split normals data.",
-                             "Enable 'Auto Smooth' option.",
-                             "or settings of modifier is incorrect."])
         )
 
     return {'FINISHED'}
