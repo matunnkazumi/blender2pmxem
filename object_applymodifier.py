@@ -58,7 +58,9 @@ class Init(object):
         # hidden objects is not evaluated
         # change show, to evaluate
         prev_hide = target_obj.hide_get()
+        prev_visible = target_obj.hide_viewport
         target_obj.hide_set(False)
+        target_obj.hide_viewport = False
 
         # has shape_keys
         if shape_keys is not None:
@@ -75,6 +77,7 @@ class Init(object):
             self.MasterObj = make_evaluated_object(target_obj)
 
         # restore hide or show
+        target_obj.hide_viewport = prev_visible
         target_obj.hide_set(prev_hide)
 
     def Set_AnimData(self, pre_anim_data):
