@@ -26,6 +26,7 @@
 import bpy
 from bpy.app.translations import pgettext_iface as iface_
 from . import global_variable
+from .prop_store import PropStore
 
 # global_variable
 GV = global_variable.Init()
@@ -53,6 +54,10 @@ class Init(object):
 
     def __init__(self):
         self.MasterObj = None
+        self.PropStore = PropStore()
+
+    def finish(self):
+        self.PropStore.restore()
 
     def Set_MasterObj(self, scn, target_obj, shape_keys):
         # hidden objects is not evaluated
@@ -272,5 +277,7 @@ class B2PMXEM_OT_ApplyModifier(bpy.types.Operator):
             # remove old mesh
             bpy.data.meshes.remove(old_mesh)
             apply_mod.Remove()
+
+        apply_mod.finish()
 
         return {'FINISHED'}

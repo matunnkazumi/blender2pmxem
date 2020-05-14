@@ -1051,6 +1051,8 @@ def write_pmx_data(context, filepath="",
             if use_mesh_modifiers:
                 apply_mod.Remove()
 
+        apply_mod.finish()
+
         # print NG_object_list
         if len(NG_object_list):
             print("Doesn't have Material:")
