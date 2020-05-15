@@ -742,6 +742,8 @@ class B2PMXEM_OT_RebindArmature(bpy.types.Operator):
             bpy.data.meshes.remove(old_mesh)
             apply_mod.Remove()
 
+        apply_mod.finish()
+
         # apply pose as rest pose
         bpy.ops.pose.armature_apply()
 
