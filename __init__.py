@@ -375,7 +375,9 @@ class B2PMXEM_OT_ExportBlender2Pmx(bpy.types.Operator, ExportHelper):
 
         keywords = self.as_keywords(ignore=("check_existing", "filter_glob", ))
 
-        return export_pmx.write_pmx_data(context, **keywords)
+        ret = export_pmx.write_pmx_data(context, **keywords)
+        self.report({'INFO'}, 'Export finished.')
+        return ret
 
     def draw(self, context):
         layout = self.layout
