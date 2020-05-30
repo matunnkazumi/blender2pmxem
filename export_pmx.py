@@ -848,6 +848,9 @@ def write_pmx_data(context, filepath="",
                     )
                     mesh = e.data
 
+            # Re-calc Normals
+            mesh.calc_normals()
+
             # Custom Normals
             normals = {}
             if use_custom_normals and hasattr(mesh, "has_custom_normals"):
