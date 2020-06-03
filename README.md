@@ -17,6 +17,9 @@ https://blender2pmxem.netlify.app/
 
 それ以外の完全に新規に作成したファイルは [CC0](https://creativecommons.org/publicdomain/zero/1.0/legalcode) です。
 
+## 更新履歴
+[CHANGELOG](CHANGELOG.md)
+
 ## 進捗
 とりあえず動いているっぽい。
 
@@ -44,3 +47,4 @@ XMLファイルはインポートもしくは「XMLファイル作成」機能�
 * XML
   * ボーンの並び順をXMLの順番でエクスポートするようにしました
   * constraints要素のbody_Aとbody_Bを剛体名に変更しました
+  * 材質モーフ・ボーンモーフ・グループモーフをXMLに保存するようにしました
