@@ -1,7 +1,7 @@
 # Changelog
 変更内容はこのファイルに記載します。
 
-このフォーマットは [Keep a Changelog](https://keepachangelog.com/ja/1.0.0/) を元にしています。
+このフォーマットは [Keep a Changelog](https://keepachangelog.com/ja/1.0.0/) に従っています。
 バージョン番号は [Semantic Versioning](https://semver.org/lang/ja/spec/v2.0.0.html) を参考にしています。
 
 ## [Unreleased]
