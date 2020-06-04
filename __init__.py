@@ -29,6 +29,7 @@ bl_info = {
     "warning": "",
     "wiki_url": "https://github.com/matunnkazumi/blender2pmxem/wiki",
     "tracker_url": "https://github.com/matunnkazumi/blender2pmxem/issues",
+    "doc_url": "https://blender2pmxem.netlify.app/",
     "category": "Import-Export"
 }
 
