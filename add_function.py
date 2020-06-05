@@ -1333,8 +1333,9 @@ def rotate_pose(context, to_A_stance):
         if bone is not None:
             pose_bones.active = bone
             bpy.ops.transform.rotate(value=settings.rotShoulder * sign,
-                                     orient_axis='Y',
                                      constraint_axis=(False, True, False),
+                                     orient_axis='Y',
+                                     orient_matrix=((1, 0, 0), (0, -1, 0), (0, 0, 1)),
                                      orient_type='GLOBAL')
             bpy.ops.pose.copy()
             bpy.ops.pose.paste(flipped=True)
@@ -1349,8 +1350,9 @@ def rotate_pose(context, to_A_stance):
         if bone is not None:
             pose_bones.active = bone
             bpy.ops.transform.rotate(value=settings.rotArm * sign,
-                                     orient_axis='Y',
                                      constraint_axis=(False, True, False),
+                                     orient_axis='Y',
+                                     orient_matrix=((1, 0, 0), (0, -1, 0), (0, 0, 1)),
                                      orient_type='GLOBAL')
             bpy.ops.pose.copy()
             bpy.ops.pose.paste(flipped=True)
