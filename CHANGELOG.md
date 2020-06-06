@@ -5,6 +5,8 @@
 バージョン番号は [Semantic Versioning](https://semver.org/lang/ja/spec/v2.0.0.html) を参考にしています。
 
 ## [Unreleased]
+
+## [1.1.0] - 2020-06-06
 ### Added
 - 材質モーフをXMLに保存
 - ボーンモーフをXMLに保存
