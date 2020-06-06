@@ -17,17 +17,19 @@ from bpy.app.translations import pgettext_iface as iface_
 from glob import glob
 import os
 import bpy
+from itertools import zip_longest
 
 bl_info = {
     "name": "MMD PMX Format (Extend)",
     "author": "matunnkazumi",
-    "version": (1, 0, 5),
+    "version": (1, 1, 0),
     "blender": (2, 80, 0),
     "location": "File > Import-Export",
     "description": "Import-Export PMX model data",
     "warning": "",
     "wiki_url": "https://github.com/matunnkazumi/blender2pmxem/wiki",
     "tracker_url": "https://github.com/matunnkazumi/blender2pmxem/issues",
+    "doc_url": "https://blender2pmxem.netlify.app/",
     "category": "Import-Export"
 }
 
@@ -46,9 +48,13 @@ translation_dict = {
         ("*", "Select %d bones"): "ボーンを%dつ選択してください",
         ("*", "'%s' No parent bone found"): "'%s' 親ボーンが見つかりませんでした",
         ("*", "'%s' No parent bone and child bone found"): "'%s' 親ボーンと子ボーンが見つかりませんでした",
-        ("*", "Bone name must be unique in PMX."): "PMXのボーンの名前が重複しています",
+        ("*", "Morph Japanese name must be unique in PMX."): "PMXのモーフの日本語名が重複しています",
+        ("*", "Morph English name must be unique in PMX."): "PMXのモーフの英語名が重複しています",
+        ("*", "Bone Japanese name must be unique in PMX."): "PMXのボーンの日本語名が重複しています",
+        ("*", "Bone English name must be unique in PMX."): "PMXのボーンの英語名が重複しています",
         ("*", "Rigid name must be unique in PMX."): "PMXの剛体の名前が重複しています",
         ("*", "Joint name must be unique in PMX."): "PMXのジョイントの名前が重複しています",
+        ("*", "Morph name must be unique in XML."): "XMLのモーフの名前が重複しています",
         ("*", "Bone name must be unique in XML."): "XMLのボーンの名前が重複しています",
         ("*", "Rigid name must be unique in XML."): "XMLの剛体の名前が重複しています",
         ("*", "Joint name must be unique in XML."): "XMLのジョイントの名前が重複しています",
@@ -109,6 +115,7 @@ translation_dict = {
         ("*", "Fix bone position"): "ボーンの位置を修正する",
         ("*", "Transfer"): "転送",
         ("*", "Transfer bones and weights"): "ボーンとウェイトを転送する",
+        ("*", "Export finished."): "エクスポートが完了しました",
     }
 }
 
@@ -166,30 +173,65 @@ class Blender2PmxemProperties(bpy.types.PropertyGroup):
 class Blender2PmxemAddonPreferences(bpy.types.AddonPreferences):
     bl_idname = __name__
 
-    use_T_stance: BoolProperty(
+    use_T_stance: BoolProperty(  # type: ignore
         name="Append with T stance",
         description="Append template armature with T stance",
         default=False
     )
-    use_custom_shape: BoolProperty(
+    use_custom_shape: BoolProperty(  # type: ignore
         name="Use Custom Shape",
         description="Use Custom Shape when creating bones",
         default=False
     )
-    use_japanese_name: BoolProperty(
+    use_japanese_name: BoolProperty(  # type: ignore
         name="Use Japanese Bone name",
         description="Append template armature with Japanese bone name",
         default=False
     )
 
-    saveVersions: IntProperty(name="Save Versions", default=0, min=0, max=32)
+    saveVersions: IntProperty(  # type: ignore
+        name="Save Versions",
+        default=0,
+        min=0,
+        max=32
+    )
 
-    rotShoulder: FloatProperty(name="Shoulder", default=0.261799, min=-1.5708, max=1.5708, unit='ROTATION')
-    rotArm: FloatProperty(name="Arm", default=0.401426, min=-1.5708, max=1.5708, unit='ROTATION')
+    rotShoulder: FloatProperty(  # type: ignore
+        name="Shoulder",
+        default=0.261799,
+        min=-1.5708,
+        max=1.5708,
+        unit='ROTATION'
+    )
+    rotArm: FloatProperty(  # type: ignore
+        name="Arm",
+        default=0.401426,
+        min=-1.5708,
+        max=1.5708,
+        unit='ROTATION'
+    )
 
-    twistBones: IntProperty(name="Number", default=3, min=0, max=3)
-    autoInfluence: FloatProperty(name="Influence", default=0.5, min=-1.0, max=1.0, step=1)
-    threshold: FloatProperty(name="Threshold", default=0.01, min=0.0, max=1.0, step=0.001, precision=5)
+    twistBones: IntProperty(  # type: ignore
+        name="Number",
+        default=3,
+        min=0,
+        max=3
+    )
+    autoInfluence: FloatProperty(  # type: ignore
+        name="Influence",
+        default=0.5,
+        min=-1.0,
+        max=1.0,
+        step=1
+    )
+    threshold: FloatProperty(  # type: ignore
+        name="Threshold",
+        default=0.01,
+        min=0.0,
+        max=1.0,
+        step=0.001,
+        precision=5
+    )
 
     def draw(self, context):
         layout = self.layout
@@ -222,9 +264,12 @@ class B2PMXEM_OT_ImportBlender2Pmx(bpy.types.Operator, ImportHelper):
     # bl_options = {'PRESET'}
 
     filename_ext = ".pmx"
-    filter_glob: StringProperty(default="*.pm[dx]", options={'HIDDEN'})
+    filter_glob: StringProperty(  # type: ignore
+        default="*.pm[dx]",
+        options={'HIDDEN'}
+    )
 
-    adjust_bone_position: BoolProperty(
+    adjust_bone_position: BoolProperty(  # type: ignore
         name="Adjust bone position",
         description="Automatically adjust bone position",
         default=False
@@ -233,22 +278,20 @@ class B2PMXEM_OT_ImportBlender2Pmx(bpy.types.Operator, ImportHelper):
     def execute(self, context):
         keywords = self.as_keywords(ignore=("filter_glob", ))
 
+        prefs = context.preferences.addons[GV.FolderName].preferences
+        use_japanese_name = prefs.use_japanese_name
+
         with open(keywords['filepath'], "rb") as f:
             from . import pmx
             pmx_data = pmx.Model()
             pmx_data.Load(f)
 
-        validate_result = validator.validate_pmx(pmx_data)
+        validate_result = validator.validate_pmx(pmx_data, use_japanese_name)
         if validate_result:
-            l1 = validate_result[0]
-            l2 = validate_result[1] if len(validate_result) > 1 else ""
-            l3 = validate_result[2] if len(validate_result) > 2 else ""
-            bpy.ops.b2pmxem.message('INVOKE_DEFAULT',
-                                    type='ERROR',
-                                    line1=l1,
-                                    line2=l2,
-                                    line3=l3
-                                    )
+            msg = '\n'.join(validate_result)
+            bpy.ops.b2pmxem.multiline_message('INVOKE_DEFAULT',
+                                              type='ERROR',
+                                              lines=msg)
             return {'CANCELLED'}
 
         import_pmx.read_pmx_data(context, **keywords)
@@ -269,22 +312,27 @@ class B2PMXEM_OT_ExportBlender2Pmx(bpy.types.Operator, ExportHelper):
 
     # ExportHelper mixin class uses this
     filename_ext = ".pmx"
-    filter_glob: StringProperty(default="*.pmx", options={'HIDDEN'})
+    filter_glob: StringProperty(  # type: ignore
+        default="*.pmx",
+        options={'HIDDEN'}
+    )
 
-    encode_type: EnumProperty(items=(('OPT_Utf-8', "UTF-8", "To use UTF-8 encoding."),
-                                     ('OPT_Utf-16', "UTF-16", "To use UTF-16 encoding."),
-                                     ),
-                              name="Encode",
-                              description="Select the encoding to use",
-                              default='OPT_Utf-16'
-                              )
+    encode_type: EnumProperty(  # type: ignore
+        items=(
+            ('OPT_Utf-8', "UTF-8", "To use UTF-8 encoding."),
+            ('OPT_Utf-16', "UTF-16", "To use UTF-16 encoding."),
+        ),
+        name="Encode",
+        description="Select the encoding to use",
+        default='OPT_Utf-16'
+    )
 
-    use_mesh_modifiers: BoolProperty(
+    use_mesh_modifiers: BoolProperty(  # type: ignore
         name="Apply Modifiers",
         description="Apply modifiers (Warning, may be slow)",
         default=False,
     )
-    use_custom_normals: BoolProperty(
+    use_custom_normals: BoolProperty(  # type: ignore
         name="Custom Normals",
         description="Use custom normals",
         default=False,
@@ -328,7 +376,10 @@ class B2PMXEM_OT_ExportBlender2Pmx(bpy.types.Operator, ExportHelper):
 
         keywords = self.as_keywords(ignore=("check_existing", "filter_glob", ))
 
-        return export_pmx.write_pmx_data(context, **keywords)
+        ret = export_pmx.write_pmx_data(context, **keywords)
+        if ret == {'FINISHED'}:
+            self.report({'INFO'}, 'Export finished.')
+        return ret
 
     def draw(self, context):
         layout = self.layout
@@ -350,15 +401,23 @@ class B2PMXEM_OT_MessageOperator(bpy.types.Operator):
     bl_idname = "b2pmxem.message"
     bl_label = "B2Pmxem Message"
 
-    type: EnumProperty(
+    type: EnumProperty(  # type: ignore
         items=(
             ('ERROR', "Error", ""),
             ('INFO', "Info", ""),
         ), default='ERROR')
-    line1: StringProperty(default="")
-    line2: StringProperty(default="")
-    line3: StringProperty(default="")
-    use_console: BoolProperty(default=False)
+    line1: StringProperty(  # type: ignore
+        default=""
+    )
+    line2: StringProperty(  # type: ignore
+        default=""
+    )
+    line3: StringProperty(  # type: ignore
+        default=""
+    )
+    use_console: BoolProperty(  # type: ignore
+        default=False
+    )
 
     def execute(self, context):
         return {'FINISHED'}
@@ -389,6 +448,58 @@ class B2PMXEM_OT_MessageOperator(bpy.types.Operator):
         if self.line3:
             col.label(text=self.line3)
             print("{0:s} {1:s}".format(" " * (len(type_text)), self.line3))
+        if self.use_console:
+            col.label(text="See the console log for more information.")
+
+        layout.separator()
+
+
+#
+#   The error message operator. When invoked, pops up a dialog
+#   window with the given message for multiple lines.
+#
+class B2PMXEM_OT_MultiLineMessageOperator(bpy.types.Operator):
+    bl_idname = "b2pmxem.multiline_message"
+    bl_label = "B2Pmxem Multiline Message"
+
+    type: EnumProperty(  # type: ignore
+        items=(
+            ('ERROR', "Error", ""),
+            ('INFO', "Info", ""),
+        ), default='ERROR')
+    lines: StringProperty(  # type: ignore
+        default=""
+    )
+    use_console: BoolProperty(  # type: ignore
+        default=False
+    )
+
+    def execute(self, context):
+        return {'FINISHED'}
+
+    def invoke(self, context, event):
+        wm = context.window_manager
+        return wm.invoke_popup(self, width=360)
+
+    def draw(self, context):
+        layout = self.layout
+
+        if self.type == 'ERROR':
+            layout.label(text=iface_("Error") + ":", icon='ERROR')
+        elif self.type == 'INFO':
+            layout.label(text=iface_("Info") + ":", icon='INFO')
+
+        row = layout.split(factor=0.05)
+        row.label(text="")
+        col = row.column(align=True)
+
+        line_list = self.lines.splitlines()
+        type_text = "[{0:s}]".format(self.type)
+
+        for msg, pre in zip_longest(line_list, [type_text], fillvalue=" " * (len(type_text))):
+            col.label(text=msg)
+            print("{0:s} {1:s}".format(pre, msg))
+
         if self.use_console:
             col.label(text="See the console log for more information.")
 
@@ -447,7 +558,10 @@ class B2PMXEM_OT_SaveAsXML(bpy.types.Operator):
     bl_label = "Save As XML File"
     bl_options = {'UNDO'}
 
-    filename: StringProperty(name="Filename", default="")
+    filename: StringProperty(  # type: ignore
+        name="Filename",
+        default=""
+    )
 
     @classmethod
     def poll(cls, context):
@@ -472,17 +586,12 @@ class B2PMXEM_OT_SaveAsXML(bpy.types.Operator):
             pmx_data = pmx.Model()
             pmx_data.Load(f)
 
-        validate_result = validator.validate_pmx(pmx_data)
+        validate_result = validator.validate_pmx(pmx_data, use_japanese_name)
         if validate_result:
-            l1 = validate_result[0]
-            l2 = validate_result[1] if len(validate_result) > 1 else ""
-            l3 = validate_result[2] if len(validate_result) > 2 else ""
-            bpy.ops.b2pmxem.message('INVOKE_DEFAULT',
-                                    type='ERROR',
-                                    line1=l1,
-                                    line2=l2,
-                                    line3=l3
-                                    )
+            msg = '\n'.join(validate_result)
+            bpy.ops.b2pmxem.multiline_message('INVOKE_DEFAULT',
+                                              type='ERROR',
+                                              lines=msg)
             return {'CANCELLED'}
 
         if props.make_xml_option == 'TRANSFER':
@@ -766,6 +875,7 @@ classes = [
     B2PMXEM_OT_MakeXML,
     B2PMXEM_OT_SaveAsXML,
     B2PMXEM_OT_MessageOperator,
+    B2PMXEM_OT_MultiLineMessageOperator,
     B2PMXEM_PT_EditPanel,
     B2PMXEM_PT_PosePanel,
     B2PMXEM_PT_ObjectPanel,

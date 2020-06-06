@@ -1,6 +1,6 @@
 # blender2pmxem
 
-blender2pmxeをBlender2.80系に対応させたい(願望)
+Blender2PmxeをBlender2.80系に対応させるよ
 
 ## 概要
 
@@ -8,10 +8,17 @@ PMX形式のファイルのインポート・エクスポートを行うBlender�
 
 KAGAYAS氏の改変Blender2Pmxe([配布ミラー](https://bowlroll.net/file/145391))を、Blenderの2.80向けに改変したものです。
 
+## 使いかたなど
+
+https://blender2pmxem.netlify.app/
+
 ## ライセンス
 改変元のライセンスに従います。
 
 それ以外の完全に新規に作成したファイルは [CC0](https://creativecommons.org/publicdomain/zero/1.0/legalcode) です。
+
+## 更新履歴
+[CHANGELOG](CHANGELOG.md)
 
 ## 進捗
 とりあえず動いているっぽい。
@@ -40,3 +47,4 @@ XMLファイルはインポートもしくは「XMLファイル作成」機能�
 * XML
   * ボーンの並び順をXMLの順番でエクスポートするようにしました
   * constraints要素のbody_Aとbody_Bを剛体名に変更しました
+  * 材質モーフ・ボーンモーフ・グループモーフをXMLに保存するようにしました

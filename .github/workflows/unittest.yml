@@ -1,18 +1,18 @@
 #
-# linting.yml
+# unitttesting.yml
 #
 # These codes are licensed under CC0.
 # http://creativecommons.org/publicdomain/zero/1.0/deed.ja
 #
 
-name: lint
+name: unittest
 on:
   pull_request:
     types: [opened, synchronize]
 
 jobs:
-  lint:
-    name: Source Code Check
+  unittest:
+    name: Run Unittest
     runs-on: ubuntu-latest
     steps:
       - name: checkout
@@ -24,15 +24,5 @@ jobs:
         with:
           python-version: '3.7.x'
           architecture: 'x64'
-      - name: install lint tools
-        run: pip install flake8==3.7.9 mypy
-      - name: logging installed packages
-        run: pip freeze
-      - name: flake8
-        run: |
-          cd ../
-          flake8 --config=blender2pmxem/.pep8 blender2pmxem
-      - name: mypy
-        run: |
-          cd ../
-          mypy --no-incremental --ignore-missing-imports blender2pmxem
+      - name: unittest discoverly
+        run: python -m unittest discover tests/

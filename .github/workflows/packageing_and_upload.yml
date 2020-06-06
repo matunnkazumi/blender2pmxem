@@ -22,7 +22,7 @@ jobs:
         with:
           fetch-depth: 1
       - name: zip
-        run: zip -r blender2pmxem.zip . -x  '/*.git/*' '/*.github/*' '/*__pycache_/*' '/*.gitignore' '/*.pep8'
+        run: zip -r blender2pmxem.zip . -x  '/*.git/*' '/*.github/*' '/*__pycache_/*' '/*.gitignore' '/*.pep8' '/*tests/*' '/*.editorconfig'
       - name: upload artifact
         uses: actions/upload-artifact@master
         with:

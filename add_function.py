@@ -157,7 +157,11 @@ class B2PMXEM_OT_RenameChainToNum(bpy.types.Operator):
     bl_label = "Rename Chain to Number"
     bl_options = {'REGISTER', 'UNDO'}
 
-    reverse: BoolProperty(name="Reverse", description="Rename reverse order", default=False)
+    reverse: BoolProperty(  # type: ignore
+        name="Reverse",
+        description="Rename reverse order",
+        default=False
+    )
 
     @classmethod
     def poll(cls, context):
@@ -382,14 +386,15 @@ class B2PMXEM_OT_AddIK(bpy.types.Operator):
     bl_label = "Add IK"
     bl_options = {'REGISTER', 'UNDO'}
 
-    type: EnumProperty(
+    type: EnumProperty(  # type: ignore
         name="Type",
         items=(
             ('LEG', "Leg", ""),
             ('TOE', "Toe", ""),
             ('HAIR', "Hair", ""),
             ('NECKTIE', "Necktie", ""),
-        ))
+        )
+    )
 
     @classmethod
     def poll(cls, context):
@@ -446,7 +451,12 @@ class B2PMXEM_OT_MuteIK(bpy.types.Operator):
     bl_label = "Toggle Mute IK"
     bl_options = {'REGISTER', 'UNDO'}
 
-    flag: BoolProperty(name="Mute", description="Set Mute Flag", default=True, options={'SKIP_SAVE'})
+    flag: BoolProperty(  # type: ignore
+        name="Mute",
+        description="Set Mute Flag",
+        default=True,
+        options={'SKIP_SAVE'}
+    )
 
     @classmethod
     def poll(cls, context):
@@ -731,6 +741,8 @@ class B2PMXEM_OT_RebindArmature(bpy.types.Operator):
             # remove old mesh
             bpy.data.meshes.remove(old_mesh)
             apply_mod.Remove()
+
+        apply_mod.finish()
 
         # apply pose as rest pose
         bpy.ops.pose.armature_apply()
@@ -1155,14 +1167,15 @@ class B2PMXEM_OT_AppendTemplate(bpy.types.Operator):
     bl_label = "Append Template Armature"
     bl_options = {'REGISTER', 'UNDO'}
 
-    type: EnumProperty(
+    type: EnumProperty(  # type: ignore
         name="Type",
         items=(
             ('Type1', "Standard", ""),
             ('Type2', "Large", ""),
             ('Type3', "Small", ""),
             ('Type4', "Chibi", ""),
-        ))
+        )
+    )
 
     def execute(self, context):
         prefs = context.preferences.addons[GV.FolderName].preferences
@@ -1320,8 +1333,9 @@ def rotate_pose(context, to_A_stance):
         if bone is not None:
             pose_bones.active = bone
             bpy.ops.transform.rotate(value=settings.rotShoulder * sign,
-                                     orient_axis='Y',
                                      constraint_axis=(False, True, False),
+                                     orient_axis='Y',
+                                     orient_matrix=((1, 0, 0), (0, -1, 0), (0, 0, 1)),
                                      orient_type='GLOBAL')
             bpy.ops.pose.copy()
             bpy.ops.pose.paste(flipped=True)
@@ -1336,8 +1350,9 @@ def rotate_pose(context, to_A_stance):
         if bone is not None:
             pose_bones.active = bone
             bpy.ops.transform.rotate(value=settings.rotArm * sign,
-                                     orient_axis='Y',
                                      constraint_axis=(False, True, False),
+                                     orient_axis='Y',
+                                     orient_matrix=((1, 0, 0), (0, -1, 0), (0, 0, 1)),
                                      orient_type='GLOBAL')
             bpy.ops.pose.copy()
             bpy.ops.pose.paste(flipped=True)
@@ -1353,10 +1368,12 @@ class B2PMXEM_OT_ToStance(bpy.types.Operator):
     bl_label = "to A or T stance"
     bl_options = {'REGISTER', 'UNDO'}
 
-    to_A_stance: BoolProperty(name="to A stance",
-                              description="Rotate bones to A stance",
-                              default=True,
-                              options={'SKIP_SAVE'})
+    to_A_stance: BoolProperty(  # type: ignore
+        name="to A stance",
+        description="Rotate bones to A stance",
+        default=True,
+        options={'SKIP_SAVE'}
+    )
 
     @classmethod
     def poll(cls, context):
@@ -1374,7 +1391,11 @@ class B2PMXEM_OT_LockLoc(bpy.types.Operator):
     bl_label = "Lock Location"
     bl_options = {'REGISTER', 'UNDO'}
 
-    flag: BoolProperty(name="Lock", description="Set Lock Flag", default=True, options={'SKIP_SAVE'})
+    flag: BoolProperty(  # type: ignore
+        name="Lock",
+        description="Set Lock Flag",
+        default=True, options={'SKIP_SAVE'}
+    )
 
     @classmethod
     def poll(cls, context):
@@ -1397,7 +1418,12 @@ class B2PMXEM_OT_LockRot(bpy.types.Operator):
     bl_label = "Lock Rotation"
     bl_options = {'REGISTER', 'UNDO'}
 
-    flag: BoolProperty(name="Lock", description="Set Lock Flag", default=True, options={'SKIP_SAVE'})
+    flag: BoolProperty(  # type: ignore
+        name="Lock",
+        description="Set Lock Flag",
+        default=True,
+        options={'SKIP_SAVE'}
+    )
 
     @classmethod
     def poll(cls, context):
@@ -1421,7 +1447,12 @@ class B2PMXEM_OT_AddDriver(bpy.types.Operator):
     bl_label = "Add Shape Driver"
     bl_options = {'REGISTER', 'UNDO'}
 
-    delete: BoolProperty(name="Delete", description="Set Delete Flag", default=False, options={'SKIP_SAVE'})
+    delete: BoolProperty(  # type: ignore
+        name="Delete",
+        description="Set Delete Flag",
+        default=False,
+        options={'SKIP_SAVE'}
+    )
 
     @classmethod
     def poll(cls, context):

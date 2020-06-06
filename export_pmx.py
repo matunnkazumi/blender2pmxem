@@ -2,21 +2,34 @@ import bpy
 import mathutils as Math
 import os
 from math import radians
+from dataclasses import astuple
 
-from bpy_extras.node_shader_utils import PrincipledBSDFWrapper
-from bpy.types import Object
-from bpy.types import Material
-from bpy.types import BlendDataObjects
-from . import pmx
-from . import object_applymodifier
-from . import global_variable
-from . import validator
 from typing import Dict
 from typing import List
 from typing import Tuple
 from typing import Optional
 from typing import Any
 from typing import Union
+from typing import Generator
+from typing import Callable
+
+from bpy_extras.node_shader_utils import PrincipledBSDFWrapper
+from bpy.types import Object
+from bpy.types import Material
+from bpy.types import BlendDataObjects
+
+from . import pmx
+from . import object_applymodifier
+from . import global_variable
+from . import validator
+from .supplement_xml import supplement_xml_reader
+from .supplement_xml.supplement_xml import Material as XMLMaterial
+from .supplement_xml.supplement_xml import Morph as XMLMorph
+from .supplement_xml.supplement_xml import MorphOffsets as XMLMorphOffsets
+from .supplement_xml.supplement_xml import GroupMorphOffset as XMLGroupMorphOffset
+from .supplement_xml.supplement_xml import MaterialMorphOffset as XMLMaterialMorphOffset
+from .supplement_xml.supplement_xml import BoneMorphOffset as XMLBoneMorphOffset
+from .supplement_xml.supplement_xml import Rotate as XMLRotate
 
 # global_variable
 GV = global_variable.Init()
@@ -152,7 +165,10 @@ def tip_bone_names(bone_name: str) -> Tuple[str, str]:
     return tip_name_jp, tip_name_en
 
 
-def create_PMMaterial(mat: Material, xml_mat_list, tex_dic: Dict[str, int], filepath: str) -> pmx.PMMaterial:
+def create_PMMaterial(mat: Material,
+                      xml_mat_list: Dict[str, XMLMaterial],
+                      tex_dic: Dict[str, int],
+                      filepath: str) -> pmx.PMMaterial:
 
     principled = PrincipledBSDFWrapper(mat, is_readonly=True)
     pmx_mat = pmx.PMMaterial()
@@ -169,15 +185,15 @@ def create_PMMaterial(mat: Material, xml_mat_list, tex_dic: Dict[str, int], file
     # Load XML Status
     if pmx_mat.Name in xml_mat_list.keys():
         temp_mat = xml_mat_list[pmx_mat.Name]
-        pmx_mat.Name = temp_mat.get("name", mat.name)
-        pmx_mat.Name_E = temp_mat.get("name_e", pmx_mat.Name)
-        pmx_mat.UseSystemToon = int(temp_mat.get("use_systemtoon", "1"))
+        pmx_mat.Name = temp_mat.name if temp_mat.name is not None else mat.name
+        pmx_mat.Name_E = temp_mat.name_e if temp_mat.name_e is not None else pmx_mat.Name
+        pmx_mat.UseSystemToon = temp_mat.use_systemtoon
 
         if pmx_mat.UseSystemToon == 1:
-            pmx_mat.ToonIndex = int(temp_mat.get("toon", "0"))
+            pmx_mat.ToonIndex = int(temp_mat.toon) if temp_mat.toon is not None else 0
 
         else:
-            tex_path = temp_mat.get("toon", "toon01.bmp")
+            tex_path = temp_mat.toon if temp_mat.toon is not None else "toon01.bmp"
 
             if tex_path == "" or tex_path == "-1":
                 pmx_mat.ToonIndex = -1
@@ -185,47 +201,50 @@ def create_PMMaterial(mat: Material, xml_mat_list, tex_dic: Dict[str, int], file
             else:
                 pmx_mat.ToonIndex = tex_dic.setdefault(tex_path, len(tex_dic))
 
-        pmx_mat.Both = int(temp_mat.get("both", "0"))
-        pmx_mat.GroundShadow = int(temp_mat.get("ground_shadow", "0"))
-        pmx_mat.DropShadow = int(temp_mat.get("drop_shadow", "0"))
-        pmx_mat.OnShadow = int(temp_mat.get("on_shadow", "0"))
+        if temp_mat.memo:
+            pmx_mat.Comment = temp_mat.memo.replace("\n", "\r\n")
 
-        pmx_mat.OnEdge = int(temp_mat.get("on_edge", "0"))
-        pmx_mat.EdgeSize = float(temp_mat.get("edge_size", "1.0"))
+        pmx_mat.Both = temp_mat.both
+        pmx_mat.GroundShadow = temp_mat.ground_shadow
+        pmx_mat.DropShadow = temp_mat.drop_shadow
+        pmx_mat.OnShadow = temp_mat.on_shadow
 
-        edge_c = temp_mat.find("edge_color")
-        pmx_mat.EdgeColor = Math.Vector((float(edge_c.get("r", "0.0")),
-                                         float(edge_c.get("g", "0.0")),
-                                         float(edge_c.get("b", "0.0")),
-                                         float(edge_c.get("a", "1.0"))))
+        pmx_mat.OnEdge = temp_mat.on_edge
+        pmx_mat.EdgeSize = temp_mat.edge_size
 
-        deffuse_elm = temp_mat.find("deffuse")
+        edge_c = temp_mat.edge_color
+        if edge_c is not None:
+            pmx_mat.EdgeColor = Math.Vector((edge_c.r, edge_c.g, edge_c.b, edge_c.a))
+        else:
+            pmx_mat.EdgeColor = Math.Vector((0.0, 0.0, 0.0, 1.0))
+
+        deffuse_elm = temp_mat.diffuse
         if deffuse_elm is not None:
-            c = (float(deffuse_elm.get("r", r)),
-                 float(deffuse_elm.get("g", g)),
-                 float(deffuse_elm.get("b", b)),
-                 float(deffuse_elm.get("a", a)))
+            c = (deffuse_elm.r if deffuse_elm.r is not None else r,
+                 deffuse_elm.g if deffuse_elm.g is not None else g,
+                 deffuse_elm.b if deffuse_elm.b is not None else b,
+                 deffuse_elm.a if deffuse_elm.a is not None else a)
             xml_deffuse = Math.Vector(c)
 
-        specular_elm = temp_mat.find("specular")
+        specular_elm = temp_mat.specular
         if specular_elm is not None:
-            xml_specular = Math.Vector((float(specular_elm.get("r", "0.0")),
-                                        float(specular_elm.get("g", "0.0")),
-                                        float(specular_elm.get("b", "0.0"))))
+            xml_specular = Math.Vector((specular_elm.r,
+                                        specular_elm.g,
+                                        specular_elm.b))
 
-        ambient_elm = temp_mat.find("ambient")
+        ambient_elm = temp_mat.ambient
         if ambient_elm is not None:
-            xml_ambient = Math.Vector((float(ambient_elm.get("r", "0.0")),
-                                       float(ambient_elm.get("g", "0.0")),
-                                       float(ambient_elm.get("b", "0.0"))))
+            xml_ambient = Math.Vector((ambient_elm.r,
+                                       ambient_elm.g,
+                                       ambient_elm.b))
 
-        pmx_mat.Power = float(temp_mat.get("power", "1"))
+        pmx_mat.Power = temp_mat.power
 
-        sphere_elm = temp_mat.find("sphere")
+        sphere_elm = temp_mat.sphere
         if sphere_elm is not None:
-            path = sphere_elm.get("path")
+            path = sphere_elm.path
             pmx_mat.SphereIndex = tex_dic.setdefault(path, len(tex_dic))
-            pmx_mat.SphereType = int(sphere_elm.get("type", "0"))
+            pmx_mat.SphereType = sphere_elm.type
 
     pmx_mat.Deffuse = xml_deffuse if xml_deffuse is not None else Math.Vector((r, g, b, a))
 
@@ -250,6 +269,149 @@ def create_PMMaterial(mat: Material, xml_mat_list, tex_dic: Dict[str, int], file
         pmx_mat.TextureIndex = tex_dic.setdefault(tex_path, len(tex_dic))
 
     return pmx_mat
+
+
+def as_vector(dc) -> Math.Vector:
+    return Math.Vector(astuple(dc))
+
+
+MorphOffsetConverter = Callable[[XMLMorphOffsets], Generator[pmx.PMMorphOffset, None, None]]
+
+
+def create_PMMorph(xml_morph: XMLMorph, type: int, converter: MorphOffsetConverter) -> pmx.PMMorph:
+
+    pm_morph = pmx.PMMorph()
+    pm_morph.Name = xml_morph.name
+    pm_morph.Name_E = xml_morph.name_e
+    pm_morph.Panel = xml_morph.group
+    pm_morph.Type = type
+    pm_morph.Offsets = [o for o in converter(xml_morph.offsets)]
+    return pm_morph
+
+
+def create_PMMorph_dict(xml_morph_list: Dict[str, XMLMorph],
+                        type: int,
+                        converter: MorphOffsetConverter) -> Dict[str, pmx.PMMorph]:
+
+    def filter_map() -> Generator[Tuple[str, pmx.PMMorph], None, None]:
+        for k, v in xml_morph_list.items():
+            if v.type == type:
+                yield k, create_PMMorph(v, type, converter)
+
+    return {k: v for k, v in filter_map()}
+
+
+def create_group_PMMorphOffset(xml_morph_offset: XMLGroupMorphOffset, morph_index: int) -> pmx.PMMorphOffset:
+    offset = pmx.PMMorphOffset()
+    offset.Index = morph_index
+    offset.Power = xml_morph_offset.power
+    return offset
+
+
+def create_group_PMMorph(xml_morph: XMLMorph, index_dict: Dict[str, int]) -> pmx.PMMorph:
+
+    def converter(offsets) -> Generator[pmx.PMMorphOffset, None, None]:
+        for offset in offsets:
+            for name, index in index_dict.items():
+                if offset.morph_name == name:
+                    yield create_group_PMMorphOffset(offset, index)
+                    break
+
+    return create_PMMorph(xml_morph, 0, converter)
+
+
+def pmx_euler2quat(eular: XMLRotate) -> Math.Vector:
+    radian = (radians(eular.x), radians(eular.y), radians(eular.z))
+    rotate_euler = Math.Euler(radian, "ZXY")
+    rotate_quat = rotate_euler.to_quaternion()
+    return Math.Vector((rotate_quat.x, rotate_quat.y, rotate_quat.z, rotate_quat.w))
+
+
+def create_bone_PMMorphOffset(xml_morph_offset: XMLBoneMorphOffset, bone_index: int) -> pmx.PMMorphOffset:
+    offset = pmx.PMMorphOffset()
+    offset.Index = bone_index
+    offset.Move = as_vector(xml_morph_offset.move)
+    offset.Rotate = pmx_euler2quat(xml_morph_offset.rotate)
+    return offset
+
+
+def create_bone_morph_dict(xml_morph_list: Dict[str, XMLMorph],
+                           bone_name_list: List[str]) -> Dict[str, pmx.PMMorph]:
+
+    def converter(offsets) -> Generator[pmx.PMMorphOffset, None, None]:
+        for offset in offsets:
+            for i, name in enumerate(bone_name_list):
+                if offset.bone_name == name:
+                    yield create_bone_PMMorphOffset(offset, i)
+                    break
+
+    return create_PMMorph_dict(xml_morph_list, 2, converter)
+
+
+def create_material_PMMorphOffset(xml_morph_offset: XMLMaterialMorphOffset, mat_index: int) -> pmx.PMMorphOffset:
+    offset = pmx.PMMorphOffset()
+    offset.Index = mat_index
+    offset.MatEffectType = xml_morph_offset.effect_type
+    offset.MatDiffuse = as_vector(xml_morph_offset.diffuse)
+    offset.MatSpeculer = as_vector(xml_morph_offset.speculer)
+    offset.MatPower = xml_morph_offset.power
+    offset.MatAmbient = as_vector(xml_morph_offset.ambient)
+    offset.MatEdgeColor = as_vector(xml_morph_offset.edge_color)
+    offset.MatEdgeSize = xml_morph_offset.edge_size
+    offset.MatTexture = as_vector(xml_morph_offset.texture)
+    offset.MatSphere = as_vector(xml_morph_offset.sphere)
+    offset.MatToon = as_vector(xml_morph_offset.toon)
+    return offset
+
+
+def create_material_morph_dict(xml_morph_list: Dict[str, XMLMorph],
+                               mat_name_list: List[str]) -> Dict[str, pmx.PMMorph]:
+
+    def converter(offsets) -> Generator[pmx.PMMorphOffset, None, None]:
+        for offset in offsets:
+            if offset.material_name is not None:
+                for i, name in enumerate(mat_name_list):
+                    if offset.material_name == name:
+                        yield create_material_PMMorphOffset(offset, i)
+                        break
+            else:
+                yield create_material_PMMorphOffset(offset, -1)
+
+    return create_PMMorph_dict(xml_morph_list, 8, converter)
+
+
+def sort_and_resolve_PMMorph(xml_morph_list: Dict[str, XMLMorph],
+                             pm_morph_dict: Dict[str, pmx.PMMorph]) -> Tuple[List[pmx.PMMorph], Dict[str, int]]:
+
+    def output_morph_names_in_xml() -> Generator[str, None, None]:
+        for name, morph in xml_morph_list.items():
+            if morph.type == 0:  # Group Morph
+                yield name
+            else:
+                if name in pm_morph_dict:
+                    yield name
+
+    index_dict = {k: i for i, k in enumerate(output_morph_names_in_xml())}
+
+    def morphs_in_xml() -> Generator[pmx.PMMorph, None, None]:
+        for name in output_morph_names_in_xml():
+            xml_morph = xml_morph_list[name]
+            if xml_morph.type == 0:
+                yield create_group_PMMorph(xml_morph, index_dict)
+            else:
+                yield pm_morph_dict[name]
+
+    output_morph_names_not_in_xml = [name for name in pm_morph_dict.keys() if name not in index_dict]
+
+    def morphs_not_in_xml() -> Generator[pmx.PMMorph, None, None]:
+        for name, morph in pm_morph_dict.items():
+            if name in output_morph_names_not_in_xml:
+                yield morph
+
+    morph_list = list(morphs_in_xml()) + list(morphs_not_in_xml())
+    name_list = list(output_morph_names_in_xml()) + output_morph_names_not_in_xml
+    name_index_dict = {k: i for i, k in enumerate(name_list)}
+    return morph_list, name_index_dict
 
 
 def create_PMJoint(joint, rigid_index: Dict[str, int]) -> pmx.PMJoint:
@@ -293,62 +455,36 @@ def write_pmx_data(context, filepath="",
 
     with open(filepath, "wb") as f:
 
-        import xml.etree.ElementTree as ETree
         pmx_data = None
         pmx_data = pmx.Model()
 
         #
-        # Filepath
-        #
-        file_name = bpy.path.basename(filepath)
-
-        xml_path = os.path.splitext(filepath)[0] + ".xml"
-        has_xml_file = os.path.isfile(xml_path)
-
-        default_xml = "default_jp.xml" if use_japanese_name else "default_en.xml"
-        def_path = os.path.join(os.path.dirname(__file__), default_xml)
-        has_def_file = os.path.isfile(def_path)
-
-        #
         # XML
         #
-        def_root = ETree.parse(def_path) if has_def_file else None
-        xml_root = ETree.parse(xml_path) if has_xml_file else None
+        file_name = bpy.path.basename(filepath)
+        xml_reader = supplement_xml_reader.SupplementXmlReader(file_name, filepath, use_japanese_name)
 
-        if xml_root is None:
-            xml_root = def_root
-            has_xml_file = has_def_file
-
-        if has_xml_file and xml_root is not None:
-            validate_result = validator.validate_xml(xml_root)
+        if xml_reader.xml_root is not None:
+            validate_result = validator.validate_xml(xml_reader.xml_root)
             if validate_result:
-                l1 = validate_result[0]
-                l2 = validate_result[1] if len(validate_result) > 1 else ""
-                l3 = validate_result[2] if len(validate_result) > 2 else ""
-                bpy.ops.b2pmxem.message('INVOKE_DEFAULT',
-                                        type='ERROR',
-                                        line1=l1,
-                                        line2=l2,
-                                        line3=l3
-                                        )
+                msg = '\n'.join(validate_result)
+                bpy.ops.b2pmxem.multiline_message('INVOKE_DEFAULT',
+                                                  type='ERROR',
+                                                  lines=msg)
                 return {'CANCELLED'}
 
         #
         # Header
         #
-        if has_xml_file and xml_root is not None:
-            infonode = xml_root.find("pmdinfo")
-
+        header = xml_reader.header()
+        if header is not None:
             # Name
-            pmx_data.Name = infonode.findtext("name", file_name)
-            pmx_data.Name_E = infonode.findtext("name_e", pmx_data.Name)
+            pmx_data.Name = header.name
+            pmx_data.Name_E = header.name_e
 
             # Comment
-            pmx_data.Comment = infonode.findtext("comment", "Comment")
-            pmx_data.Comment_E = infonode.findtext("comment_e", "Comment")
-
-            pmx_data.Comment = pmx_data.Comment.replace("\n", "\r\n")
-            pmx_data.Comment_E = pmx_data.Comment_E.replace("\n", "\r\n")
+            pmx_data.Comment = header.comment
+            pmx_data.Comment_E = header.comment_e
 
         # Fixed Stats
         # print("Export to " + encode_type)
@@ -362,13 +498,7 @@ def write_pmx_data(context, filepath="",
         bpy.ops.object.mode_set(mode="EDIT", toggle=False)
 
         # read xml
-        xml_bone_list = {}
-        if has_xml_file and xml_root is not None:
-            bone_root = xml_root.find("bones")
-            bone_list = bone_root.findall("bone")
-
-            for bone in bone_list:
-                xml_bone_list[bone.get("b_name")] = bone
+        xml_bone_list = xml_reader.bone_dict()
 
         # make index
         arm_obj = bpy.context.active_object
@@ -613,16 +743,7 @@ def write_pmx_data(context, filepath="",
         bpy.ops.object.mode_set(mode="OBJECT", toggle=False)
 
         # Material Read
-        xml_mat_index = {}
-        xml_mat_list = {}
-
-        if has_xml_file and xml_root is not None:
-            mat_root = xml_root.find("materials")
-            mat_list = mat_root.findall("material")
-
-            for xml_index, mat in enumerate(mat_list):
-                xml_mat_index[xml_index] = mat.get("b_name")
-                xml_mat_list[mat.get("b_name")] = mat
+        xml_mat_index, xml_mat_list = xml_reader.material()
 
         faceTemp = {}
         tex_dic = {}
@@ -674,26 +795,10 @@ def write_pmx_data(context, filepath="",
             pmx_data.Textures[tex_index].Path = tex
 
         # Face
-        xml_morph_index = {}
-        xml_morph_list = {}
         morph_list = {}
 
         # read default_xml data
-        if has_def_file and def_root is not None:
-            morph_root = def_root.find("morphs")
-            morph_l = morph_root.findall("morph")
-
-            for morph in morph_l:
-                xml_morph_list[morph.get("b_name")] = morph
-
-        if has_xml_file and xml_root is not None:
-            morph_root = xml_root.find("morphs")
-            morph_l = morph_root.findall("morph")
-
-            for xml_index, morph in enumerate(morph_l):
-                # print(morph.get("b_name"))
-                xml_morph_index[xml_index] = morph.get("b_name")
-                xml_morph_list[morph.get("b_name")] = morph
+        xml_morph_list = xml_reader.morph()
 
         # Vertex
         # print("Get Vertex")
@@ -742,6 +847,9 @@ def write_pmx_data(context, filepath="",
                         use_console=True
                     )
                     mesh = e.data
+
+            # Re-calc Normals
+            mesh.calc_normals()
 
             # Custom Normals
             normals = {}
@@ -916,9 +1024,9 @@ def write_pmx_data(context, filepath="",
                             pmd_morph.Panel = 4  # Other
 
                         else:
-                            pmd_morph.Name = xml_morph.get("name", block.name)
-                            pmd_morph.Name_E = xml_morph.get("name_e", block.name)
-                            pmd_morph.Panel = int(xml_morph.get("group", "4"))
+                            pmd_morph.Name = xml_morph.name if xml_morph.name is not None else block.name
+                            pmd_morph.Name_E = xml_morph.name_e if xml_morph.name_e is not None else block.name
+                            pmd_morph.Panel = xml_morph.group
 
                     # calculate relative morph position
                     morph_index = 0
@@ -946,6 +1054,8 @@ def write_pmx_data(context, filepath="",
             if use_mesh_modifiers:
                 apply_mod.Remove()
 
+        apply_mod.finish()
+
         # print NG_object_list
         if len(NG_object_list):
             print("Doesn't have Material:")
@@ -957,14 +1067,6 @@ def write_pmx_data(context, filepath="",
             print("Exported using custom normals:")
             for data in OK_normal_list:
                 print("   --> %s" % data)
-        elif use_custom_normals:
-            bpy.ops.b2pmxem.message(
-                'INVOKE_DEFAULT',
-                type='ERROR',
-                line1="Could not use custom split normals data.",
-                line2="Enable 'Auto Smooth' option.",
-                line3="or settings of modifier is incorrect."
-            )
 
         # Set Face
         # print("Get Face")
@@ -976,31 +1078,22 @@ def write_pmx_data(context, filepath="",
                 pmx_data.Faces.append(face)
 
         # Set Morph
-        keys = list(xml_morph_index.keys())
-        keys.sort()
-        # print(keys)
 
-        morph_tag_index = {}
-        index = 0
-        for key in keys:
-            m_name = xml_morph_index[key]
-            if m_name in morph_list.keys():
-                pmx_data.Morphs.append(morph_list[m_name])
-                morph_tag_index[m_name] = index
-                index += 1
+        # Bone Moprh
+        bone_morph_dict = create_bone_morph_dict(xml_morph_list, bone_index)
+        morph_list.update(bone_morph_dict)
 
-        for m_name, morph in morph_list.items():
-            check_index = morph_tag_index.get(m_name, -1)
-            if check_index == -1:
-                pmx_data.Morphs.append(morph)
-                morph_tag_index[m_name] = index
-                index += 1
+        # Material Morph
+        material_morph_dict = create_material_morph_dict(xml_morph_list, mat_name_List)
+        morph_list.update(material_morph_dict)
+
+        # Group Morph and set to PMX
+        pmx_data.Morphs, morph_tag_index = sort_and_resolve_PMMorph(xml_morph_list, morph_list)
 
         # Label
         # print("Get Label")
-        if has_xml_file and xml_root is not None:
-            label_root = xml_root.find("labels")
-            label_list = label_root.findall("label")
+        if xml_reader.has_xml_file:
+            label_list = xml_reader.label()
 
             for label in label_list:
                 pmx_label = pmx.PMDisplayFrame()
@@ -1060,9 +1153,8 @@ def write_pmx_data(context, filepath="",
         # Rigid
         # print("Get Rigid")
         rigid_index = {}  # type: Dict[str, int]
-        if has_xml_file and xml_root is not None:
-            rigid_root = xml_root.find("rigid_bodies")
-            rigid_list = rigid_root.findall("rigid")
+        if xml_reader.has_xml_file:
+            rigid_list = xml_reader.rigid()
 
             for index, rigid in enumerate(rigid_list):
                 rigid_index[rigid.get("name")] = index
@@ -1102,9 +1194,8 @@ def write_pmx_data(context, filepath="",
 
         # Joint
         # print("Get Joint")
-        if has_xml_file and xml_root is not None:
-            joint_root = xml_root.find("constraints")
-            joint_list = joint_root.findall("constraint")
+        if xml_reader.has_xml_file:
+            joint_list = xml_reader.joint()
 
             for joint in joint_list:
                 pmx_joint = create_PMJoint(joint, rigid_index)
@@ -1114,6 +1205,31 @@ def write_pmx_data(context, filepath="",
 
         GV.SetVertCount(len(pmx_data.Vertices))
         GV.PrintTime(filepath, type='export')
+
+    # finish notification
+    if use_custom_normals:
+        if len(OK_normal_list):
+            bpy.ops.b2pmxem.message(
+                'INVOKE_DEFAULT',
+                type='INFO',
+                line1="Export finished.",
+            )
+        else:
+            bpy.ops.b2pmxem.multiline_message(
+                'INVOKE_DEFAULT',
+                type='ERROR',
+                lines="\n".join(["Export finished.",
+                                 "",
+                                 "Could not use custom split normals data.",
+                                 "Enable 'Auto Smooth' option.",
+                                 "or settings of modifier is incorrect."])
+            )
+    else:
+        bpy.ops.b2pmxem.message(
+            'INVOKE_DEFAULT',
+            type='INFO',
+            line1="Export finished.",
+        )
 
     return {'FINISHED'}
 
