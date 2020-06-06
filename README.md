@@ -1,6 +1,6 @@
 # blender2pmxem
 
-blender2pmxeをBlender2.80系に対応させたい(願望)
+Blender2PmxeをBlender2.80系に対応させるよ
 
 ## 概要
 
