@@ -2,6 +2,7 @@ import unittest
 
 from pmx import pmx
 
+
 class TestPmx(unittest.TestCase):
 
     def test_Model(self):
