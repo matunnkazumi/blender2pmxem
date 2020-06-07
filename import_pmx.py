@@ -12,11 +12,11 @@ import re
 from . import add_function, global_variable
 from bpy_extras.node_shader_utils import PrincipledBSDFWrapper
 
-from . import pmx
-from .pmx import PMMorph
-from .pmx import PMMaterial
-from .pmx import PMTexture
-from .pmx import PMMorphOffset
+from .pmx import pmx
+from .pmx.pmx import PMMorph
+from .pmx.pmx import PMMaterial
+from .pmx.pmx import PMTexture
+from .pmx.pmx import PMMorphOffset
 from .supplement_xml.supplement_xml import Morph as XMLMorph
 from .supplement_xml.supplement_xml import GroupMorphOffset as XMLGroupMorphOffset
 from .supplement_xml.supplement_xml import Move as XMLMove
@@ -258,7 +258,7 @@ def read_pmx_data(context, filepath="",
 
     with open(filepath, "rb") as f:
 
-        from . import pmx
+        from .pmx import pmx
         pmx_data = pmx.Model()
         pmx_data.Load(f)
 

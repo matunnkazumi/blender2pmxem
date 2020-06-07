@@ -5,7 +5,7 @@
 # http://creativecommons.org/publicdomain/zero/1.0/deed.ja
 #
 
-from . import pmx
+from .pmx import pmx
 from typing import List
 
 
