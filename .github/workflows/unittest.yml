@@ -24,5 +24,7 @@ jobs:
         with:
           python-version: '3.7.x'
           architecture: 'x64'
+      - name: install required package
+        run: pip install mathutils
       - name: unittest discoverly
         run: python -m unittest discover tests/
