@@ -6,6 +6,12 @@
 
 ## [Unreleased]
 
+## [1.1.1] - 2020-07-04
+### Fixed
+- UVの切れ目の判定を修正
+  - 差がわずかな場合は繋がっているものと扱う
+- CHANGELOG.md の記法のミスの修正
+
 ## [1.1.0] - 2020-06-06
 ### Added
 - 材質モーフをXMLに保存
@@ -76,7 +82,9 @@
   - Mat to tex
   - 陰影なしチェックボックス
 
-[Unreleased]: https://github.com/matunnkazumi/blender2pmxem/compare/1.0.5...HEAD
+[Unreleased]: https://github.com/matunnkazumi/blender2pmxem/compare/1.1.1...HEAD
+[1.1.1]: https://github.com/matunnkazumi/blender2pmxem/compare/1.1.0...1.1.1
+[1.1.0]: https://github.com/matunnkazumi/blender2pmxem/compare/1.0.5...1.1.0
 [1.0.5]: https://github.com/matunnkazumi/blender2pmxem/compare/1.0.4...1.0.5
 [1.0.4]: https://github.com/matunnkazumi/blender2pmxem/compare/1.0.3...1.0.4
 [1.0.3]: https://github.com/matunnkazumi/blender2pmxem/compare/1.0.2...1.0.3
