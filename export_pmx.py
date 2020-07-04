@@ -957,7 +957,8 @@ def write_pmx_data(context, filepath="",
                     for loop in loops:
                         temp_index = loop.vertex_index + base_vert_index
                         target_uv = uv_data[loop.index].uv
-                        vert_key = (temp_index, target_uv[0], target_uv[1])
+                        rounded_uv = [round(f, 6) for f in target_uv]
+                        vert_key = (temp_index, rounded_uv[0], rounded_uv[1])
 
                         if vert_key in vert_uv_dic.keys():
                             pass
