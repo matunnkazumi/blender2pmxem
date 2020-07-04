@@ -5,6 +5,8 @@
 バージョン番号は [Semantic Versioning](https://semver.org/lang/ja/spec/v2.0.0.html) を参考にしています。
 
 ## [Unreleased]
+### Fixed
+- CHANGELOG.md の記法のミスの修正
 
 ## [1.1.0] - 2020-06-06
 ### Added
@@ -76,7 +78,8 @@
   - Mat to tex
   - 陰影なしチェックボックス
 
-[Unreleased]: https://github.com/matunnkazumi/blender2pmxem/compare/1.0.5...HEAD
+[Unreleased]: https://github.com/matunnkazumi/blender2pmxem/compare/1.1.0...HEAD
+[1.1.0]: https://github.com/matunnkazumi/blender2pmxem/compare/1.0.5...1.1.0
 [1.0.5]: https://github.com/matunnkazumi/blender2pmxem/compare/1.0.4...1.0.5
 [1.0.4]: https://github.com/matunnkazumi/blender2pmxem/compare/1.0.3...1.0.4
 [1.0.3]: https://github.com/matunnkazumi/blender2pmxem/compare/1.0.2...1.0.3
