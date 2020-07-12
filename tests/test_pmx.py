@@ -1,5 +1,6 @@
 import unittest
 from pathlib import Path
+import lzma
 
 from pmx import pmx
 
@@ -29,10 +30,10 @@ class TestPmx(unittest.TestCase):
         self.assertEqual(len(model.SoftBodies), 0)
 
     def test_vertex_length_type2(self):
-        test_pmx = Path(__file__).parent / 'data' / 'test_02_vertex_64009.pmx'
+        test_pmx = Path(__file__).parent / 'data' / 'test_02_vertex_64009.pmx.xz'
 
         model = pmx.Model()
-        with test_pmx.open(mode="rb") as f:
+        with lzma.open(test_pmx, mode="rb") as f:
             model.Load(f)
 
         self.assertEqual(len(model.Vertices), 64010)
@@ -57,10 +58,10 @@ class TestPmx(unittest.TestCase):
         self.assertEqual(model.Faces[-1], 64000)
 
     def test_vertex_length_type4(self):
-        test_pmx = Path(__file__).parent / 'data' / 'test_02_vertex_66409.pmx'
+        test_pmx = Path(__file__).parent / 'data' / 'test_02_vertex_66409.pmx.xz'
 
         model = pmx.Model()
-        with test_pmx.open(mode="rb") as f:
+        with lzma.open(test_pmx, mode="rb") as f:
             model.Load(f)
 
         self.assertEqual(len(model.Vertices), 66049)
