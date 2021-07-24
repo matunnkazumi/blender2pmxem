@@ -809,6 +809,8 @@ def write_pmx_data(context, filepath="",
         NG_object_list = []
         OK_normal_list = []
 
+        shape_key_error = False
+
         apply_mod = object_applymodifier.Init()
 
         for mesh_obj in bpy.data.objects:
@@ -839,13 +841,7 @@ def write_pmx_data(context, filepath="",
                 try:
                     mesh = apply_mod.Get_Apply_Mesh(mesh_obj)
                 except object_applymodifier.ShapeVertexError as e:
-                    bpy.ops.b2pmxem.message(
-                        'INVOKE_DEFAULT',
-                        type='ERROR',
-                        line1="Failed to create some shape keys.",
-                        line2="maybe cause is merge vertex by Mirror modifier.",
-                        use_console=True
-                    )
+                    shape_key_error = True
                     mesh = e.data
 
             # Re-calc Normals
@@ -1208,23 +1204,13 @@ def write_pmx_data(context, filepath="",
         GV.PrintTime(filepath, type='export')
 
     # finish notification
-    if use_custom_normals:
-        if len(OK_normal_list):
-            bpy.ops.b2pmxem.message(
-                'INVOKE_DEFAULT',
-                type='INFO',
-                line1="Export finished.",
-            )
-        else:
-            bpy.ops.b2pmxem.multiline_message(
-                'INVOKE_DEFAULT',
-                type='ERROR',
-                lines="\n".join(["Export finished.",
-                                 "",
-                                 "Could not use custom split normals data.",
-                                 "Enable 'Auto Smooth' option.",
-                                 "or settings of modifier is incorrect."])
-            )
+    error, detail_messages = error_handling(use_custom_normals, OK_normal_list, shape_key_error)
+    if error:
+        bpy.ops.b2pmxem.multiline_message(
+            'INVOKE_DEFAULT',
+            type='ERROR',
+            lines="\n".join(["Export finished."] + detail_messages)
+        )
     else:
         bpy.ops.b2pmxem.message(
             'INVOKE_DEFAULT',
@@ -1233,6 +1219,27 @@ def write_pmx_data(context, filepath="",
         )
 
     return {'FINISHED'}
+
+
+def error_handling(use_custom_normals: bool, normal_list: List[str], shape_key_error: bool) -> Tuple[bool, List[str]]:
+    error = False
+    message = []
+
+    if use_custom_normals:
+        if not len(normal_list):
+            error = True
+            message.extend(["",
+                            "Could not use custom split normals data.",
+                            "Enable 'Auto Smooth' option.",
+                            "or settings of modifier is incorrect."])
+
+    if shape_key_error:
+        error = True
+        message.extend(["",
+                        "Failed to create some shape keys.",
+                        "maybe cause is merge vertex by Mirror modifier."])
+
+    return error, message
 
 
 def load_xml_bone(bone_name, xml_bone_list, bone_index):
