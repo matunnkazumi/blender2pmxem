@@ -25,7 +25,7 @@ jobs:
           python-version: '3.7.x'
           architecture: 'x64'
       - name: install lint tools
-        run: pip install flake8==3.7.9 mypy
+        run: pip install flake8==3.7.9 mypy==0.790
       - name: logging installed packages
         run: pip freeze
       - name: flake8
