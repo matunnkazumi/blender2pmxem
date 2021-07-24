@@ -172,11 +172,10 @@ class Init(object):
 
                 depsgraph = bpy.context.evaluated_depsgraph_get()
 
-                for oi in depsgraph.object_instances:
-                    oiname = oi.object.name
-                    if oiname == target_obj.name:
-                        target_obj_eval = oi.object
-                        break
+                target = [oi.object for oi in depsgraph.object_instances if oi.object.name == target_obj.name]
+                if not target:
+                    continue
+                target_obj_eval = target[0]
 
                 tmp_mesh = target_obj_eval.to_mesh()
                 new_vertex_num = len(tmp_mesh.vertices)
