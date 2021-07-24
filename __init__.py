@@ -41,6 +41,7 @@ translation_dict = {
     "ja_JP": {
         ("*", "Failed to create some shape keys."): "いくつかのシェイプキーの作成に失敗しました。",
         ("*", "maybe cause is merge vertex by Mirror modifier."): "多分原因はミラーモディファイアの頂点結合です。",
+        ("*", "or invisibled object."): "もしくは非表示になっているオブジェクトかもしれません。",
         ("*", "Could not use custom split normals data."): "カスタム分割法線データを使用できませんでした。",
         ("*", "Enable 'Auto Smooth' option."): "「自動スムーズ」オプションをONにして下さい。",
         ("*", "or settings of modifier is incorrect."): "またはモディファイアの設定が正しくありません。",

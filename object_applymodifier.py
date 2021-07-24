@@ -174,6 +174,8 @@ class Init(object):
 
                 target = [oi.object for oi in depsgraph.object_instances if oi.object.name == target_obj.name]
                 if not target:
+                    to_raise = True
+                    print("Failed to create shape key '{0:s}' by object render".format(tmp_name))
                     continue
                 target_obj_eval = target[0]
 
@@ -182,7 +184,7 @@ class Init(object):
 
                 if pre_vertex_num != new_vertex_num:
                     to_raise = True
-                    print("Failed to create shape key '{0:s}'".format(tmp_name))
+                    print("Failed to create shape key '{0:s}' by vertex number".format(tmp_name))
                     continue
 
                 # add shape_keys

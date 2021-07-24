@@ -1237,7 +1237,8 @@ def error_handling(use_custom_normals: bool, normal_list: List[str], shape_key_e
         error = True
         message.extend(["",
                         "Failed to create some shape keys.",
-                        "maybe cause is merge vertex by Mirror modifier."])
+                        "maybe cause is merge vertex by Mirror modifier.",
+                        "or invisibled object."])
 
     return error, message
 
