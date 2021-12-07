@@ -34,5 +34,5 @@ class UtilTreeBuilder(TreeBuilder):
         return elm
 
     def self_closing(self, tag_name: str) -> Element:
-        self.start(tag_name)
+        self.start(tag_name, {})
         return self.end(tag_name)
