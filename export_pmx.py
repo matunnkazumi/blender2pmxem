@@ -263,7 +263,7 @@ def create_PMMaterial(mat: Material,
         image_filepath = texture.image.filepath
 
         tex_abs_path = bpy.path.abspath(image_filepath)
-        tex_path = bpy.path.relpath(tex_abs_path, tex_base_path)
+        tex_path = bpy.path.relpath(tex_abs_path, start=tex_base_path)
         tex_path = tex_path.replace("//", "", 1)
 
         pmx_mat.TextureIndex = tex_dic.setdefault(tex_path, len(tex_dic))
