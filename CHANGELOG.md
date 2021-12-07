@@ -6,7 +6,14 @@
 
 ## [Unreleased]
 
+## [1.1.3] - 2021-12-08
+### Fixed
+- Blender 3.0で発生したエラーの対応
+  - 材質のテクスチャファイル情報のエクスポート時のエラーを修正
+  - インポートなどのXML作成時のエラーを修正
+
 ## [1.1.2] - 2021-07-24
+### Fixed
 - 非表示オブジェクトのシェイプキーのエクスポート時にエラーを修正
 - その場合、シェイプキーのエクスポートに失敗するので、メッセージを追加
 - シェイプキーのエラーメッセージのダイアログ表示がおかしいのを修正
@@ -88,6 +95,7 @@
   - 陰影なしチェックボックス
 
 [Unreleased]: https://github.com/matunnkazumi/blender2pmxem/compare/1.1.2...HEAD
+[1.1.3]: https://github.com/matunnkazumi/blender2pmxem/compare/1.1.2...1.1.3
 [1.1.2]: https://github.com/matunnkazumi/blender2pmxem/compare/1.1.1...1.1.2
 [1.1.1]: https://github.com/matunnkazumi/blender2pmxem/compare/1.1.0...1.1.1
 [1.1.0]: https://github.com/matunnkazumi/blender2pmxem/compare/1.0.5...1.1.0
