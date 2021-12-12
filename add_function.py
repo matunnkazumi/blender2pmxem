@@ -1319,7 +1319,7 @@ class B2PMXEM_OT_MirrorVertexGroup(bpy.types.Operator):
 def rotate_pose(context, to_A_stance):
     settings = context.preferences.addons[GV.FolderName].preferences
     pose_bones = context.object.data.bones
-    sign = -1 if to_A_stance else 1
+    sign = 1 if to_A_stance else -1
 
     str_shoulder = ("shoulder_L", "shoulder.L", "肩_L", "肩.L")
     str_arm = ("arm_L", "arm.L", "腕_L", "腕.L")
@@ -1335,7 +1335,7 @@ def rotate_pose(context, to_A_stance):
             bpy.ops.transform.rotate(value=settings.rotShoulder * sign,
                                      constraint_axis=(False, True, False),
                                      orient_axis='Y',
-                                     orient_matrix=((1, 0, 0), (0, -1, 0), (0, 0, 1)),
+                                     orient_matrix=((1, 0, 0), (0, 1, 0), (0, 0, 1)),
                                      orient_type='GLOBAL')
             bpy.ops.pose.copy()
             bpy.ops.pose.paste(flipped=True)
@@ -1352,7 +1352,7 @@ def rotate_pose(context, to_A_stance):
             bpy.ops.transform.rotate(value=settings.rotArm * sign,
                                      constraint_axis=(False, True, False),
                                      orient_axis='Y',
-                                     orient_matrix=((1, 0, 0), (0, -1, 0), (0, 0, 1)),
+                                     orient_matrix=((1, 0, 0), (0, 1, 0), (0, 0, 1)),
                                      orient_type='GLOBAL')
             bpy.ops.pose.copy()
             bpy.ops.pose.paste(flipped=True)
