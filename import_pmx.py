@@ -544,7 +544,6 @@ def read_pmx_data(context, filepath="",
 
         for vert_index, vert_data in enumerate(pmx_data.Vertices):
             mesh.vertices[vert_index].co = GT(vert_data.Position, GlobalMatrix)
-            mesh.vertices[vert_index].normal = GT_normal(vert_data.Normal, GlobalMatrix)
             # mesh.vertices[vert_index].uv = pmx_data.Vertices[vert_index].UV
 
             # BDEF1
