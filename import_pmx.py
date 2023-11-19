@@ -12,11 +12,11 @@ import re
 from . import add_function, global_variable
 from bpy_extras.node_shader_utils import PrincipledBSDFWrapper
 
-from . import pmx
-from .pmx import PMMorph
-from .pmx import PMMaterial
-from .pmx import PMTexture
-from .pmx import PMMorphOffset
+from .pmx import pmx
+from .pmx.pmx import PMMorph
+from .pmx.pmx import PMMaterial
+from .pmx.pmx import PMTexture
+from .pmx.pmx import PMMorphOffset
 from .supplement_xml.supplement_xml import Morph as XMLMorph
 from .supplement_xml.supplement_xml import GroupMorphOffset as XMLGroupMorphOffset
 from .supplement_xml.supplement_xml import Move as XMLMove
@@ -258,7 +258,7 @@ def read_pmx_data(context, filepath="",
 
     with open(filepath, "rb") as f:
 
-        from . import pmx
+        from .pmx import pmx
         pmx_data = pmx.Model()
         pmx_data.Load(f)
 
@@ -544,7 +544,6 @@ def read_pmx_data(context, filepath="",
 
         for vert_index, vert_data in enumerate(pmx_data.Vertices):
             mesh.vertices[vert_index].co = GT(vert_data.Position, GlobalMatrix)
-            mesh.vertices[vert_index].normal = GT_normal(vert_data.Normal, GlobalMatrix)
             # mesh.vertices[vert_index].uv = pmx_data.Vertices[vert_index].UV
 
             # BDEF1
@@ -1103,7 +1102,7 @@ def make_xml_group_morph(builder: UtilTreeBuilder, morph: XMLMorph):
     builder.new_line()
 
     builder.data("  ")
-    builder.start("group_offsets")
+    builder.start("group_offsets", {})
     builder.new_line()
     for offset in morph.offsets:
         make_xml_group_morph_offset(builder, offset, 2)
@@ -1128,7 +1127,7 @@ def make_xml_bone_morph(builder: UtilTreeBuilder, morph: XMLMorph):
     builder.new_line()
 
     builder.data("  ")
-    builder.start("bone_offsets")
+    builder.start("bone_offsets", {})
     builder.new_line()
     for offset in morph.offsets:
         make_xml_bone_morph_offset(builder, offset, 2)
@@ -1160,7 +1159,7 @@ def make_xml_material_morph(builder: UtilTreeBuilder, morph: XMLMorph):
     builder.new_line()
 
     builder.data("  ")
-    builder.start("material_offsets")
+    builder.start("material_offsets", {})
     builder.new_line()
     for offset in morph.offsets:
         make_xml_material_morph_offset(builder, offset, 2)

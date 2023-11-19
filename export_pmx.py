@@ -18,7 +18,7 @@ from bpy.types import Object
 from bpy.types import Material
 from bpy.types import BlendDataObjects
 
-from . import pmx
+from .pmx import pmx
 from . import object_applymodifier
 from . import global_variable
 from . import validator

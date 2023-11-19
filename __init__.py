@@ -22,7 +22,7 @@ from itertools import zip_longest
 bl_info = {
     "name": "MMD PMX Format (Extend)",
     "author": "matunnkazumi",
-    "version": (1, 1, 4),
+    "version": (1, 1, 5),
     "blender": (2, 80, 0),
     "location": "File > Import-Export",
     "description": "Import-Export PMX model data",
@@ -283,7 +283,7 @@ class B2PMXEM_OT_ImportBlender2Pmx(bpy.types.Operator, ImportHelper):
         use_japanese_name = prefs.use_japanese_name
 
         with open(keywords['filepath'], "rb") as f:
-            from . import pmx
+            from .pmx import pmx
             pmx_data = pmx.Model()
             pmx_data.Load(f)
 
@@ -583,7 +583,7 @@ class B2PMXEM_OT_SaveAsXML(bpy.types.Operator):
             return {'CANCELLED'}
 
         with open(filepath, "rb") as f:
-            from . import pmx
+            from .pmx import pmx
             pmx_data = pmx.Model()
             pmx_data.Load(f)
 
