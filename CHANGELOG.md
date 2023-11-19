@@ -6,6 +6,11 @@
 
 ## [Unreleased]
 
+## [1.1.5] - 2023-11-19
+### Fixed
+- Blender 2.93以降で発生したエラーの対応
+  - インポートなどのXML作成時のエラーを修正
+
 ## [1.1.4] - 2021-12-12
 ### Fixed
 - Blender 2.93, 3.0でTスタンス・Aスタンス変更がおかしくなっていたのを修正
@@ -99,7 +104,8 @@
   - Mat to tex
   - 陰影なしチェックボックス
 
-[Unreleased]: https://github.com/matunnkazumi/blender2pmxem/compare/1.1.4...HEAD
+[Unreleased]: https://github.com/matunnkazumi/blender2pmxem/compare/1.1.5...HEAD
+[1.1.5]: https://github.com/matunnkazumi/blender2pmxem/compare/1.1.4...1.1.5
 [1.1.4]: https://github.com/matunnkazumi/blender2pmxem/compare/1.1.3...1.1.4
 [1.1.3]: https://github.com/matunnkazumi/blender2pmxem/compare/1.1.2...1.1.3
 [1.1.2]: https://github.com/matunnkazumi/blender2pmxem/compare/1.1.1...1.1.2
