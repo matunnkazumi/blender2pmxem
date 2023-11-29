@@ -1105,7 +1105,7 @@ def make_xml_group_morph(builder: UtilTreeBuilder, morph: XMLMorph):
     builder.start("group_offsets", {})
     builder.new_line()
     for offset in morph.offsets:
-        make_xml_group_morph_offset(builder, offset, 2)
+        make_xml_group_morph_offset(builder, offset, 2) # type: ignore
 
     builder.data("  ")
     builder.end("group_offsets")
@@ -1130,7 +1130,7 @@ def make_xml_bone_morph(builder: UtilTreeBuilder, morph: XMLMorph):
     builder.start("bone_offsets", {})
     builder.new_line()
     for offset in morph.offsets:
-        make_xml_bone_morph_offset(builder, offset, 2)
+        make_xml_bone_morph_offset(builder, offset, 2) # type: ignore
 
     builder.data("  ")
     builder.end("bone_offsets")
@@ -1162,7 +1162,7 @@ def make_xml_material_morph(builder: UtilTreeBuilder, morph: XMLMorph):
     builder.start("material_offsets", {})
     builder.new_line()
     for offset in morph.offsets:
-        make_xml_material_morph_offset(builder, offset, 2)
+        make_xml_material_morph_offset(builder, offset, 2) # type: ignore
 
     builder.data("  ")
     builder.end("material_offsets")
